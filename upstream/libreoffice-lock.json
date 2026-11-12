@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-11-12",
+  "product": "LibreOffice",
+  "version": "26.8.3.1",
+  "channel": "fresh (26.8.x); 26.2 still reaches end of life 2026-11-30",
+  "gitTag": "libreoffice-26.8.3.1",
+  "gitTagObject": "80b13170fbe29d19ee0a7b8f56cc4cb7fe8bfcb2",
+  "gitCommit": "861effc5289d539f15c4c18d1ba8579ffd78728b",
+  "gitCommitSource": "git ls-remote --tags https://git.libreoffice.org/core (2026-11-12)",
+  "baseUrl": "https://download.documentfoundation.org/libreoffice/src/26.8.3",
+  "signingKey": {
+    "note": "LibreOffice Build Team key, stored in upstream/libreoffice-signing-key.asc (fetched from keyserver.ubuntu.com; keys.openpgp.org strips its user ID). scripts/fetch-source.sh checks every .asc with sqv and requires this exact signer fingerprint.",
+    "fingerprint": "C2839ECAD9408FBE9531C3E9F434A1EFAFEEAEA3",
+    "keyFile": "upstream/libreoffice-signing-key.asc"
+  },
+  "tarballs": [
+    {"name": "libreoffice-26.8.3.1.tar.xz", "sha256": "83006a81376988d04a73eaa4dcf44f6f12774a81fd763726406a831905a9de28", "size": 303031904, "required": true},
+    {"name": "libreoffice-translations-26.8.3.1.tar.xz", "sha256": "22c191a11907d1c449f27aa2ca976e02abdd98eaf59f823ecf8b35609bf838f0", "size": 236367940, "required": true},
+    {"name": "libreoffice-dictionaries-26.8.3.1.tar.xz", "sha256": "62652a9ff21dc04f76042c72034d6920db9b054d56b4fa72151d031daaa92164", "size": 62442836, "required": true},
+    {"name": "libreoffice-help-26.8.3.1.tar.xz", "sha256": "efb82de9a87daa6bfdc4b3a9bb1c255476f21c6fe5cb8fb7bd6217e6082c72b8", "size": 53513212, "required": false}
+  ],
+  "hashSource": "SHA-256 listed on the download.documentfoundation.org .mirrorlist pages (2026-11-12)"
+}

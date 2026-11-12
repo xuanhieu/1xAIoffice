@@ -1,0 +1,87 @@
+tab,group,label_vi,word_label,command
+Trang đầu,Bảng tạm,Dán,Paste,.uno:Paste
+Trang đầu,Bảng tạm,Cắt,Cut,.uno:Cut
+Trang đầu,Bảng tạm,Sao chép,Copy,.uno:Copy
+Trang đầu,Bảng tạm,Sao định dạng,Format Painter,.uno:FormatPaintbrush
+Trang đầu,Phông chữ,Phông chữ,Font,.uno:CharFontName
+Trang đầu,Phông chữ,Cỡ chữ,Font Size,.uno:FontHeight
+Trang đầu,Phông chữ,Tăng cỡ chữ,Grow Font,.uno:Grow
+Trang đầu,Phông chữ,Giảm cỡ chữ,Shrink Font,.uno:Shrink
+Trang đầu,Phông chữ,Đổi kiểu chữ hoa thường,Change Case,.uno:ChangeCaseRotateCase
+Trang đầu,Phông chữ,Xoá định dạng,Clear All Formatting,.uno:ResetAttributes
+Trang đầu,Phông chữ,Đậm,Bold,.uno:Bold
+Trang đầu,Phông chữ,Nghiêng,Italic,.uno:Italic
+Trang đầu,Phông chữ,Gạch chân,Underline,.uno:Underline
+Trang đầu,Phông chữ,Gạch ngang,Strikethrough,.uno:Strikeout
+Trang đầu,Phông chữ,Chỉ số dưới,Subscript,.uno:SubScript
+Trang đầu,Phông chữ,Chỉ số trên,Superscript,.uno:SuperScript
+Trang đầu,Phông chữ,Màu tô sáng,Text Highlight Color,.uno:CharBackColor
+Trang đầu,Phông chữ,Màu chữ,Font Color,.uno:FontColor|.uno:Color
+Trang đầu,Đoạn văn,Dấu đầu dòng,Bullets,.uno:DefaultBullet
+Trang đầu,Đoạn văn,Đánh số,Numbering,.uno:DefaultNumbering
+Trang đầu,Đoạn văn,Danh sách nhiều cấp,Multilevel List,.uno:SetOutline
+Trang đầu,Đoạn văn,Giảm thụt lề,Decrease Indent,.uno:DecrementIndent
+Trang đầu,Đoạn văn,Tăng thụt lề,Increase Indent,.uno:IncrementIndent
+Trang đầu,Đoạn văn,Sắp xếp,Sort,.uno:SortDialog
+Trang đầu,Đoạn văn,Hiện ký hiệu định dạng,Show/Hide ¶,.uno:ControlCodes
+Trang đầu,Đoạn văn,Căn trái,Align Left,.uno:StartPara|.uno:LeftPara
+Trang đầu,Đoạn văn,Căn giữa,Center,.uno:CenterPara
+Trang đầu,Đoạn văn,Căn phải,Align Right,.uno:EndPara|.uno:RightPara
+Trang đầu,Đoạn văn,Căn đều hai bên,Justify,.uno:JustifyPara
+Trang đầu,Đoạn văn,Giãn dòng,Line and Paragraph Spacing,.uno:LineSpacing
+Trang đầu,Đoạn văn,Tô nền đoạn,Shading,.uno:BackgroundColor
+Trang đầu,Đoạn văn,Đường viền,Borders,.uno:SetBorderStyle
+Trang đầu,Kiểu,Bộ sưu tập kiểu,Styles,.uno:StylesPreview|.uno:StyleApply
+Trang đầu,Chỉnh sửa,Tìm và thay thế,Find / Replace,.uno:SearchDialog
+Trang đầu,Chỉnh sửa,Chọn tất cả,Select All,.uno:SelectAll
+Chèn,Trang,Ngắt trang,Page Break,.uno:InsertPagebreak
+Chèn,Bảng,Bảng,Table,.uno:InsertTable
+Chèn,Minh hoạ,Ảnh,Pictures,.uno:InsertGraphic
+Chèn,Minh hoạ,Biểu đồ,Chart,.uno:InsertObjectChart
+Chèn,Liên kết,Liên kết,Link,.uno:HyperlinkDialog
+Chèn,Liên kết,Dấu trang,Bookmark,.uno:InsertBookmark
+Chèn,Liên kết,Tham chiếu chéo,Cross-reference,.uno:InsertReferenceField
+Chèn,Chú thích,Chú thích,Comment,.uno:InsertAnnotation
+Chèn,Đầu trang và chân trang,Đầu trang,Header,.uno:InsertPageHeader|.uno:UseHeaderFooterMenu
+Chèn,Đầu trang và chân trang,Chân trang,Footer,.uno:InsertPageFooter|.uno:UseHeaderFooterMenu
+Chèn,Đầu trang và chân trang,Số trang,Page Number,.uno:InsertPageNumberField
+Chèn,Văn bản,Hộp văn bản,Text Box,.uno:DrawText
+Chèn,Văn bản,Chữ nghệ thuật,WordArt,.uno:FontworkGalleryFloater
+Chèn,Văn bản,Dòng chữ ký,Signature Line,.uno:InsertSignatureLine
+Chèn,Văn bản,Ngày và giờ,Date & Time,.uno:InsertDateField
+Chèn,Ký hiệu,Công thức,Equation,.uno:InsertObjectStarMath
+Chèn,Ký hiệu,Ký hiệu,Symbol,.uno:CharmapControl
+Thiết kế,Nền trang,Hình mờ,Watermark,.uno:Watermark
+Bố cục,Thiết lập trang,Lề,Margins,.uno:PageMargin
+Bố cục,Thiết lập trang,Hướng giấy,Orientation,.uno:Orientation
+Bố cục,Thiết lập trang,Cột,Columns,.uno:PageColumnDialog
+Bố cục,Thiết lập trang,Ngắt,Breaks,.uno:InsertBreak
+Bố cục,Thiết lập trang,Ngắt từ,Hyphenation,.uno:Hyphenate
+Bố cục,Thiết lập trang,Thiết lập trang,Page Setup,.uno:PageDialog
+Bố cục,Sắp xếp,Bao quanh văn bản,Wrap Text,.uno:WrapMenu|.uno:TextWrap
+Bố cục,Sắp xếp,Đưa lên trước,Bring Forward,.uno:BringToFront
+Bố cục,Sắp xếp,Đưa ra sau,Send Backward,.uno:SendToBack
+Tham chiếu,Mục lục,Mục lục,Table of Contents,.uno:InsertMultiIndex
+Tham chiếu,Mục lục,Cập nhật bảng,Update Table,.uno:UpdateAll
+Tham chiếu,Chú thích cuối,Chèn chú thích cuối trang,Insert Footnote,.uno:InsertFootnote
+Tham chiếu,Chú thích cuối,Chèn chú thích cuối văn bản,Insert Endnote,.uno:InsertEndnote
+Tham chiếu,Trích dẫn,Chèn trích dẫn,Insert Citation,.uno:InsertAuthoritiesEntry
+Tham chiếu,Chú thích hình,Chèn chú thích hình,Insert Caption,.uno:InsertCaptionDialog
+Thư,Bắt đầu trộn thư,Trộn thư,Start Mail Merge,.uno:MailMergeWizard
+Xem lại,Soát lỗi,Chính tả và ngữ pháp,Spelling & Grammar,.uno:SpellingAndGrammarDialog
+Xem lại,Soát lỗi,Từ đồng nghĩa,Thesaurus,.uno:ThesaurusDialog
+Xem lại,Soát lỗi,Đếm từ,Word Count,.uno:WordCountDialog
+Xem lại,Chú thích,Chú thích mới,New Comment,.uno:InsertAnnotation
+Xem lại,Theo dõi,Theo dõi thay đổi,Track Changes,.uno:TrackChanges
+Xem lại,Thay đổi,Chấp nhận tất cả,Accept All Changes,.uno:AcceptAllTrackedChanges
+Xem lại,Thay đổi,Từ chối tất cả,Reject All Changes,.uno:RejectAllTrackedChanges
+Xem lại,Thay đổi,Thay đổi trước,Previous,.uno:PreviousTrackedChange
+Xem lại,Thay đổi,Thay đổi sau,Next,.uno:NextTrackedChange
+Xem lại,So sánh,So sánh,Compare,.uno:CompareDocuments
+Xem lại,Bảo vệ,Bảo vệ,Restrict Editing,.uno:Protect
+Xem,Hiển thị,Thước,Ruler,.uno:Ruler
+Xem,Hiển thị,Ngăn điều hướng,Navigation Pane,.uno:Navigator
+Xem,Thu phóng,Một trang,One Page,.uno:ZoomPage
+Xem,Thu phóng,100%,100%,.uno:Zoom100Percent
+Xem,Thu phóng,Nhiều trang,Multiple Pages,.uno:ShowMultiplePages
+Xem,Chế độ xem,Toàn màn hình,Focus,.uno:FullScreen

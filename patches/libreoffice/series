@@ -1,0 +1,7 @@
+# Patches applied to the LibreOffice source, in order (one file name per line, relative to this folder).
+# Every patch starts with a header:
+#   Subject: <one line>
+#   Why: <the problem it solves>
+#   Upstream: <link to the Gerrit change, or "not suitable: <reason>">
+#   Test: <how it is checked>
+# Rule: prefer configure options and .xcu configuration over patching code.
