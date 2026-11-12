@@ -31,6 +31,13 @@
   <!-- Personal and business profiles save in Microsoft Office formats without the "keep format?" prompt.
        The government profile overrides these with ODF 1.2 (docs/legal/STATUS.md, Circulars 19/2011 and 39/2017). -->
   <oor:component-data oor:package="org.openoffice" oor:name="Setup">
+    <!-- No LibreOffice welcome / what's-new dialog, and no TDF "Get involved" / "Donate" infobars: the timestamps
+         are set far in the future and finalized, so the 90-day reminders never come due. -->
+    <node oor:name="Product">
+      <prop oor:name="WhatsNew" oor:op="fuse"><value>false</value></prop>
+      <prop oor:name="LastTimeGetInvolvedShown" oor:op="fuse" oor:finalized="true"><value>32503680000</value></prop>
+      <prop oor:name="LastTimeDonateShown" oor:op="fuse" oor:finalized="true"><value>32503680000</value></prop>
+    </node>
     <node oor:name="Office">
       <node oor:name="Factories">
         <node oor:name="com.sun.star.text.TextDocument">
@@ -46,6 +53,10 @@
     </node>
   </oor:component-data>
   <oor:component-data oor:package="org.openoffice.Office" oor:name="Common">
+    <!-- No "Tip of the day" dialog at every start. -->
+    <node oor:name="Misc">
+      <prop oor:name="ShowTipOfTheDay" oor:op="fuse"><value>false</value></prop>
+    </node>
     <node oor:name="Save">
       <node oor:name="Document">
         <prop oor:name="WarnAlienFormat" oor:op="fuse"><value>false</value></prop>

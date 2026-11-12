@@ -1,0 +1,488 @@
+# 1xVnOffice: lớp dịch tiếng Việt bổ sung cho LibreOffice (MPL-2.0).
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFileNew"
+msgid "New"
+msgstr "Mới"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFileFile"
+msgid "File"
+msgstr "Tệp"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFilePrint"
+msgid "Print"
+msgstr "In"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFileProperties"
+msgid "Properties"
+msgstr "Thuộc tính"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|FileMenuButton"
+msgid "_File"
+msgstr "_Tệp"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|HelpMenuButton"
+msgid "_Help"
+msgstr "Trợ _giúp"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|FileTabLabel"
+msgid "~File"
+msgstr "~Tệp"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelHomeClipboard"
+msgid "Clipboard"
+msgstr "Bảng tạm"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelHomeFont"
+msgid "Font"
+msgstr "Phông chữ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelHomeParagraph"
+msgid "Paragraph"
+msgstr "Đoạn văn"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelHomeStyle"
+msgid "Style"
+msgstr "Kiểu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|HomeMenuButton"
+msgid "_Home"
+msgstr "Trang _đầu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|HomeTabLabel"
+msgid "~Home"
+msgstr "Trang ~đầu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelInsertPage"
+msgid "Page"
+msgstr "Trang"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelInsertData"
+msgid "Data"
+msgstr "Dữ liệu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelInsertGraphic"
+msgid "Graphic"
+msgstr "Minh họa"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelInsertReferences"
+msgid "References"
+msgstr "Tham chiếu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelInsertText"
+msgid "Text"
+msgstr "Văn bản"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelInsertDrawingObjects"
+msgid "Drawing Objects"
+msgstr "Hình vẽ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|InsertMenuButton"
+msgid "_Insert"
+msgstr "_Chèn"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|InsertTabLabel"
+msgid "~Insert"
+msgstr "~Chèn"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelLayoutPageLayout"
+msgid "Page"
+msgstr "Thiết lập trang"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelLayoutBreaks"
+msgid "Breaks"
+msgstr "Ngắt"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelLayoutParagraphLayout"
+msgid "Paragraph"
+msgstr "Đoạn văn"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelLayoutTools"
+msgid "Tools"
+msgstr "Công cụ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelLayoutObjects"
+msgid "Objects"
+msgstr "Sắp xếp"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|LayoutMenuButton"
+msgid "_Layout"
+msgstr "_Bố cục"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|LayoutTabLabel"
+msgid "~Layout"
+msgstr "~Bố cục"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReferencesIndex"
+msgid "Index"
+msgstr "Mục lục"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReferencesReference"
+msgid "References"
+msgstr "Tham chiếu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReferencesFields"
+msgid "Fields"
+msgstr "Trường"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ReferencesMenuButton"
+msgid "Reference_s"
+msgstr "Tham _chiếu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ReferencesTabLabel"
+msgid "Reference~s"
+msgstr "Tham ~chiếu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReviewSpelling"
+msgid "Spelling"
+msgstr "Soát lỗi"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReviewComments"
+msgid "Comments"
+msgstr "Chú thích"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReviewTrackChanges"
+msgid "Track Changes"
+msgstr "Theo dõi thay đổi"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelReviewResolveChanges"
+msgid "Resolve Changes"
+msgstr "Thay đổi"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ReviewMenuButton"
+msgid "_Review"
+msgstr "_Xem lại"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ReviewTabLabel"
+msgid "~Review"
+msgstr "~Xem lại"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelViewMode"
+msgid "Mode"
+msgstr "Chế độ xem"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelViewMarks"
+msgid "Marks"
+msgstr "Ký hiệu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelViewZoom"
+msgid "Zoom"
+msgstr "Thu phóng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelViewWidgets"
+msgid "Widgets"
+msgstr "Hiển thị"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelViewObjects"
+msgid "Objects"
+msgstr "Đối tượng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ViewMenuButton"
+msgid "_View"
+msgstr "X_em"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ViewTabLabel"
+msgid "~View"
+msgstr "X~em"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelTableLayout"
+msgid "Layout"
+msgstr "Bố cục"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelTableSelect"
+msgid "Selection"
+msgstr "Chọn"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelTableStyle"
+msgid "Style"
+msgstr "Kiểu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelTableAlignment"
+msgid "Alignment"
+msgstr "Căn chỉnh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelTableFunctions"
+msgid "Functions"
+msgstr "Hàm"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelTableNumbers"
+msgid "Numbers"
+msgstr "Số"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|TableMenuButton"
+msgid "_Table"
+msgstr "_Bảng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|TableTabLabel"
+msgid "~Table"
+msgstr "~Bảng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelImage"
+msgid "Image"
+msgstr "Ảnh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelImageFillBorder"
+msgid "Fill & Border"
+msgstr "Tô và viền"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelImageAnchorWrap"
+msgid "Anchor & Wrap"
+msgstr "Neo và bao quanh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelImagePositioning"
+msgid "Positioning"
+msgstr "Vị trí"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelImageModify"
+msgid "Modify"
+msgstr "Chỉnh sửa"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ImageMenuButton"
+msgid "Ima_ge"
+msgstr "Ả_nh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ImageTabLabel"
+msgid "Ima~ge"
+msgstr "Ả~nh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelDraw"
+msgid "Drawing Object"
+msgstr "Hình vẽ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelDrawFillBorder"
+msgid "Fill & Border"
+msgstr "Tô và viền"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelDrawAnchorWrap"
+msgid "Anchor & Wrap"
+msgstr "Neo và bao quanh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelDrawPositioning"
+msgid "Positioning"
+msgstr "Vị trí"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelDrawGrouping"
+msgid "Grouping"
+msgstr "Nhóm"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelDraw3D"
+msgid "3D"
+msgstr "3D"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|DrawMenuButton"
+msgid "_Draw"
+msgstr "_Vẽ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|DrawTabLabel"
+msgid "~Draw"
+msgstr "~Vẽ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelObject"
+msgid "Object"
+msgstr "Đối tượng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelObjectFillBorder"
+msgid "Fill & Border"
+msgstr "Tô và viền"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelObjectAnchorWrap"
+msgid "Anchor & Wrap"
+msgstr "Neo và bao quanh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelObjectPositioning"
+msgid "Positioning"
+msgstr "Vị trí"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ObjectMenuButton"
+msgid "_Object"
+msgstr "Đối _tượng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ObjectTabLabel"
+msgid "~Object"
+msgstr "Đối ~tượng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelMedia"
+msgid "Object"
+msgstr "Đối tượng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelMediaAnchorWrap"
+msgid "Anchor & Wrap"
+msgstr "Neo và bao quanh"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelMediaPositioning"
+msgid "Positioning"
+msgstr "Vị trí"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelMediaPlayer"
+msgid "Media Player"
+msgstr "Trình phát"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|MediaMenuButton"
+msgid "_Media"
+msgstr "Đa phương _tiện"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|MediaTabLabel"
+msgid "~Media"
+msgstr "Đa phương ~tiện"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelPrintMode"
+msgid "Mode"
+msgstr "Chế độ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelPrintZoom"
+msgid "Zoom"
+msgstr "Thu phóng"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelPrintPrint"
+msgid "Print"
+msgstr "In"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|PrintMenuButton"
+msgid "_Print"
+msgstr "_In"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|PrintTabLabel"
+msgid "~Print"
+msgstr "~In"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFormMode"
+msgid "Mode"
+msgstr "Chế độ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFormProperties"
+msgid "Properties"
+msgstr "Thuộc tính"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelFormControls"
+msgid "Controls"
+msgstr "Điều khiển"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|FormMenuButton"
+msgid "Fo_rm"
+msgstr "Biểu _mẫu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|FormTabLabel"
+msgid "Fo~rm"
+msgstr "Biểu ~mẫu"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ExtensionMenuButton"
+msgid "E_xtension"
+msgstr "Tiện _ích"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ExtensionLabel"
+msgid "E~xtension"
+msgstr "Tiện ~ích"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelToolsMacro"
+msgid "Macro"
+msgstr "Macro"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|labelToolsMessage"
+msgid "Message"
+msgstr "Thư"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ToolsMenuButton"
+msgid "_Tools"
+msgstr "Công _cụ"
+
+#: sw/uiconfig/swriter/ui/notebookbar.ui
+msgctxt "TabbedWriter|ToolsTabLabel"
+msgid "~Tools"
+msgstr "Công ~cụ"

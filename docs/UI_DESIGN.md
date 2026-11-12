@@ -62,6 +62,20 @@ Những lệnh lệch chính: đầu trang, chân trang, số trang, ngày giờ
 4. Gửi bản dịch về Weblate của LibreOffice để giảm phần phải tự giữ.
 5. Mục tiêu bản 1.0: 100% chuỗi của `sfx2 sw sc sd svx cui vcl framework` có tiếng Việt.
 
+Tiến độ:
+
+| Ngày | Phạm vi | Số chuỗi | Ghi chú |
+|---|---|---|---|
+| 13/11/2026 | Ribbon Writer (`notebookbar.ui`) và nhãn của 415 lệnh trên ribbon đó | 97 + 353 | Nhiều bản dịch nháp cũ sai nghĩa ("Reject All" → "Chọn tất cả", "Orientation" → "Trình chiếu", "Next" → "Văn bản"); đã dịch lại theo `l10n/vi/glossary.csv` |
+
+Kết quả trên bản build release (ảnh `docs/ui/writer-1xvnoffice-vi-2026-11-13.png`): toàn bộ thẻ, nhóm và nút của ribbon Writer đã tiếng Việt; tên sản phẩm 1xVnOffice; không còn hộp chào mừng, mẹo hằng ngày hay thanh mời quyên góp khi mở app.
+
+Còn tiếng Anh, làm ở lượt sau: tên kiểu đoạn ("Default Paragraph Style", "Body Text", "Block Quotation"), thanh trạng thái ("0 words, 0 characters", "Default Page Style", "Insert"). Ngôn ngữ tài liệu mặc định vẫn là "Anh (Mỹ)", cần đổi sang tiếng Việt để kiểm tra chính tả đúng.
+
+Bài học: kiểm tra `msgfmt` là chưa đủ. Bộ đọc của LibreOffice (`cfgex`) bỏ qua không báo lỗi khi chuỗi nhiều dòng bị ghi gộp một dòng, nên bước `defaults` giờ đọc thẳng nhãn lệnh tiếng Việt từ ứng dụng đang chạy.
+
+Cách làm: `scripts/l10n-merge.py` trộn `l10n/vi/**.po` vào cây dịch trước khi build (bước `l10n` của `build-macos.sh`); bộ đọc/ghi PO tự viết (`scripts/po.py`) giữ nguyên dòng gốc, ghi lại file không đổi giống hệt từng byte.
+
 ## Thứ tự làm
 
 1. Đo trước: chụp ribbon Tabbed hiện có của LibreOffice 26.8 sau khi build xong, lập `command-map.csv` cho Writer.

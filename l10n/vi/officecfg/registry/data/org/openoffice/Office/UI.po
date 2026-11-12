@@ -1,0 +1,3180 @@
+# 1xVnOffice: lớp dịch tiếng Việt bổ sung cho LibreOffice (MPL-2.0).
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FontworkGalleryFloater\n"
+"Label\n"
+"value.text"
+msgid "Insert Fontwork"
+msgstr "Chèn chữ nghệ thuật"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FontworkGalleryFloater\n"
+"ContextLabel\n"
+"value.text"
+msgid "Fontwork..."
+msgstr "Chữ nghệ thuật..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FontworkGalleryFloater\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Fontwork Text"
+msgstr "Chèn chữ nghệ thuật"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:BasicShapes\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Basic Shapes"
+msgstr "Hình ~cơ bản"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:BasicShapes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Basic Shapes (double click for multi-selection)"
+msgstr "Hình cơ bản (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SymbolShapes\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Symbol Shapes"
+msgstr "Hình ~ký hiệu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SymbolShapes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Symbol Shapes (double click for multi-selection)"
+msgstr "Hình ký hiệu (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ParaspaceIncrease\n"
+"Label\n"
+"value.text"
+msgid "Increase"
+msgstr "Tăng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ParaspaceIncrease\n"
+"ContextLabel\n"
+"value.text"
+msgid "Increase Paragraph Spacing"
+msgstr "Tăng khoảng cách đoạn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ParaspaceIncrease\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Increase Paragraph Spacing"
+msgstr "Tăng khoảng cách đoạn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ParaspaceDecrease\n"
+"Label\n"
+"value.text"
+msgid "Decrease"
+msgstr "Giảm"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ParaspaceDecrease\n"
+"ContextLabel\n"
+"value.text"
+msgid "Decrease Paragraph Spacing"
+msgstr "Giảm khoảng cách đoạn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ParaspaceDecrease\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Decrease Paragraph Spacing"
+msgstr "Giảm khoảng cách đoạn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ArrowShapes\n"
+"Label\n"
+"value.text"
+msgid "Arrow Shapes"
+msgstr "Mũi tên khối"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ArrowShapes\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Block Arrows"
+msgstr "~Mũi tên khối"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ArrowShapes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Block Arrows (double click for multi-selection)"
+msgstr "Mũi tên khối (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FlowChartShapes\n"
+"Label\n"
+"value.text"
+msgid "Flowchart Shapes"
+msgstr "Hình lưu đồ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FlowChartShapes\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Flowchart"
+msgstr "~Lưu đồ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FlowChartShapes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Flowchart (double click for multi-selection)"
+msgstr "Lưu đồ (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CalloutShapes\n"
+"Label\n"
+"value.text"
+msgid "Callout Shapes"
+msgstr "Hình chú thích"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CalloutShapes\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Callout Shapes"
+msgstr "Hình ~chú thích"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CalloutShapes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Callout Shapes (double click for multi-selection)"
+msgstr "Hình chú thích (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:StarShapes\n"
+"Label\n"
+"value.text"
+msgid "Star Shapes"
+msgstr "Ngôi sao"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:StarShapes\n"
+"ContextLabel\n"
+"value.text"
+msgid "S~tars and Banners"
+msgstr "Ngôi ~sao và băng rôn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:StarShapes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Stars and Banners (double click for multi-selection)"
+msgstr "Ngôi sao và băng rôn (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ChangeTheme\n"
+"Label\n"
+"value.text"
+msgid "Dark Mode"
+msgstr "Chế độ tối"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ChangeTheme\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle between dark and light modes"
+msgstr "Chuyển giữa chế độ tối và sáng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Grow\n"
+"Label\n"
+"value.text"
+msgid "Increase"
+msgstr "Tăng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Grow\n"
+"ContextLabel\n"
+"value.text"
+msgid "Increase Size"
+msgstr "Tăng cỡ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Grow\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Increase Font Size"
+msgstr "Tăng cỡ chữ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Shrink\n"
+"Label\n"
+"value.text"
+msgid "Decrease"
+msgstr "Giảm"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Shrink\n"
+"ContextLabel\n"
+"value.text"
+msgid "Decrease Size"
+msgstr "Giảm cỡ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Shrink\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Decrease Font Size"
+msgstr "Giảm cỡ chữ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Shadowed\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Shadow"
+msgstr "Bật/tắt đổ bóng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:OutlineFont\n"
+"Label\n"
+"value.text"
+msgid "Outline Font Effect"
+msgstr "Chữ viền"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:OutlineFont\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Apply outline attribute to font. Not all fonts implement this attribute."
+msgstr "Áp kiểu chữ viền. Không phải phông nào cũng hỗ trợ kiểu này."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExtendedHelp\n"
+"Label\n"
+"value.text"
+msgid "~What's This?"
+msgstr "~Đây là gì?"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:StartPara\n"
+"Label\n"
+"value.text"
+msgid "Start"
+msgstr "Căn đầu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:StartPara\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Align Start"
+msgstr "Căn theo đầu dòng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:EndPara\n"
+"Label\n"
+"value.text"
+msgid "End"
+msgstr "Căn cuối"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:EndPara\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Align End"
+msgstr "Căn theo cuối dòng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LineSpacing\n"
+"Label\n"
+"value.text"
+msgid "Line Spacing"
+msgstr "Giãn dòng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LineSpacing\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Set Line Spacing"
+msgstr "Đặt giãn dòng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Line\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Line (double click for multi-selection)"
+msgstr "Chèn đường kẻ (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ConnectorToolbox\n"
+"Label\n"
+"value.text"
+msgid "Connectors"
+msgstr "Đường nối"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ConnectorToolbox\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Connectors (double click for multi-selection)"
+msgstr "Đường nối (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ArrowsToolbox\n"
+"Label\n"
+"value.text"
+msgid "Lines and Arrows"
+msgstr "Đường và mũi tên"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ArrowsToolbox\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Lines and Arrows (double click for multi-selection)"
+msgstr "Đường và mũi tên (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:GrafMode\n"
+"Label\n"
+"value.text"
+msgid "Image Mode"
+msgstr "Chế độ màu ảnh"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Crop\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Crop Image"
+msgstr "Cắt xén ảnh"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CompressGraphic\n"
+"Label\n"
+"value.text"
+msgid "Compress Image"
+msgstr "Nén ảnh"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CompressGraphic\n"
+"ContextLabel\n"
+"value.text"
+msgid "Co~mpress..."
+msgstr "~Nén..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveGraphic\n"
+"Label\n"
+"value.text"
+msgid "Save Image"
+msgstr "Lưu ảnh"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveGraphic\n"
+"ContextLabel\n"
+"value.text"
+msgid "Save..."
+msgstr "~Lưu..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:NewDoc\n"
+"ContextLabel\n"
+"value.text"
+msgid "Manage Templates"
+msgstr "Quản lý mẫu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:NewDoc\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Open Templates Manager"
+msgstr "Mở trình quản lý mẫu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveAsRemote\n"
+"Label\n"
+"value.text"
+msgid "Sa~ve Remote..."
+msgstr "Lưu lên ~máy chủ..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveAsRemote\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Save Remote File"
+msgstr "Lưu tệp lên máy chủ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveAsRemote\n"
+"PopupLabel\n"
+"value.text"
+msgid "Save ~Remote File..."
+msgstr "Lưu tệp lên ~máy chủ..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveACopy\n"
+"Label\n"
+"value.text"
+msgid "Save a Copy..."
+msgstr "Lưu một bản sao..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CheckOut\n"
+"Label\n"
+"value.text"
+msgid "Check Out"
+msgstr "Lấy ra để sửa"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CancelCheckOut\n"
+"Label\n"
+"value.text"
+msgid "Cancel Checkout..."
+msgstr "Hủy lấy ra..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CheckIn\n"
+"Label\n"
+"value.text"
+msgid "Check In..."
+msgstr "Trả lại..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Reload\n"
+"Label\n"
+"value.text"
+msgid "Re~load"
+msgstr "~Tải lại"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:PrintDefault\n"
+"Label\n"
+"value.text"
+msgid "Print Directly"
+msgstr "In ngay"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ToggleObjectBezierMode\n"
+"Label\n"
+"value.text"
+msgid "Toggle Point Edit Mode"
+msgstr "Bật/tắt chế độ sửa điểm"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertAnnotation\n"
+"PopupLabel\n"
+"value.text"
+msgid "Insert Comment"
+msgstr "Chèn chú thích"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertAnnotation\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Comment"
+msgstr "Chèn chú thích"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AlignMiddle\n"
+"Label\n"
+"value.text"
+msgid "~Middle"
+msgstr "~Giữa"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:VerticalText\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Vertical Text"
+msgstr "Chèn chữ dọc"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ChangeCaseRotateCase\n"
+"Label\n"
+"value.text"
+msgid "Cycle Case"
+msgstr "Đổi kiểu hoa thường"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ChangeCaseRotateCase\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Cycle Case (Title Case, Sentence case, UPPERCASE, lowercase)"
+msgstr "Đổi kiểu hoa thường (Viết Hoa Đầu Từ, Viết hoa đầu câu, CHỮ HOA, chữ thường)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertDoc\n"
+"Label\n"
+"value.text"
+msgid "Content from Document..."
+msgstr "Nội dung từ tài liệu..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AddDirect\n"
+"Label\n"
+"value.text"
+msgid "~New Document"
+msgstr "Tài liệu ~mới"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AddDirect\n"
+"ContextLabel\n"
+"value.text"
+msgid "New"
+msgstr "Mới"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SaveAsTemplate\n"
+"Label\n"
+"value.text"
+msgid "Save as Template..."
+msgstr "Lưu thành mẫu..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:BrowseView\n"
+"Label\n"
+"value.text"
+msgid "~Web View"
+msgstr "Dạng ~web"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:BrowseView\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Web"
+msgstr "~Web"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:StylesPreview\n"
+"Label\n"
+"value.text"
+msgid "Styles Preview"
+msgstr "Xem trước kiểu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LineWidth\n"
+"Label\n"
+"value.text"
+msgid "Line Thickness"
+msgstr "Độ dày đường"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertObject\n"
+"Label\n"
+"value.text"
+msgid "Insert OLE Object"
+msgstr "Chèn đối tượng OLE"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertObject\n"
+"ContextLabel\n"
+"value.text"
+msgid "~OLE Object..."
+msgstr "Đối tượng ~OLE..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertObject\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Open dialog to insert OLE object"
+msgstr "Mở hộp thoại chèn đối tượng OLE"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LeaveGroup\n"
+"Label\n"
+"value.text"
+msgid "E~xit Group"
+msgstr "~Thoát nhóm"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CharBackColor\n"
+"Label\n"
+"value.text"
+msgid "Character Highlighting Color"
+msgstr "Màu tô sáng văn bản"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SetBorderStyle\n"
+"Label\n"
+"value.text"
+msgid "Borders (Shift to overwrite)"
+msgstr "Đường viền (giữ Shift để ghi đè)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ObjectMenue\n"
+"Label\n"
+"value.text"
+msgid "OLE Ob~ject"
+msgstr "Đối tượng ~OLE"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ObjectMenue\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Menu for editing or saving OLE objects"
+msgstr "Menu sửa hoặc lưu đối tượng OLE"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FrameLineColor\n"
+"Label\n"
+"value.text"
+msgid "Border Color"
+msgstr "Màu viền"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertGraphic\n"
+"Label\n"
+"value.text"
+msgid "~Image..."
+msgstr "Ả~nh..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertGraphic\n"
+"PopupLabel\n"
+"value.text"
+msgid "Insert Image..."
+msgstr "Chèn ảnh..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AutoFormat\n"
+"Label\n"
+"value.text"
+msgid "Table Styles"
+msgstr "Kiểu bảng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AutoFormat\n"
+"ContextLabel\n"
+"value.text"
+msgid "Auto~Format Styles..."
+msgstr "Kiểu ~tự định dạng..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SpellingAndGrammarDialog\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Check Spelling"
+msgstr "Kiểm tra chính tả"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Spacing\n"
+"Label\n"
+"value.text"
+msgid "Character Spacing"
+msgstr "Khoảng cách ký tự"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Spacing\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Set Character Spacing"
+msgstr "Đặt khoảng cách ký tự"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertDraw\n"
+"Label\n"
+"value.text"
+msgid "Draw Functions"
+msgstr "Công cụ vẽ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:InsertDraw\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Show Draw Functions"
+msgstr "Hiện công cụ vẽ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:DrawText\n"
+"Label\n"
+"value.text"
+msgid "~Text Box"
+msgstr "~Hộp văn bản"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:DrawText\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Text Box"
+msgstr "Chèn hộp văn bản"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:HyperlinkDialog\n"
+"Label\n"
+"value.text"
+msgid "~Hyperlink..."
+msgstr "~Liên kết..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:MergeCells\n"
+"Label\n"
+"value.text"
+msgid "Merge Cells"
+msgstr "Trộn ô"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SplitCell\n"
+"Label\n"
+"value.text"
+msgid "Split Cells..."
+msgstr "Tách ô..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LineEndStyle\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Select start and end arrowheads for lines."
+msgstr "Chọn đầu mũi tên ở hai đầu đường kẻ."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FormatPaintbrush\n"
+"Label\n"
+"value.text"
+msgid "Clone Formatting"
+msgstr "Sao định dạng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FormatPaintbrush\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Clone Formatting (double click for multi-selection)"
+msgstr "Sao định dạng (nhấp đúp để áp nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Cut\n"
+"Label\n"
+"value.text"
+msgid "~Cut"
+msgstr "~Cắt"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Copy\n"
+"Label\n"
+"value.text"
+msgid "Cop~y"
+msgstr "Sao ~chép"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Navigator\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Show Navigator Window"
+msgstr "Hiện ngăn điều hướng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ImageMapDialog\n"
+"Label\n"
+"value.text"
+msgid "Image~Map"
+msgstr "Bản đồ ~ảnh"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:GridVisible\n"
+"Label\n"
+"value.text"
+msgid "Grid"
+msgstr "Lưới"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ProtectTraceChangeMode\n"
+"Label\n"
+"value.text"
+msgid "~Protect..."
+msgstr "~Bảo vệ..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ProtectTraceChangeMode\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Protect Track Changes"
+msgstr "Bảo vệ theo dõi thay đổi"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ProtectTraceChangeMode\n"
+"PopupLabel\n"
+"value.text"
+msgid "Protect Track Changes"
+msgstr "Bảo vệ theo dõi thay đổi"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CompareDocuments\n"
+"Label\n"
+"value.text"
+msgid "Compare"
+msgstr "So sánh"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CompareDocuments\n"
+"ContextLabel\n"
+"value.text"
+msgid "Co~mpare Document..."
+msgstr "~So sánh tài liệu..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CompareDocuments\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Compare Non-Track Changed Document"
+msgstr "So sánh với tài liệu không theo dõi thay đổi"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:MergeDocuments\n"
+"Label\n"
+"value.text"
+msgid "Merge"
+msgstr "Gộp"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:MergeDocuments\n"
+"ContextLabel\n"
+"value.text"
+msgid "Merge Documen~t..."
+msgstr "Gộp ~tài liệu..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:MergeDocuments\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Merge Track Changed Document"
+msgstr "Gộp tài liệu có theo dõi thay đổi"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:DecrementIndent\n"
+"Label\n"
+"value.text"
+msgid "Decrease"
+msgstr "Giảm thụt lề"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:IncrementIndent\n"
+"Label\n"
+"value.text"
+msgid "Increase"
+msgstr "Tăng thụt lề"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LineToolbox\n"
+"Label\n"
+"value.text"
+msgid "Curves and Polygons"
+msgstr "Đường cong và đa giác"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:LineToolbox\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Curves and Polygons (double click for multi-selection)"
+msgstr "Đường cong và đa giác (nhấp đúp để chèn nhiều lần)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SpellOnline\n"
+"Label\n"
+"value.text"
+msgid "Auto Spellcheck"
+msgstr "Tự động kiểm tr~a chính tả"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CharmapControl\n"
+"Label\n"
+"value.text"
+msgid "Symbol"
+msgstr "Ký hiệu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CharmapControl\n"
+"ContextLabel\n"
+"value.text"
+msgid "S~pecial Character..."
+msgstr "Ký tự đặc ~biệt..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CharmapControl\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Special Characters"
+msgstr "Chèn ký tự đặc biệt"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:TipOfTheDay\n"
+"Label\n"
+"value.text"
+msgid "~Tip of the day"
+msgstr "~Mẹo hằng ngày"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:TipOfTheDay\n"
+"ContextLabel\n"
+"value.text"
+msgid "Show Tip of the Day"
+msgstr "Hiện mẹo hằng ngày"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:TipOfTheDay\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Show the Tip of the Day dialog"
+msgstr "Hiện hộp thoại mẹo hằng ngày"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SendMailDocAsPDF\n"
+"Label\n"
+"value.text"
+msgid "Email as P~DF..."
+msgstr "Gửi email dạng P~DF..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SendViaBluetooth\n"
+"Label\n"
+"value.text"
+msgid "Send via ~Bluetooth..."
+msgstr "Gửi qua ~Bluetooth..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportDirectToPDF\n"
+"Label\n"
+"value.text"
+msgid "Export Directly as PDF"
+msgstr "Xuất ngay ra PDF"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportDirectToPDF\n"
+"ContextLabel\n"
+"value.text"
+msgid "Export Directly as PDF"
+msgstr "Xuất ngay ra PDF"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportDirectToPDF\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Export Directly as PDF"
+msgstr "Xuất ngay ra PDF"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportToEPUB\n"
+"Label\n"
+"value.text"
+msgid "EPUB"
+msgstr "EPUB"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportToEPUB\n"
+"ContextLabel\n"
+"value.text"
+msgid "Export as E~PUB..."
+msgstr "Xuất ra E~PUB..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportToEPUB\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Export as EPUB"
+msgstr "Xuất ra EPUB"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportDirectToEPUB\n"
+"Label\n"
+"value.text"
+msgid "EPUB"
+msgstr "EPUB"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportDirectToEPUB\n"
+"ContextLabel\n"
+"value.text"
+msgid "Export Directly as EPUB"
+msgstr "Xuất ngay ra EPUB"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExportDirectToEPUB\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Export as EPUB"
+msgstr "Xuất ra EPUB"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SendFeedback\n"
+"Label\n"
+"value.text"
+msgid "Send Feedback"
+msgstr "Gửi góp ý"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:QuestionAnswers\n"
+"Label\n"
+"value.text"
+msgid "~Get Help Online"
+msgstr "~Hỏi đáp trực tuyến"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:GetInvolved\n"
+"Label\n"
+"value.text"
+msgid "Get ~Involved"
+msgstr "Tham ~gia đóng góp"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Documentation\n"
+"Label\n"
+"value.text"
+msgid "~User Guides"
+msgstr "~Hướng dẫn sử dụng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Donation\n"
+"Label\n"
+"value.text"
+msgid "Donate to LibreOffice"
+msgstr "Ủng hộ LibreOffice"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ShowLicense\n"
+"Label\n"
+"value.text"
+msgid "License Information"
+msgstr "Thông tin giấy phép"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ControlProperties\n"
+"Label\n"
+"value.text"
+msgid "Con~trol Properties..."
+msgstr "Thuộc tính ~điều khiển..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:FormProperties\n"
+"Label\n"
+"value.text"
+msgid "For~m Properties..."
+msgstr "Thuộc tính ~biểu mẫu..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:PrintPreview\n"
+"Label\n"
+"value.text"
+msgid "Print Pr~eview"
+msgstr "Xem ~trước khi in"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:PrintPreview\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Print Preview"
+msgstr "Bật/tắt xem trước khi in"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SendMail\n"
+"Label\n"
+"value.text"
+msgid "Email"
+msgstr "Email"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SendMail\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Email Document..."
+msgstr "Gửi tài liệu qua ~email..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:SendMail\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Attach to Email"
+msgstr "Đính kèm vào email"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:ExtensionManager\n"
+"Label\n"
+"value.text"
+msgid "~Extensions..."
+msgstr "~Tiện ích mở rộng..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:CellVertCenter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Center Vertically"
+msgstr "Căn giữa theo chiều dọc"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AutoSum\n"
+"Label\n"
+"value.text"
+msgid "Sum"
+msgstr "Tổng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:FontDialog\n"
+"Label\n"
+"value.text"
+msgid "C~haracter..."
+msgstr "~Ký tự..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:AnchorMenu\n"
+"Label\n"
+"value.text"
+msgid "Anchor Menu"
+msgstr "Neo"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:AnchorMenu\n"
+"ContextLabel\n"
+"value.text"
+msgid "Anc~hor"
+msgstr "~Neo"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:AnchorMenu\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Select anchor for object"
+msgstr "Chọn điểm neo cho đối tượng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:AVMediaPlayer\n"
+"Label\n"
+"value.text"
+msgid "Me~dia Player"
+msgstr "Trình ~phát đa phương tiện"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertAVMedia\n"
+"ContextLabel\n"
+"value.text"
+msgid "Audio or ~Video..."
+msgstr "Âm thanh hoặc ~video..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertHardHyphen\n"
+"Label\n"
+"value.text"
+msgid "Insert Non-br~eaking Hyphen"
+msgstr "Chèn gạch nối ~không ngắt"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertHardHyphen\n"
+"ContextLabel\n"
+"value.text"
+msgid "Non-breaking ~Hyphen"
+msgstr "Gạch nối ~không ngắt"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertSoftHyphen\n"
+"Label\n"
+"value.text"
+msgid "Insert S~oft Hyphen"
+msgstr "Chèn gạch nối ~mềm"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertSoftHyphen\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Soft Hyphen"
+msgstr "Gạch nối ~mềm"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertNonBreakingSpace\n"
+"Label\n"
+"value.text"
+msgid "Insert ~No-break Space"
+msgstr "Chèn ~dấu cách không ngắt"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertNonBreakingSpace\n"
+"ContextLabel\n"
+"value.text"
+msgid "~No-break Space"
+msgstr "~Dấu cách không ngắt"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertZWSP\n"
+"Label\n"
+"value.text"
+msgid "Insert Zero-~width Space"
+msgstr "Chèn dấu cách độ rộng ~0"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertZWSP\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Zero-width Space"
+msgstr "Dấu cách độ rộng ~0"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertWJ\n"
+"Label\n"
+"value.text"
+msgid "Insert Word ~Joiner"
+msgstr "Chèn ký tự ~nối từ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertWJ\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Word Joiner"
+msgstr "Ký tự ~nối từ"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertLRM\n"
+"Label\n"
+"value.text"
+msgid "Insert ~Left-to-Right Mark"
+msgstr "Chèn dấu ~trái sang phải"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertLRM\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Left-to-Right Mark"
+msgstr "Dấu ~trái sang phải"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertRLM\n"
+"Label\n"
+"value.text"
+msgid "Insert ~Right-to-Left Mark"
+msgstr "Chèn dấu ~phải sang trái"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertRLM\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Right-to-Left Mark"
+msgstr "Dấu ~phải sang trái"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:DeleteColumns\n"
+"Label\n"
+"value.text"
+msgid "Delete Columns"
+msgstr "Xóa cột"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:DeleteColumns\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Delete Columns"
+msgstr "~Xóa cột"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:DeleteColumns\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Delete selected columns"
+msgstr "Xóa các cột đã chọn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:SetLanguageSelectionMenu\n"
+"PopupLabel\n"
+"value.text"
+msgid "Language for Selection"
+msgstr "Ngôn ngữ cho phần đã chọn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:SetLanguageParagraphMenu\n"
+"PopupLabel\n"
+"value.text"
+msgid "Language for Paragraph"
+msgstr "Ngôn ngữ cho đoạn"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:SetLanguageAllTextMenu\n"
+"Label\n"
+"value.text"
+msgid "For All Text"
+msgstr "Cho toàn bộ văn bản"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:SetLanguageAllTextMenu\n"
+"PopupLabel\n"
+"value.text"
+msgid "Language for All Text"
+msgstr "Ngôn ngữ cho toàn bộ văn bản"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:ExternalEdit\n"
+"Label\n"
+"value.text"
+msgid "Edit with External Tool"
+msgstr "Sửa bằng công cụ ngoài"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:Menubar\n"
+"Label\n"
+"value.text"
+msgid "Menubar"
+msgstr "Thanh menu"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:NameGroup\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Give a label to identify an object"
+msgstr "Đặt tên để nhận biết đối tượng"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:ObjectTitleDescription\n"
+"Label\n"
+"value.text"
+msgid "Alt Text..."
+msgstr "Văn bản thay thế..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:ObjectTitleDescription\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Add descriptions of non-text content (for accessibility)"
+msgstr "Thêm mô tả cho nội dung không phải chữ (trợ năng)"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:SafeMode\n"
+"Label\n"
+"value.text"
+msgid "~Restart in Troubleshoot Mode..."
+msgstr "~Khởi động lại ở chế độ xử lý sự cố..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertSignatureLine\n"
+"Label\n"
+"value.text"
+msgid "Signat~ure Line..."
+msgstr "Dòng ~chữ ký..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:InsertQrCode\n"
+"Label\n"
+"value.text"
+msgid "QR and ~Barcode..."
+msgstr "Mã QR và mã ~vạch..."
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Popups..uno:ThemeDialog\n"
+"Label\n"
+"value.text"
+msgid "Theme..."
+msgstr "Chủ đề..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertEndnote\n"
+"Label\n"
+"value.text"
+msgid "~Endnote"
+msgstr "Chú thích cuối ~văn bản"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertEndnote\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Endnote"
+msgstr "Chèn chú thích cuối văn bản"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertSection\n"
+"Label\n"
+"value.text"
+msgid "Columns"
+msgstr "Cột"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertSection\n"
+"ContextLabel\n"
+"value.text"
+msgid "Section..."
+msgstr "Phân đoạn..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertSection\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert a section with columns"
+msgstr "Chèn phân đoạn có cột"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertMultiIndex\n"
+"Label\n"
+"value.text"
+msgid "Table of Contents"
+msgstr "Mục lục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertMultiIndex\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Table of Contents, Index or Bibliography"
+msgstr "Chèn mục lục, chỉ mục hoặc danh mục tài liệu tham khảo"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertMultiIndex\n"
+"ContextLabel\n"
+"value.text"
+msgid "Table of Contents, Index or Bibliography..."
+msgstr "Mục lục, chỉ mục hoặc tài liệu tham khảo..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertAuthoritiesEntry\n"
+"Label\n"
+"value.text"
+msgid "~Citation..."
+msgstr "~Trích dẫn..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShadowCursor\n"
+"Label\n"
+"value.text"
+msgid "Toggle Direct Cursor Mode"
+msgstr "Bật/tắt con trỏ tự do"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShadowCursor\n"
+"ContextLabel\n"
+"value.text"
+msgid "Direct Cursor Mode"
+msgstr "Con trỏ tự do"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateAllIndexes\n"
+"Label\n"
+"value.text"
+msgid "Update All"
+msgstr "Cậ~p nhật tất cả"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateAllIndexes\n"
+"ContextLabel\n"
+"value.text"
+msgid "Indexes and ~Tables"
+msgstr "Chỉ ~mục và mục lục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateAllIndexes\n"
+"PopupLabel\n"
+"value.text"
+msgid "Update Indexes and ~Tables"
+msgstr "Cập nhật chỉ mục và ~mục lục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateCurIndex\n"
+"Label\n"
+"value.text"
+msgid "Update Index"
+msgstr "Cập nhật chỉ mục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateCurIndex\n"
+"ContextLabel\n"
+"value.text"
+msgid "Current ~Index"
+msgstr "Chỉ mục ~hiện tại"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateCurIndex\n"
+"PopupLabel\n"
+"value.text"
+msgid "Update ~Index"
+msgstr "Cập nhật ~chỉ mục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectTrackedChange\n"
+"Label\n"
+"value.text"
+msgid "Reject"
+msgstr "Từ chối"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectTrackedChange\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Reject Tracked Change"
+msgstr "Từ chối thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectTrackedChange\n"
+"PopupLabel\n"
+"value.text"
+msgid "Reject Change"
+msgstr "Từ chối thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectTrackedChangeToNext\n"
+"Label\n"
+"value.text"
+msgid "Reject and Move to Next"
+msgstr "Từ chối và sang thay đổi sau"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectTrackedChangeToNext\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Reject Tracked Change and select the next one"
+msgstr "Từ chối thay đổi này và chọn thay đổi kế tiếp"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectAllTrackedChanges\n"
+"Label\n"
+"value.text"
+msgid "Reject All"
+msgstr "Từ chối tất cả"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectAllTrackedChanges\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Reject All Tracked Changes"
+msgstr "Từ chối tất cả thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RejectAllTrackedChanges\n"
+"PopupLabel\n"
+"value.text"
+msgid "Reject All Changes"
+msgstr "Từ chối tất cả thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChange\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Accept Tracked Change"
+msgstr "Chấp nhận thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChange\n"
+"PopupLabel\n"
+"value.text"
+msgid "Accept Change"
+msgstr "Chấp nhận thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChangeToNext\n"
+"Label\n"
+"value.text"
+msgid "Accept and Move to Next"
+msgstr "Chấp nhận và sang thay đổi sau"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChangeToNext\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Accept Tracked Change and select the next one"
+msgstr "Chấp nhận thay đổi này và chọn thay đổi kế tiếp"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptAllTrackedChanges\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Accept All Tracked Changes"
+msgstr "Chấp nhận tất cả thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptAllTrackedChanges\n"
+"PopupLabel\n"
+"value.text"
+msgid "Accept All Changes"
+msgstr "Chấp nhận tất cả thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:NextTrackedChange\n"
+"Label\n"
+"value.text"
+msgid "Next"
+msgstr "Sau"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:NextTrackedChange\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Next Tracked Change"
+msgstr "Thay đổi sau"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:PreviousTrackedChange\n"
+"Label\n"
+"value.text"
+msgid "Pr~evious"
+msgstr "~Trước"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:PreviousTrackedChange\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Previous Tracked Change"
+msgstr "Thay đổi trước"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateAllLinks\n"
+"PopupLabel\n"
+"value.text"
+msgid "Update ~Links"
+msgstr "Cập nhật ~liên kết"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TrackChanges\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Record Tracked Changes"
+msgstr "Ghi lại thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowTrackedChanges\n"
+"Label\n"
+"value.text"
+msgid "Show Tracked Changes"
+msgstr "Hiện thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowTrackedChanges\n"
+"ContextLabel\n"
+"value.text"
+msgid "Show"
+msgstr "Hiện"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowTrackedChanges\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Show tracked changes"
+msgstr "Hiện các thay đổi đã theo dõi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UseHeaderFooterMenu\n"
+"Label\n"
+"value.text"
+msgid "Use header/footer menu"
+msgstr "Dùng menu đầu trang/chân trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UseHeaderFooterMenu\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Use the advanced popup menu to create header/footer on the fly"
+msgstr "Dùng menu bật lên để tạo nhanh đầu trang/chân trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GotoPage\n"
+"Label\n"
+"value.text"
+msgid "Go t~o Page..."
+msgstr "Đến ~trang..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Manage Tracked Changes"
+msgstr "Quản lý thay đổi"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateCharts\n"
+"Label\n"
+"value.text"
+msgid "~Charts"
+msgstr "~Biểu đồ"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UpdateCharts\n"
+"PopupLabel\n"
+"value.text"
+msgid "Update ~Charts"
+msgstr "Cập nhật ~biểu đồ"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertBookmark\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Bookmark"
+msgstr "Chèn dấu trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ChangeDatabaseField\n"
+"Label\n"
+"value.text"
+msgid "Exchange Data~base..."
+msgstr "Đổi cơ sở ~dữ liệu..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertCaptionDialog\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Caption"
+msgstr "Chèn chú thích hình"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertCaptionDialog\n"
+"PopupLabel\n"
+"value.text"
+msgid "Insert Caption..."
+msgstr "Chèn chú thích hình..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFootnoteDialog\n"
+"Label\n"
+"value.text"
+msgid "Insert Special F~ootnote/Endnote..."
+msgstr "Chèn chú thích cuối ~đặc biệt..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertReferenceField\n"
+"Label\n"
+"value.text"
+msgid "Cross-~reference..."
+msgstr "Tham chiếu ~chéo..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertReferenceField\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Cross-reference"
+msgstr "Chèn tham chiếu chéo"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertTable\n"
+"ContextLabel\n"
+"value.text"
+msgid "Insert ~Table..."
+msgstr "Chèn ~bảng..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFrameInteract\n"
+"Label\n"
+"value.text"
+msgid "Insert Frame Interactively"
+msgstr "Vẽ khung"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFrameInteract\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Frame Interactively"
+msgstr "~Vẽ khung"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertIndexesEntry\n"
+"Label\n"
+"value.text"
+msgid "Insert Index Entry"
+msgstr "Chèn mục chỉ mục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertIndexesEntry\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Index Entry..."
+msgstr "~Mục chỉ mục..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertObjectStarMath\n"
+"Label\n"
+"value.text"
+msgid "~Formula Object..."
+msgstr "~Công thức..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertObjectStarMath\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Formula Object"
+msgstr "Chèn công thức"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFieldCtrl\n"
+"Label\n"
+"value.text"
+msgid "Fiel~d"
+msgstr "~Trường"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFieldCtrl\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Field"
+msgstr "Chèn trường"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertDateField\n"
+"Label\n"
+"value.text"
+msgid "~Date (fixed)"
+msgstr "~Ngày (cố định)"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:PageNumberWizard\n"
+"Label\n"
+"value.text"
+msgid "~Page Number..."
+msgstr "Số ~trang..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:PageNumberWizard\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert page number"
+msgstr "Chèn số trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPageNumberField\n"
+"Label\n"
+"value.text"
+msgid "~Page Number Field"
+msgstr "Trường số ~trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPageNumberField\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Page Number"
+msgstr "Số ~trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPageNumberField\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Page Number"
+msgstr "Chèn số trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFootnote\n"
+"Label\n"
+"value.text"
+msgid "~Footnote"
+msgstr "Chú thích cuối ~trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFootnote\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Footnote"
+msgstr "Chèn chú thích cuối trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RotateRight\n"
+"Label\n"
+"value.text"
+msgid "Rotate 90° ~Right"
+msgstr "Xoay 90° sang ~phải"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:PageColumnType\n"
+"Label\n"
+"value.text"
+msgid "Page Columns"
+msgstr "Cột trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:PageDialog\n"
+"Label\n"
+"value.text"
+msgid "~Page Style..."
+msgstr "Kiểu ~trang..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog\n"
+"Label\n"
+"value.text"
+msgid "Frame or Object Properties"
+msgstr "Thuộc tính khung hoặc đối tượng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Properties..."
+msgstr "~Thuộc tính..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Thuộc tính ảnh"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Properties..."
+msgstr "~Thuộc tính..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Properties..."
+msgstr "~Thuộc tính..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog\n"
+"PopupLabel\n"
+"value.text"
+msgid "~Table Properties..."
+msgstr "Thuộc tính ~bảng..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ResetAttributes\n"
+"Label\n"
+"value.text"
+msgid "Clear"
+msgstr "Xóa định dạng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ResetAttributes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Clear Direct Formatting"
+msgstr "Xóa định dạng trực tiếp"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:WrapOff\n"
+"Label\n"
+"value.text"
+msgid "None"
+msgstr "Không bao quanh"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:WrapOn\n"
+"Label\n"
+"value.text"
+msgid "~Parallel"
+msgstr "~Song song"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowTwoPages\n"
+"Label\n"
+"value.text"
+msgid "Two Pages Preview"
+msgstr "Xem trước hai trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowSinglePage\n"
+"Label\n"
+"value.text"
+msgid "Single Page Preview"
+msgstr "Xem trước một trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:WrapThrough\n"
+"Label\n"
+"value.text"
+msgid "~Through"
+msgstr "~Xuyên qua"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowMultiplePages\n"
+"Label\n"
+"value.text"
+msgid "Multiple Pages Preview"
+msgstr "Xem trước nhiều trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:HeadingRowsRepeat\n"
+"Label\n"
+"value.text"
+msgid "Header Rows Repeat Across Pages"
+msgstr "Lặp hàng tiêu đề ở mỗi trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"Label\n"
+"value.text"
+msgid "Insert Rows Above"
+msgstr "Chèn hàng phía trên"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"ContextLabel\n"
+"value.text"
+msgid "Rows ~Above"
+msgstr "Hàng phía ~trên"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Chèn hàng phía trên"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"Label\n"
+"value.text"
+msgid "Insert Rows Below"
+msgstr "Chèn hàng phía dưới"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"ContextLabel\n"
+"value.text"
+msgid "Rows ~Below"
+msgstr "Hàng phía ~dưới"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Chèn hàng phía dưới"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"Label\n"
+"value.text"
+msgid "Insert Columns Before"
+msgstr "Chèn cột bên trái"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"ContextLabel\n"
+"value.text"
+msgid "Columns B~efore"
+msgstr "Cột bên ~trái"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Chèn cột bên trái"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"Label\n"
+"value.text"
+msgid "Insert Columns After"
+msgstr "Chèn cột bên phải"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"ContextLabel\n"
+"value.text"
+msgid "Columns A~fter"
+msgstr "Cột bên ~phải"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Chèn cột bên phải"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DeleteRows\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Delete selected rows"
+msgstr "Xóa các hàng đã chọn"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DeleteColumns\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Delete selected columns"
+msgstr "Xóa các cột đã chọn"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DeleteTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Table"
+msgstr "Xóa bảng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DeleteTable\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Delete table"
+msgstr "Xóa bảng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OptimizeTable\n"
+"Label\n"
+"value.text"
+msgid "Optimize Size"
+msgstr "Tối ưu kích thước"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:EntireCell\n"
+"Label\n"
+"value.text"
+msgid "Select Cell"
+msgstr "Chọn ô"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:EntireCell\n"
+"ContextLabel\n"
+"value.text"
+msgid "C~ell"
+msgstr "~Ô"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:EntireCell\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Select Cell"
+msgstr "Chọn ô"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:EntireColumn\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Column"
+msgstr "~Cột"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:SelectTable\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Select Table"
+msgstr "Chọn bảng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFormula\n"
+"Label\n"
+"value.text"
+msgid "Edit Fo~rmula"
+msgstr "Sửa ~công thức"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertFormula\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert or Edit Formula"
+msgstr "Chèn hoặc sửa công thức"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:UnsetCellsReadOnly\n"
+"Label\n"
+"value.text"
+msgid "Unprotect Cells"
+msgstr "Bỏ bảo vệ ô"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DecrementLevel\n"
+"Label\n"
+"value.text"
+msgid "Demote Outline Level"
+msgstr "Hạ cấp đề mục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:IncrementLevel\n"
+"Label\n"
+"value.text"
+msgid "Promote Outline Level"
+msgstr "Nâng cấp đề mục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DecrementSubLevels\n"
+"Label\n"
+"value.text"
+msgid "Demote Outline Level with Subpoints"
+msgstr "Hạ cấp đề mục kèm mục con"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:IncrementSubLevels\n"
+"Label\n"
+"value.text"
+msgid "Promote Outline Level with Subpoints"
+msgstr "Nâng cấp đề mục kèm mục con"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:JumpToSpecificPage\n"
+"Label\n"
+"value.text"
+msgid "Jump To Specific Page"
+msgstr "Đi tới trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Repaginate\n"
+"PopupLabel\n"
+"value.text"
+msgid "Update Page Formatting"
+msgstr "Cập nhật định dạng trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:NumberFormatDate\n"
+"Label\n"
+"value.text"
+msgid "Number Format: Date"
+msgstr "Định dạng số: Ngày"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:WrapIdeal\n"
+"Label\n"
+"value.text"
+msgid "~Optimal"
+msgstr "~Tối ưu"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:NumberingStart\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Restart Numbering"
+msgstr "Bật/tắt đánh số lại từ đầu"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:WrapLeft\n"
+"Label\n"
+"value.text"
+msgid "Before"
+msgstr "Bên trái"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:WrapRight\n"
+"Label\n"
+"value.text"
+msgid "After"
+msgstr "Bên phải"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:SetMinimalColumnWidth\n"
+"Label\n"
+"value.text"
+msgid "Minimal Column Width"
+msgstr "Độ rộng cột tối thiểu"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:SetMinimalColumnWidth\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Minimal Column Width: Adjust width of selected columns to fit content"
+msgstr "Độ rộng cột tối thiểu: chỉnh độ rộng các cột đã chọn vừa với nội dung"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:SetMinimalRowHeight\n"
+"Label\n"
+"value.text"
+msgid "Minimal Row Height"
+msgstr "Chiều cao hàng tối thiểu"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:SetMinimalRowHeight\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Minimal Row Height: Adjust height of selected rows to fit content"
+msgstr "Chiều cao hàng tối thiểu: chỉnh chiều cao các hàng đã chọn vừa với nội dung"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:DistributeRows\n"
+"Label\n"
+"value.text"
+msgid "Distribute Rows Evenly"
+msgstr "Phân bố đều các hàng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:RowSplit\n"
+"Label\n"
+"value.text"
+msgid "Row to ~Break Across Pages"
+msgstr "Cho phép hàng ~ngắt sang trang sau"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Ruler\n"
+"Label\n"
+"value.text"
+msgid "~Rulers"
+msgstr "~Thước"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowGraphics\n"
+"Label\n"
+"value.text"
+msgid "View Images and Charts"
+msgstr "Hiện ảnh và biểu đồ"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowGraphics\n"
+"ContextLabel\n"
+"value.text"
+msgid "~Images and Charts"
+msgstr "Ả~nh và biểu đồ"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Hyphenate\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert Soft Hyphen..."
+msgstr "Chèn gạch nối mềm..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ChapterNumberingDialog\n"
+"Label\n"
+"value.text"
+msgid "Heading ~Numbering..."
+msgstr "~Đánh số đề mục..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ChapterNumberingDialog\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Set Heading Numbering"
+msgstr "Đặt cách đánh số đề mục"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ControlCodes\n"
+"Label\n"
+"value.text"
+msgid "Formatting Marks"
+msgstr "Ký hiệu định dạng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ControlCodes\n"
+"ContextLabel\n"
+"value.text"
+msgid "For~matting Marks"
+msgstr "Ký hiệu định ~dạng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ControlCodes\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Formatting Marks"
+msgstr "Hiện/ẩn ký hiệu định dạng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowWhitespace\n"
+"Label\n"
+"value.text"
+msgid "Show Whitespac~e"
+msgstr "Hiện khoảng ~trắng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowWhitespace\n"
+"ContextLabel\n"
+"value.text"
+msgid "Whitespac~e"
+msgstr "Khoảng ~trắng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowWhitespace\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Show whitespace between pages"
+msgstr "Hiện khoảng trắng giữa các trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableBoundaries\n"
+"Label\n"
+"value.text"
+msgid "Table Boundaries (deprecated)"
+msgstr "Đường biên bảng (cũ)"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowBoundaries\n"
+"Label\n"
+"value.text"
+msgid "Show Boundaries"
+msgstr "Hiện đường biên"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowBoundaries\n"
+"ContextLabel\n"
+"value.text"
+msgid "Boundaries"
+msgstr "Đường biên"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ShowBoundaries\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Show boundaries for all types depending on settings at formatting aids."
+msgstr "Hiện đường biên của mọi loại theo thiết lập trợ giúp định dạng."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatPaintbrush\n"
+"Label\n"
+"value.text"
+msgid "Clone Formatting"
+msgstr "Sao định dạng"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatPaintbrush\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
+msgstr "Sao định dạng (nhấp đúp để áp nhiều lần)"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BaselineGridVisible\n"
+"Label\n"
+"value.text"
+msgid "Display ~Baseline Grid"
+msgstr "Hiện ~lưới dòng chuẩn"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BaselineGridVisible\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Display the baseline grid for page line-spacing"
+msgstr "Hiện lưới dòng chuẩn theo giãn dòng của trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:WordCountDialog\n"
+"Label\n"
+"value.text"
+msgid "~Word Count..."
+msgstr "~Đếm từ..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:ContinueNumbering\n"
+"Label\n"
+"value.text"
+msgid "~Add to List"
+msgstr "~Thêm vào danh sách"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:ContinueNumbering\n"
+"TooltipLabel\n"
+"value.text"
+msgid "“Add to List” adds selected paragraphs to an immediately preceding list."
+msgstr "“Thêm vào danh sách” nối các đoạn đã chọn vào danh sách ngay phía trước."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:Orientation\n"
+"Label\n"
+"value.text"
+msgid "Orientation"
+msgstr "Hướng giấy"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:Orientation\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Change page orientation to portrait or landscape"
+msgstr "Đổi hướng trang sang dọc hoặc ngang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:AttributePageSize\n"
+"Label\n"
+"value.text"
+msgid "Page Size"
+msgstr "Khổ giấy"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:PageMargin\n"
+"Label\n"
+"value.text"
+msgid "Page Margins"
+msgstr "Lề trang"
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:Watermark\n"
+"Label\n"
+"value.text"
+msgid "Watermark..."
+msgstr "Hình mờ..."
+
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Popups..uno:TableCellBackgroundColor\n"
+"Label\n"
+"value.text"
+msgid "Table Cell Background Color"
+msgstr "Màu nền ô"

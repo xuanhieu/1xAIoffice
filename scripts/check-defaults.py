@@ -17,6 +17,11 @@ EXPECTED = [
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.presentation.PresentationDocument", "ooSetupFactoryDefaultFilter", "Impress MS PowerPoint 2007 XML"),
     ("/org.openoffice.Office.Common/Save/Document", "WarnAlienFormat", False),
     ("/org.openoffice.Office.Common/Security/Scripting", "MacroSecurityLevel", 2),
+    ("/org.openoffice.Setup/Product", "WhatsNew", False),
+    ("/org.openoffice.Office.Common/Misc", "ShowTipOfTheDay", False),
+    ("/org.openoffice.Setup/Product", "LastTimeGetInvolvedShown", 32503680000),
+    ("/org.openoffice.Setup/Product", "LastTimeDonateShown", 32503680000),
+    ("/org.openoffice.Setup/Product", "ooName", "1xVnOffice"),
 ]
 
 
@@ -43,6 +48,12 @@ def main():
         ok = got == want
         failures += not ok
         print(f"{'OK  ' if ok else 'SAI '} {path}/{prop} = {got!r}" + ("" if ok else f" (mong đợi {want!r})"))
+    # Translations must reach the running office: the ribbon label of Cut comes from the Vietnamese config layer.
+    commands = ctx.getValueByName("/singletons/com.sun.star.frame.theUICommandDescription")
+    label = dict((p.Name, p.Value) for p in commands.getByName("com.sun.star.text.TextDocument").getByName(".uno:Cut"))["Label"]
+    ok = label == "~Cắt"
+    failures += not ok
+    print(f"{'OK  ' if ok else 'SAI '} nhãn tiếng Việt của .uno:Cut = {label!r}" + ("" if ok else " (mong đợi '~Cắt')"))
     try:
         ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", ctx).terminate()
     except Exception:  # noqa: BLE001 - the bridge drops when the office exits

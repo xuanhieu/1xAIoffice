@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build 1xVnOffice for macOS from the locked LibreOffice tarballs.
-# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch configure build config sign smoke defaults all
+# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config sign smoke defaults all
 set -euo pipefail
 # shellcheck source=scripts/env.sh
 source "$(dirname "$0")/env.sh"
@@ -93,6 +93,19 @@ step_patch() {
   mv "$marker.new" "$marker"
 }
 
+step_l10n() {
+  # Merge the 1xVnOffice translation layer (l10n/) into the LibreOffice translations before building.
+  [ -d "$SRC_DIR/translations/source" ] || die "Chưa có bản dịch; chạy bước extract."
+  python3 "$REPO_ROOT/scripts/l10n-merge.py" --src "$SRC_DIR" --lang vi --strict
+  # gbuild's MoTarget does not depend on its .po file, so a changed translation is never recompiled on its own.
+  # Remove the compiled catalogue of every module the layer touches; make rebuilds and reinstalls it.
+  local po_file module
+  while IFS= read -r po_file; do
+    module="$(basename "$(dirname "$po_file")")"
+    rm -f "$SRC_DIR/workdir/MoTarget/${module}vi.mo"
+  done < <(find "$REPO_ROOT/l10n/vi" -name messages.po)
+}
+
 step_configure() {
   setup_toolbin
   [ -d "$SRC_DIR" ] || die "Chưa có mã nguồn; chạy bước extract."
@@ -117,7 +130,9 @@ step_build() {
   (cd "$SRC_DIR" && "$MAKE_BIN") 2>&1 | tee "$LOG_DIR/build-$STAMP.log"
 }
 
-app_path() { find "$SRC_DIR/instdir" -maxdepth 1 -name '*.app' -print -quit; }
+# The bundle is named after the product (1xVnOffice.app); the newest one wins if an older name is still there.
+# shellcheck disable=SC2012 # bundle names are fixed product names without spaces
+app_path() { ls -dt "$SRC_DIR"/instdir/*.app 2>/dev/null | head -1; }
 
 step_config() {
   local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
@@ -163,11 +178,11 @@ step_defaults() {
   info "Cấu hình mặc định có hiệu lực."
 }
 
-[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch configure build config sign smoke defaults all"
+[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config sign smoke defaults all"
 for s in "$@"; do
   case "$s" in
-    all) step_preflight; step_extract; step_patch; step_configure; step_build; step_config; step_sign; step_smoke; step_defaults ;;
-    preflight|extract|patch|configure|build|config|sign|smoke|defaults) "step_$s" ;;
+    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_sign; step_smoke; step_defaults ;;
+    preflight|extract|patch|l10n|configure|build|config|sign|smoke|defaults) "step_$s" ;;
     *) die "Bước lạ: $s" ;;
   esac
 done
