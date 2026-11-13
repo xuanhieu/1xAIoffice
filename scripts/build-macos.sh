@@ -162,20 +162,35 @@ step_smoke() {
   info "Smoke test đạt: $tmp/smoke.pdf"
 }
 
-step_defaults() {
-  # Start a headless office with a fresh profile and check that config/1x-defaults.xcd took effect.
-  local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
-  local profile; profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
-  local pipe="onex_defaults_$$"
+run_defaults_check() {  # run_defaults_check <lang> <profile dir>
+  local app="$1" lang="$2" profile="$3" pipe="onex_defaults_$$_$2" rc=0
   "$app/Contents/MacOS/soffice" --headless --norestore -env:UserInstallation="file://$profile" \
     "--accept=pipe,name=$pipe;urp;" >/dev/null 2>&1 &
   local pid=$!
-  local rc=0
-  "$app/Contents/Resources/python" "$REPO_ROOT/scripts/check-defaults.py" "$pipe" || rc=$?
+  "$app/Contents/Resources/python" "$REPO_ROOT/scripts/check-defaults.py" "$pipe" "$lang" || rc=$?
   sleep 2; kill "$pid" 2>/dev/null || true
-  rm -rf "$profile"
-  [ "$rc" = 0 ] || die "Cấu hình mặc định chưa có hiệu lực."
-  info "Cấu hình mặc định có hiệu lực."
+  return "$rc"
+}
+
+step_defaults() {
+  # 1) Fresh profile: config/1x-defaults.xcd took effect and the UI is English by default.
+  # 2) Profile switched to Vietnamese (as a user would in Options): the 1x translations reach the office.
+  local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
+  local en vi rc=0
+  en="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
+  vi="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
+  mkdir -p "$vi/user"
+  cat > "$vi/user/registrymodifications.xcu" <<'XCU'
+<?xml version="1.0" encoding="UTF-8"?>
+<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<item oor:path="/org.openoffice.Office.Linguistic/General"><prop oor:name="UILocale" oor:op="fuse"><value>vi</value></prop></item>
+</oor:items>
+XCU
+  run_defaults_check "$app" en "$en" || rc=1
+  run_defaults_check "$app" vi "$vi" || rc=1
+  rm -rf "$en" "$vi"
+  [ "$rc" = 0 ] || die "Cấu hình mặc định hoặc bản dịch chưa có hiệu lực."
+  info "Cấu hình mặc định và bản dịch có hiệu lực."
 }
 
 [ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config sign smoke defaults all"

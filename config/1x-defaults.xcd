@@ -21,10 +21,11 @@
     </node>
   </oor:component-data>
 
-  <!-- Vietnamese user interface by default (personal profile); English stays available in Options. -->
+  <!-- English user interface by default (owner's decision 2026-11-13); Vietnamese is fully translated and chosen in
+       Tools > Options > Language Settings > Languages. -->
   <oor:component-data oor:package="org.openoffice.Office" oor:name="Linguistic">
     <node oor:name="General">
-      <prop oor:name="UILocale" oor:op="fuse"><value>vi</value></prop>
+      <prop oor:name="UILocale" oor:op="fuse"><value>en-US</value></prop>
     </node>
   </oor:component-data>
 

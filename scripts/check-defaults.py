@@ -1,5 +1,6 @@
 # Run with the office's bundled Python against a running soffice (see scripts/build-macos.sh step "defaults").
-# Reads the effective configuration of a fresh profile and checks that config/1x-defaults.xcd took effect.
+# Usage: python check-defaults.py <pipe> en   -> fresh profile: config/1x-defaults.xcd took effect, English UI
+#        python check-defaults.py <pipe> vi   -> profile switched to Vietnamese: the 1x translations reach the office
 import sys
 import time
 
@@ -11,7 +12,7 @@ EXPECTED = [
     ("/org.openoffice.Office.UI.ToolbarMode/Applications/Calc", "Active", "notebookbar.ui"),
     ("/org.openoffice.Office.UI.ToolbarMode/Applications/Impress", "Active", "notebookbar.ui"),
     ("/org.openoffice.Office.UI.ToolbarMode/Applications/Draw", "Active", "notebookbar.ui"),
-    ("/org.openoffice.Office.Linguistic/General", "UILocale", "vi"),
+    ("/org.openoffice.Office.Linguistic/General", "UILocale", "en-US"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.text.TextDocument", "ooSetupFactoryDefaultFilter", "MS Word 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.sheet.SpreadsheetDocument", "ooSetupFactoryDefaultFilter", "Calc MS Excel 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.presentation.PresentationDocument", "ooSetupFactoryDefaultFilter", "Impress MS PowerPoint 2007 XML"),
@@ -36,11 +37,15 @@ def connect(pipe):
     sys.exit("không kết nối được tới soffice")
 
 
+CUT_LABEL = {"en": "~Cut", "vi": "~Cắt"}
+
+
 def main():
     ctx = connect(sys.argv[1])
+    lang = sys.argv[2] if len(sys.argv) > 2 else "en"
     provider = ctx.ServiceManager.createInstanceWithContext("com.sun.star.configuration.ConfigurationProvider", ctx)
     failures = 0
-    for path, prop, want in EXPECTED:
+    for path, prop, want in (EXPECTED if lang == "en" else []):
         arg = PropertyValue()
         arg.Name, arg.Value = "nodepath", path
         node = provider.createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", (arg,))
@@ -48,12 +53,13 @@ def main():
         ok = got == want
         failures += not ok
         print(f"{'OK  ' if ok else 'SAI '} {path}/{prop} = {got!r}" + ("" if ok else f" (mong đợi {want!r})"))
-    # Translations must reach the running office: the ribbon label of Cut comes from the Vietnamese config layer.
+    # The label of Cut, read from the running office, proves which UI language and config translations are active.
     commands = ctx.getValueByName("/singletons/com.sun.star.frame.theUICommandDescription")
     label = dict((p.Name, p.Value) for p in commands.getByName("com.sun.star.text.TextDocument").getByName(".uno:Cut"))["Label"]
-    ok = label == "~Cắt"
+    want = CUT_LABEL[lang]
+    ok = label == want
     failures += not ok
-    print(f"{'OK  ' if ok else 'SAI '} nhãn tiếng Việt của .uno:Cut = {label!r}" + ("" if ok else " (mong đợi '~Cắt')"))
+    print(f"{'OK  ' if ok else 'SAI '} nhãn ({lang}) của .uno:Cut = {label!r}" + ("" if ok else f" (mong đợi {want!r})"))
     try:
         ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", ctx).terminate()
     except Exception:  # noqa: BLE001 - the bridge drops when the office exits
