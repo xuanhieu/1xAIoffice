@@ -55,6 +55,13 @@ Chủ dự án không muốn theme mặc định của LibreOffice. Hướng đ�
   - Nút quyên góp cho TDF đã tắt (`ShowDonation=false`).
 - **Còn thiếu so với trang chủ kiểu WPS:** ô tìm tài liệu ở đầu trang, thẻ tài liệu (mục 4), khung đề xuất bên phải, danh sách gần đây dạng bảng (tên, nơi lưu, ngày sửa). Các phần này cần viết lại `BackingWindow` (sfx2, C++) hoặc làm trang chủ riêng. Đây là việc kế tiếp của mục 5.
 
+## Bộ hướng dẫn nhanh đi kèm (13/11/2026)
+
+- `scripts/guides/make-guides.py` dùng chính 1xVnOffice sinh ra 1xDoc (.docx, kèm .pdf), 1xSheet (.xlsx) và 1xSlide (.pptx), mỗi file có bản tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp 1xVnOffice. Bước build `guides` cài chúng vào `App/Contents/Resources/guides/<lang>/`, kèm ảnh xem trước trang đầu.
+- Hướng dẫn 1xSheet là bảng chạy được: đổi số lượng thì thành tiền, số tiền bằng chữ (DOCTIEN) và biểu đồ tự cập nhật. Bảng có sẵn lọc, cố định dòng tiêu đề và định dạng có điều kiện.
+- Lần chạy đầu, job `GuideSeeder` (sự kiện `onFirstRunInitialization`) đưa ba hướng dẫn vào mục Gần đây theo ngôn ngữ giao diện, rồi nạp lại Start Center. Job chỉ chạy khi mục Gần đây còn trống.
+- Bài học: LibreOffice headless trên macOS bị abort trong `AquaSalMenu::setMainMenu` khi mở một tài liệu ẩn (`Hidden=True`) hoặc một cửa sổ tài liệu thứ hai. Vì vậy mỗi tệp được sinh trong một phiên soffice riêng, với tài liệu hiển thị.
+
 ## Số đo gốc (13/11/2026)
 
 `scripts/ui-coverage.py` so ribbon với bảng đối chiếu `docs/ui/writer-command-map.csv` (86 lệnh chính của Word: Trang đầu, Chèn, Thiết kế, Bố cục, Tham chiếu, Thư, Xem lại, Xem).

@@ -12,6 +12,7 @@ import uno
 import unohelper
 from com.sun.star.frame import XDispatch, XDispatchProvider
 from com.sun.star.lang import XInitialization, XServiceInfo
+from com.sun.star.task import XJob
 
 import datetime
 import json
@@ -281,7 +282,79 @@ if XVnSheetFunctions is not None:
             return ("com.sun.star.sheet.AddIn",)
 
 
+GUIDES_IMPL = "org.1xvnoffice.tools.GuideSeeder"
+
+
+class GuideSeeder(unohelper.Base, XJob):
+    """First run (job event onFirstRunInitialization): put the bundled quick start guides into Recent documents, like
+    WPS does, then reload the Start Center so they show at once. Only when Recent is still empty, so a user's own
+    history is never touched."""
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def _config(self, path, update=False):
+        provider = self.ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.configuration.ConfigurationProvider", self.ctx)
+        arg = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
+        arg.Name, arg.Value = "nodepath", path
+        kind = "ConfigurationUpdateAccess" if update else "ConfigurationAccess"
+        return provider.createInstanceWithArguments("com.sun.star.configuration." + kind, (arg,))
+
+    def execute(self, args):
+        try:
+            self.seed()
+        except Exception:  # a failed convenience must never disturb start-up
+            pass
+        return None
+
+    def seed(self):
+        import base64
+        from vn1x.guides import guide_files, thumbnail_png
+        subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+        root = uno.fileUrlToSystemPath(subst.substituteVariables("$(inst)", True)) + "/Resources/guides"
+        locale = self._config("/org.openoffice.Office.Linguistic/General").UILocale
+        files = guide_files(root, locale)
+        if not files:
+            return
+        histories = self._config("/org.openoffice.Office.Histories/Histories", update=True)
+        if not histories.hasByName("PickList"):
+            return
+        pick = histories.getByName("PickList")
+        items, order = pick.getByName("ItemList"), pick.getByName("OrderList")
+        if items.ElementNames:
+            return
+        for i, (path, filt) in enumerate(files):
+            url = uno.systemPathToFileUrl(str(path))
+            item = items.createInstance()
+            png = thumbnail_png(path)
+            thumb = base64.b64encode(png).decode("ascii") if png else ""
+            item.Filter, item.Title, item.Thumbnail, item.ReadOnly, item.Pinned = filt, path.name, thumb, False, False
+            items.insertByName(url, item)
+            ref = order.createInstance()
+            ref.HistoryItemRef = url
+            order.insertByName(str(i), ref)
+        histories.commitChanges()
+        self.reload_start_center()
+
+    def reload_start_center(self):
+        desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
+        frames = desktop.getFrames()
+        for i in range(frames.getCount()):
+            frame = frames.getByIndex(i)
+            controller = frame.getController()
+            if controller is None or controller.getModel() is not None:
+                continue  # only the Start Center has a controller without a document
+            window = frame.getContainerWindow()
+            start = self.ctx.ServiceManager.createInstanceWithArgumentsAndContext(
+                "com.sun.star.frame.StartModule", (window,), self.ctx)
+            frame.setComponent(start, start)
+            start.attachFrame(frame)
+            window.setVisible(True)
+
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationHelper.addImplementation(Handler, IMPL, ("com.sun.star.frame.ProtocolHandler",))
+g_ImplementationHelper.addImplementation(GuideSeeder, GUIDES_IMPL, ("com.sun.star.task.Job",))
 if XVnSheetFunctions is not None:
     g_ImplementationHelper.addImplementation(SheetFunctions, SHEET_IMPL, ("com.sun.star.sheet.AddIn",))

@@ -28,6 +28,7 @@ EXPECTED = [
     ("/org.openoffice.Office.Common/Appearance", "LibreOfficeTheme", 1),
     ("/org.openoffice.Office.Common/Misc", "SymbolStyle", "1x"),
     ("/org.openoffice.Office.Common/Misc", "ShowDonation", False),
+    ("/org.openoffice.Office.Impress/Misc/NewDoc", "AutoPilot", False),
 ]
 
 

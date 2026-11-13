@@ -64,4 +64,12 @@
       </node>
     </node>
   </oor:component-data>
+  <!-- 1xSlide opens on an empty slide like PowerPoint and WPS, without LibreOffice's "Select a Template" dialog. -->
+  <oor:component-data oor:package="org.openoffice.Office" oor:name="Impress">
+    <node oor:name="Misc">
+      <node oor:name="NewDoc">
+        <prop oor:name="AutoPilot" oor:op="fuse"><value>false</value></prop>
+      </node>
+    </node>
+  </oor:component-data>
 </oor:data>

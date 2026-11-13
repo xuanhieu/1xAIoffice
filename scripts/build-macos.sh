@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build 1xVnOffice for macOS from the locked LibreOffice tarballs.
-# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config brand extensions sign smoke defaults tools all
+# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config brand guides extensions sign smoke defaults tools all
 set -euo pipefail
 # shellcheck source=scripts/env.sh
 source "$(dirname "$0")/env.sh"
@@ -174,6 +174,31 @@ PYRC
   info "Đã cài nhận diện 1xVnOffice (logo, About, splash, icon)."
 }
 
+step_guides() {
+  # Build the bundled quick start guides (scripts/guides/make-guides.py) with the app itself and install them into
+  # App/Contents/Resources/guides/<lang>/. One soffice session and one visible document per file: headless macOS
+  # soffice aborts in AquaSalMenu::setMainMenu on a hidden or second document window.
+  local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
+  local out="$ONEX_WORK/guides" pipe="guides1x" lang kind profile pid
+  rm -rf "$out"; mkdir -p "$out"
+  for lang in en vi; do
+    for kind in doc sheet slide; do
+      profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
+      rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
+      "$app/Contents/MacOS/soffice" --headless --norestore -env:UserInstallation="file://$profile" \
+        "--accept=pipe,name=$pipe;urp;" >/dev/null 2>&1 &
+      pid=$!
+      "$app/Contents/Resources/python" "$REPO_ROOT/scripts/guides/make-guides.py" --pipe "$pipe" --out "$out" \
+        --only "$lang:$kind" || { kill -9 "$pid" 2>/dev/null; die "Không sinh được hướng dẫn $lang:$kind."; }
+      kill -9 "$pid" 2>/dev/null; wait "$pid" 2>/dev/null || true
+      rm -rf "$profile" "/tmp/OSL_PIPE_$(id -u)_$pipe"
+    done
+  done
+  rm -rf "$app/Contents/Resources/guides"
+  cp -R "$out" "$app/Contents/Resources/guides"
+  info "Đã cài bộ hướng dẫn: $(cd "$out" && find . -type f | wc -l | tr -d ' ') tệp."
+}
+
 step_extensions() {
   # Package extensions/* and install them as bundled extensions of the app (unpacked, so no user action is needed).
   local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
@@ -268,11 +293,11 @@ XCU
   info "Cấu hình mặc định và bản dịch có hiệu lực."
 }
 
-[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config brand extensions sign smoke defaults tools all"
+[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config brand guides extensions sign smoke defaults tools all"
 for s in "$@"; do
   case "$s" in
-    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_brand; step_extensions; step_sign; step_smoke; step_defaults; step_tools ;;
-    preflight|extract|patch|l10n|configure|build|config|brand|extensions|sign|smoke|defaults|tools) "step_$s" ;;
+    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_brand; step_guides; step_extensions; step_sign; step_smoke; step_defaults; step_tools ;;
+    preflight|extract|patch|l10n|configure|build|config|brand|guides|extensions|sign|smoke|defaults|tools) "step_$s" ;;
     *) die "Bước lạ: $s" ;;
   esac
 done
