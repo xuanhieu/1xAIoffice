@@ -55,6 +55,20 @@ Chủ dự án không muốn theme mặc định của LibreOffice. Hướng đ�
   - Nút quyên góp cho TDF đã tắt (`ShowDonation=false`).
 - **Còn thiếu so với trang chủ kiểu WPS:** ô tìm tài liệu ở đầu trang, thẻ tài liệu (mục 4), khung đề xuất bên phải, danh sách gần đây dạng bảng (tên, nơi lưu, ngày sửa). Các phần này cần viết lại `BackingWindow` (sfx2, C++) hoặc làm trang chủ riêng. Đây là việc kế tiếp của mục 5.
 
+## Ribbon gọn kiểu WPS / Office (13/11/2026)
+
+- **Icon Fluent:** `branding/fluent-map.json` ánh xạ 232 lệnh ribbon sang Fluent UI System Icons (MIT). `make-brand.py --fluent <icons>` sinh đủ ba cỡ (`cmd/sc_`, `cmd/lc_`, `cmd/32/`) vào `images_1x.zip`, nét màu `#E3E5EB` hợp nền than chì. Lệnh chưa có trong bảng dùng icon `colibre_dark`; muốn thêm lệnh thì chỉ cần sửa file JSON.
+- **Bố cục:** bước build `ribbon` (`scripts/ui/ribbon.py`) ghi lại `notebookbar.ui` đã cài của Writer, Calc, Impress và Draw từ bản gốc, chạy lại không cộng dồn và không cần build lại lõi.
+  - Ẩn tên nhóm (239 nhãn).
+  - Paste, Clone Formatting, Find and Replace là nút lớn có chữ.
+  - Cut, Copy, Clear chỉ hiện icon.
+- **Còn khác WPS:**
+  - Thẻ đang chọn vẫn vẽ dạng viên thuốc, vì plugin macOS (Aqua) tự vẽ cả vùng thẻ.
+  - Chưa có thẻ tài liệu trên thanh tiêu đề.
+  - Impress còn hàng công cụ vẽ và thanh Properties.
+  - Thẻ "Extension" vẫn hiện.
+  - Chưa có nút NĐ30 và công cụ tiếng Việt ngay trên thẻ Home.
+
 ## Bộ hướng dẫn nhanh đi kèm (13/11/2026)
 
 - `scripts/guides/make-guides.py` dùng chính 1xVnOffice sinh ra 1xDoc (.docx, kèm .pdf), 1xSheet (.xlsx) và 1xSlide (.pptx), mỗi file có bản tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp 1xVnOffice. Bước build `guides` cài chúng vào `App/Contents/Resources/guides/<lang>/`, kèm ảnh xem trước trang đầu.

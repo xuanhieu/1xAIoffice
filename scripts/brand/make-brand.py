@@ -158,12 +158,44 @@ def icon_file(kind, key):
                32, 32)
 
 
-def icon_theme_zip(path):
+ICON_FG = "#E3E5EB"  # màu nét icon lệnh trên nền than chì
+# Cỡ icon lệnh của LibreOffice -> cỡ Fluent gần nhất (nút lớn 32px dùng bản 28px để nét không quá đậm).
+CMD_SIZES = {"cmd/sc_{}.svg": 16, "cmd/lc_{}.svg": 24, "cmd/32/{}.svg": 28}
+
+
+def fluent_icons(fluent_dir):
+    """Icon lệnh từ Fluent UI System Icons theo branding/fluent-map.json: {tên tệp trong theme: svg}, và danh sách
+    lệnh không tìm được icon."""
+    import re
+    mapping = json.loads((REPO / "branding" / "fluent-map.json").read_text(encoding="utf-8"))
+    out, missing = {}, []
+    for cmd, names in mapping.items():
+        if cmd.startswith("_"):
+            continue
+        for pattern, size in CMD_SIZES.items():
+            src = next((Path(fluent_dir) / f"{n}_{sz}_regular.svg" for n in names for sz in (size, 20, 24)
+                        if (Path(fluent_dir) / f"{n}_{sz}_regular.svg").is_file()), None)
+            if src is None:
+                missing.append(cmd)
+                break
+            text = src.read_text(encoding="utf-8")
+            text = re.sub(r'<svg ', f'<svg fill="{ICON_FG}" ', text, count=1)
+            text = re.sub(r'width="\d+" height="\d+"', f'width="{size}" height="{size}"', text, count=1)
+            out[pattern.format(cmd)] = text
+    return out, sorted(set(missing))
+
+
+def icon_theme_zip(path, fluent_dir=None):
     """Icon theme "1x": chỉ chứa icon được thay; mọi icon khác LibreOffice tự lấy từ colibre/colibre_dark."""
     import zipfile
+    extra, missing = fluent_icons(fluent_dir) if fluent_dir else ({}, [])
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for name, (kind, key) in sorted(ICON_FILES.items()):
             z.writestr(name, icon_file(kind, key))
+        for name, text in sorted(extra.items()):
+            z.writestr(name, text)
+    if fluent_dir:
+        print(f"icon Fluent: {len(extra) // len(CMD_SIZES)} lệnh; không có icon: {', '.join(missing) or 'không'}")
 
 
 def theme_xcd():
@@ -231,6 +263,7 @@ def main():
     ap.add_argument("--font", required=True, help="Noto Sans Bold .ttf")
     ap.add_argument("--font-regular", required=True, help="Noto Sans Regular .ttf")
     ap.add_argument("--no-png", action="store_true")
+    ap.add_argument("--fluent", help="thư mục icons của gói @fluentui/svg-icons (MIT), cho icon lệnh trên ribbon")
     a = ap.parse_args()
     bold, regular = Font(a.font), Font(a.font_regular)
     (OUT / "shell").mkdir(parents=True, exist_ok=True)
@@ -240,7 +273,7 @@ def main():
         (OUT / "shell" / f"{name}.svg").write_text(text, encoding="utf-8")
     (OUT / "mark.svg").write_text(svg(256, 256, mark_group(0, 0, 256, "m")), encoding="utf-8")
     (REPO / "config" / "1x-theme.xcd").write_text(theme_xcd(), encoding="utf-8")
-    icon_theme_zip(OUT / "images_1x.zip")
+    icon_theme_zip(OUT / "images_1x.zip", a.fluent)
     if a.no_png:
         return
     with tempfile.TemporaryDirectory() as tmp:

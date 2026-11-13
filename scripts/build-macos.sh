@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build 1xVnOffice for macOS from the locked LibreOffice tarballs.
-# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config brand guides extensions sign smoke defaults tools all
+# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config brand ribbon guides extensions sign smoke defaults tools all
 set -euo pipefail
 # shellcheck source=scripts/env.sh
 source "$(dirname "$0")/env.sh"
@@ -174,6 +174,13 @@ PYRC
   info "Đã cài nhận diện 1xVnOffice (logo, About, splash, icon)."
 }
 
+step_ribbon() {
+  # Compact WPS / Office-style ribbon: scripts/ui/ribbon.py rewrites the installed notebookbar.ui of each app from the
+  # pristine source copy (no group captions, large main commands, icon-only secondary ones).
+  local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
+  python3 "$REPO_ROOT/scripts/ui/ribbon.py" --src "$SRC_DIR" --app "$app" || die "Không biến đổi được ribbon."
+}
+
 step_guides() {
   # Build the bundled quick start guides (scripts/guides/make-guides.py) with the app itself and install them into
   # App/Contents/Resources/guides/<lang>/. One soffice session and one visible document per file: headless macOS
@@ -293,11 +300,11 @@ XCU
   info "Cấu hình mặc định và bản dịch có hiệu lực."
 }
 
-[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config brand guides extensions sign smoke defaults tools all"
+[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config brand ribbon guides extensions sign smoke defaults tools all"
 for s in "$@"; do
   case "$s" in
-    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_brand; step_guides; step_extensions; step_sign; step_smoke; step_defaults; step_tools ;;
-    preflight|extract|patch|l10n|configure|build|config|brand|guides|extensions|sign|smoke|defaults|tools) "step_$s" ;;
+    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_brand; step_ribbon; step_guides; step_extensions; step_sign; step_smoke; step_defaults; step_tools ;;
+    preflight|extract|patch|l10n|configure|build|config|brand|ribbon|guides|extensions|sign|smoke|defaults|tools) "step_$s" ;;
     *) die "Bước lạ: $s" ;;
   esac
 done
