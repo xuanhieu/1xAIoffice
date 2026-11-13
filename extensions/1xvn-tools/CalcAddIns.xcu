@@ -42,6 +42,66 @@
             </node>
           </node>
         </node>
+        <node oor:name="tachho" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">TACHHO</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">Returns the family name of a Vietnamese full name, e.g. Nguyễn Thị Ánh Nguyệt -> Nguyễn.</value>
+            <value xml:lang="vi">Trả về họ trong họ tên, vd Nguyễn Thị Ánh Nguyệt -> Nguyễn.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">TACHHO</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="FullName" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Full name</value><value xml:lang="vi">Họ tên</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The full name, for example "Nguyễn Thị Ánh Nguyệt".</value><value xml:lang="vi">Họ tên đầy đủ, ví dụ "Nguyễn Thị Ánh Nguyệt".</value></prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="tachdem" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">TACHDEM</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">Returns the middle name, e.g. Nguyễn Thị Ánh Nguyệt -> Thị Ánh.</value>
+            <value xml:lang="vi">Trả về tên đệm, vd Nguyễn Thị Ánh Nguyệt -> Thị Ánh.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">TACHDEM</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="FullName" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Full name</value><value xml:lang="vi">Họ tên</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The full name, for example "Nguyễn Thị Ánh Nguyệt".</value><value xml:lang="vi">Họ tên đầy đủ, ví dụ "Nguyễn Thị Ánh Nguyệt".</value></prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="tachten" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">TACHTEN</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">Returns the given name, e.g. Nguyễn Thị Ánh Nguyệt -> Nguyệt.</value>
+            <value xml:lang="vi">Trả về tên, vd Nguyễn Thị Ánh Nguyệt -> Nguyệt.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">TACHTEN</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="FullName" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Full name</value><value xml:lang="vi">Họ tên</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The full name, for example "Nguyễn Thị Ánh Nguyệt".</value><value xml:lang="vi">Họ tên đầy đủ, ví dụ "Nguyễn Thị Ánh Nguyệt".</value></prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="sapten" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">SAPTEN</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">A sort key for Vietnamese names: given name first, in Vietnamese letter and tone order. Sort by this column.</value>
+            <value xml:lang="vi">Khoá sắp xếp danh sách người Việt: tên trước, đúng thứ tự chữ cái và dấu thanh. Sắp bảng theo cột này.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">SAPTEN</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="FullName" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Full name</value><value xml:lang="vi">Họ tên</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The full name, for example "Nguyễn Thị Ánh Nguyệt".</value><value xml:lang="vi">Họ tên đầy đủ, ví dụ "Nguyễn Thị Ánh Nguyệt".</value></prop>
+            </node>
+          </node>
+        </node>
       </node>
     </node>
   </node>

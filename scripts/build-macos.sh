@@ -220,17 +220,18 @@ step_extensions() {
   done
 }
 
-run_tools_check() {  # run_tools_check <app> writer|calc
+run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check
   local app="$1" part="$2" profile pipe="onex_tools_$$_$2" rc=0
   profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
   rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
   # Fixed sample for the NĐ30 composer (part "nd30"): the command reads it instead of opening its dialog.
   local nd30_fields='{"type":"to_trinh","parent_org":"UBND tỉnh Đà Nẵng","org":"Sở Khoa học và Công nghệ","org_abbr":"SKHCN","number":5,"place":"Đà Nẵng","date":"2026-01-05","summary":"Về việc phê duyệt kế hoạch năm 2026","body":["Đoạn một.","Đoạn hai."],"authority":"KT.","authority_title":"Giám đốc","signer_title":"Phó Giám đốc","signer_name":"Nguyễn Văn A","recipients":["UBND tỉnh","Lãnh đạo Sở"],"archive_unit":"VP","archive_copies":2}'
-  ONEX_TOOLS_SILENT=1 ONEX_TOOLS_ND30_FIELDS="$nd30_fields" \
+  ONEX_TOOLS_SILENT=1 ONEX_TOOLS_CHECK_OUT="$LOG_DIR/nd30-check.json" ONEX_TOOLS_CHECK_FIX=1 \
+    ONEX_TOOLS_ND30_FIELDS="$nd30_fields" \
     "$app/Contents/MacOS/soffice" --headless --norestore -env:UserInstallation="file://$profile" \
     "--accept=pipe,name=$pipe;urp;" >/dev/null 2>&1 &
   local pid=$!
-  ONEX_TOOLS_ND30_PNG="$LOG_DIR/nd30-sample.png" \
+  ONEX_TOOLS_CHECK_OUT="$LOG_DIR/nd30-check.json" ONEX_TOOLS_CHECK_FIX=1 ONEX_TOOLS_ND30_PNG="$LOG_DIR/nd30-sample.png" \
     "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xvn-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
   sleep 2; kill -9 "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
@@ -247,6 +248,7 @@ step_tools() {
   run_tools_check "$app" writer || rc=1
   run_tools_check "$app" calc || rc=1
   run_tools_check "$app" nd30 || rc=1
+  run_tools_check "$app" nd30check || rc=1
   [ "$rc" = 0 ] || die "Lệnh tiếng Việt chạy sai trên app."
   info "Lệnh tiếng Việt chạy đúng trên app."
 }

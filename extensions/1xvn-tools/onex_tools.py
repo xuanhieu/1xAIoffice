@@ -20,7 +20,8 @@ import json
 from vn1x import docops
 from vn1x import nd30
 from vn1x.numwords import NumberWordsError, money_to_words, number_to_words, parse_number_text
-from vn1x.vntext import normalize, remove_diacritics, tcvn3_to_unicode
+from vn1x.vnname import sort_key, split_name
+from vn1x.vntext import normalize, remove_diacritics, tcvn3_to_unicode, vni_to_unicode, viqr_to_unicode
 
 IMPL = "org.1xvnoffice.tools.ProtocolHandler"
 PROTOCOL = "vnd.1x.tools:"
@@ -36,6 +37,11 @@ TEXTS = {
         "done": "Changed {n} text part(s).",
         "unsupported": "This command works in Writer and Calc documents.",
         "nd30_error": "Cannot create the document: {err}",
+        "check_ok": "Decree 30 check: nothing measurable is wrong.",
+        "check_found": "Decree 30 check: {n} point(s) to look at.\n\n{list}",
+        "check_offer": "\n\nSet the page back to the rules now (paper size, margins, default font)?",
+        "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Ctrl+Z undoes it.",
+        "check_writer_only": "Open the document in 1xDoc first: this command checks a text document.",
     },
     "vi": {
         "title": "1xVnOffice",
@@ -46,6 +52,11 @@ TEXTS = {
         "done": "Đã đổi {n} đoạn chữ.",
         "unsupported": "Lệnh này dùng trong tài liệu Writer và Calc.",
         "nd30_error": "Không tạo được văn bản: {err}",
+        "check_ok": "Kiểm thể thức NĐ30: không thấy điểm nào sai trong những thứ đo được.",
+        "check_found": "Kiểm thể thức NĐ30: có {n} điểm cần xem lại.\n\n{list}",
+        "check_offer": "\n\nSửa phần trang ngay bây giờ (khổ giấy, lề, phông mặc định)?",
+        "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Ctrl+Z để hoàn tác.",
+        "check_writer_only": "Hãy mở văn bản trong 1xDoc trước: lệnh này kiểm tài liệu văn bản.",
     },
 }
 
@@ -88,6 +99,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         pass
 
     def dispatch(self, url, args):
+        if url.Path == "Nd30Check":
+            self.t = TEXTS[_ui_lang(self.ctx)]
+            self.cmd_Nd30Check()
+            return
         if url.Path == "Nd30Document":  # works from any module: creates a new Writer document
             self.t = TEXTS[_ui_lang(self.ctx)]
             self.cmd_Nd30Document()
@@ -155,6 +170,14 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
     def cmd_NormalizeUnicode(self, doc, is_writer):
         self._text(doc, is_writer, normalize, "Normalize Unicode")
 
+    def cmd_ConvertVNI(self, doc, is_writer):
+        """Chữ gõ kiểu VNI ("Vie65t") thành Unicode. Chỉ đổi chỗ có dấu đứng ngay sau nguyên âm."""
+        self._text(doc, is_writer, lambda t: vni_to_unicode(t)[0], "Convert VNI typing")
+
+    def cmd_ConvertVIQR(self, doc, is_writer):
+        """Chữ gõ kiểu VIQR ("Vie^.t") thành Unicode."""
+        self._text(doc, is_writer, lambda t: viqr_to_unicode(t)[0], "Convert VIQR typing")
+
     def cmd_ConvertTCVN3(self, doc, is_writer):
         if not is_writer:
             self._text(doc, False, lambda s: tcvn3_to_unicode(s)[0], "Convert TCVN3 to Unicode")
@@ -185,6 +208,31 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                 if not from_selection or new != old:
                     t.CharFontName = TCVN3_REPLACEMENT_FONT
         self.message(self.t["done"].format(n=changed))
+
+    def cmd_Nd30Check(self):
+        """Kiểm thể thức văn bản đang mở theo NĐ30 và mời sửa phần trang."""
+        from vn1x import nd30_check, nd30_check_writer
+        doc = self.frame.getController().getModel() if self.frame else None
+        if doc is None or not doc.supportsService("com.sun.star.text.TextDocument"):
+            self.message(self.t["check_writer_only"])
+            return
+        issues = nd30_check.check(nd30_check_writer.describe(doc))
+        out = os.environ.get("ONEX_TOOLS_CHECK_OUT")   # bước kiểm tự động đọc kết quả ở đây
+        if out:
+            with open(out, "w", encoding="utf-8") as f:
+                json.dump([{"key": i.key, "message": i.message, "fix": i.fix} for i in issues], f, ensure_ascii=False)
+        if not issues:
+            self.message(self.t["check_ok"])
+            return
+        report = "\n".join(f"{n}. {i.message}" for n, i in enumerate(issues, 1))
+        text = self.t["check_found"].format(n=len(issues), list=report)
+        if not any(i.fix for i in issues):
+            self.message(text)
+            return
+        if self.ask(text + self.t["check_offer"]):
+            fix = nd30_check.page_fix()
+            nd30_check_writer.apply_page_fix(doc, fix)
+            self.message(self.t["check_fixed"].format(font=fix["font"]))
 
     def cmd_Nd30Document(self):
         # ONEX_TOOLS_ND30_FIELDS (JSON) bypasses the dialog for automated tests.
@@ -217,6 +265,17 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
             doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, ())
         nd30_writer.fill(doc, spec)
+
+    def ask(self, text):
+        """Hỏi Có/Không. Khi chạy tự động (ONEX_TOOLS_SILENT) thì coi như Có, để bước kiểm chạy được phần sửa."""
+        if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
+            return os.environ.get("ONEX_TOOLS_CHECK_FIX") == "1"
+        from com.sun.star.awt.MessageBoxType import QUERYBOX
+        toolkit = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx)
+        box = toolkit.createMessageBox(self.frame.getContainerWindow(), QUERYBOX, 3, self.t["title"], text)
+        answer = box.execute()
+        box.dispose()
+        return answer == 2   # com.sun.star.awt.MessageBoxResults.YES
 
     def message(self, text):
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
@@ -251,7 +310,8 @@ except ImportError:  # type library not registered (e.g. imported outside the of
 
 if XVnSheetFunctions is not None:
     class SheetFunctions(unohelper.Base, XVnSheetFunctions, XServiceInfo):
-        """=DOCSO(số; ["lẻ"|"linh"]) và =DOCTIEN(số tiền; [đơn vị, mặc định "đồng"]). Giá trị không đọc được
+        """Hàm bảng tính của 1xVnOffice: =DOCSO(số; ["lẻ"|"linh"]), =DOCTIEN(số tiền; [đơn vị, mặc định "đồng"]),
+        =TACHHO / =TACHDEM / =TACHTEN(họ tên) và =SAPTEN(họ tên) cho khoá sắp xếp. Giá trị không đọc được
         (quá 18 chữ số…) báo lỗi trong ô thay vì trả về chữ sai."""
 
         def __init__(self, ctx, *args):
@@ -265,6 +325,18 @@ if XVnSheetFunctions is not None:
                 return number_to_words(repr(number), le=le, capitalize=True)
             except (NumberWordsError, ValueError) as exc:
                 raise _illegal(str(exc))
+
+        def tachho(self, full_name):
+            return split_name(full_name)[0]
+
+        def tachdem(self, full_name):
+            return split_name(full_name)[1]
+
+        def tachten(self, full_name):
+            return split_name(full_name)[2]
+
+        def sapten(self, full_name):
+            return sort_key(full_name)
 
         def doctien(self, amount, currency):
             try:

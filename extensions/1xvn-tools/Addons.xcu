@@ -13,6 +13,12 @@
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
           </node>
+          <node oor:name="m00b" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Check</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Check Decree 30 Format...</value><value xml:lang="vi">Kiểm thể thức NĐ30...</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
+          </node>
           <node oor:name="m00" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NumberToWords</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Number to Words</value><value xml:lang="vi">Đọc số thành chữ</value></prop>
@@ -22,6 +28,18 @@
           <node oor:name="m01" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:MoneyToWords</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Amount in Words (VND)</value><value xml:lang="vi">Đọc số tiền thành chữ</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
+          <node oor:name="m01a" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:ConvertVNI</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Convert VNI Typing to Unicode</value><value xml:lang="vi">Chuyển kiểu gõ VNI sang Unicode</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
+          <node oor:name="m01b" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:ConvertVIQR</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Convert VIQR Typing to Unicode</value><value xml:lang="vi">Chuyển kiểu gõ VIQR sang Unicode</value></prop>
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
           </node>
@@ -54,6 +72,12 @@
         <node oor:name="m00a" oor:op="replace">
           <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Document</value></prop>
           <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Decree 30 document</value><value xml:lang="vi">Văn bản NĐ30</value></prop>
+          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
+        </node>
+        <node oor:name="m00b" oor:op="replace">
+          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Check</value></prop>
+          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Check NĐ30</value><value xml:lang="vi">Kiểm NĐ30</value></prop>
           <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
           <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
         </node>
@@ -96,6 +120,13 @@
       <node oor:name="UserDefinedImages">
         <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Document_16.svg</value></prop>
         <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Document_26.svg</value></prop>
+      </node>
+    </node>
+    <node oor:name="img_Nd30Check" oor:op="replace">
+      <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Check</value></prop>
+      <node oor:name="UserDefinedImages">
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Check_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Check_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_NumberToWords" oor:op="replace">

@@ -30,3 +30,9 @@ Mỗi lệnh là một bước hoàn tác. Chữ đã là Unicode không bao gi�
 - Kiểm trên app thật: `scripts/build-macos.sh tools` (`tests/runtime_check.py`).
 
 Chưa làm (NĐ30): kiểm thể thức cho văn bản có sẵn, bố cục riêng của quyết định (căn cứ, điều khoản), nhớ thông tin cơ quan giữa các lần dùng, đường kẻ dài đúng từng dòng (hiện ước lượng theo bề rộng chữ). Chưa làm (khác): cảnh báo khi lưu `.xlsx` có ô dùng `DOCSO`/`DOCTIEN` (kèm lựa chọn đổi thành giá trị), chuyển mã VNI, icon riêng cho các nút.
+
+**Kiểm thể thức NĐ30...** (menu Tiếng Việt, và nút trên thẻ Trang đầu): đọc văn bản đang mở rồi báo những điểm lệch chuẩn đo được: khổ giấy, bốn lề, phông mặc định, cỡ chữ và cách căn lề của nội dung, và sự có mặt của Quốc hiệu, Tiêu ngữ, mục "Nơi nhận:". Lệ thuộc khoảng cho phép trong `data/nd30.json` (lề trên/dưới 20–25 mm, trái 30–35, phải 15–20, nội dung 13–14 pt). Sửa tự động được phần trang (khổ giấy, lề, phông mặc định) sau khi hỏi, gom thành một bước hoàn tác. Công cụ chỉ kiểm trình bày, không kết luận về nội dung hay giá trị pháp lý.
+
+**Chuyển kiểu gõ VNI / VIQR sang Unicode** (menu Tiếng Việt): đổi chữ còn ở dạng gõ phím thành chữ có dấu, ví dụ `Tie^'ng Vie^.t` hoặc `Tie61ng Vie65t` thành `Tiếng Việt`. Dấu phải đứng ngay sau nguyên âm mang nó, nên dấu câu thường (dấu nháy trong `don't`, dấu chấm cuối câu) không bị đổi. Khác với lệnh TCVN3: TCVN3 là bảng mã phông chữ, còn VNI và VIQR ở đây là quy ước gõ phím bằng ký tự ASCII.
+
+**Hàm họ tên trong 1xSheet:** `=TACHHO(họ tên)`, `=TACHDEM(...)`, `=TACHTEN(...)` tách ba phần; `=SAPTEN(...)` trả về khoá sắp xếp để sắp danh sách theo tên trước, đúng thứ tự chữ cái tiếng Việt (ă, â sau a; đ sau d) và đúng thứ tự dấu thanh (ngang, huyền, hỏi, ngã, sắc, nặng). Sắp bằng hàm sẵn có của bảng tính thì sai cả hai chỗ này.

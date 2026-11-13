@@ -48,6 +48,8 @@ def main():
         writer_checks(desktop, prop, run, check)
     elif part == "nd30":
         nd30_checks(desktop, prop, run, check)
+    elif part == "nd30check":
+        nd30_check_checks(desktop, prop, run, check)
     else:
         calc_checks(desktop, prop, run, check)
     try:
@@ -84,6 +86,35 @@ def writer_checks(desktop, prop, run, check):
     check("Writer đọc số tiền", text.getString(), "Một triệu hai trăm năm mươi nghìn đồng")
 
     doc.close(True)
+
+
+def nd30_check_checks(desktop, prop, run, check):
+    """Lệnh kiểm thể thức trên một tài liệu sai chuẩn: phải tìm ra lỗi rồi sửa được phần trang.
+    soffice chạy với ONEX_TOOLS_CHECK_OUT (nơi ghi kết quả) và ONEX_TOOLS_CHECK_FIX=1 (coi như người dùng đồng ý sửa).
+    """
+    import json
+    import os
+    doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+    pages = doc.getStyleFamilies().getByName("PageStyles")
+    std = pages.getByName("Standard")
+    std.Width, std.Height = 21590, 27940          # khổ Letter
+    std.LeftMargin = std.RightMargin = 2500       # lề sai
+    styles = doc.getStyleFamilies().getByName("ParagraphStyles")
+    styles.getByName("Standard").CharFontName = "Arial"
+    doc.getText().setString("Một đoạn nội dung bất kỳ, không có Quốc hiệu.")
+    run(doc, "Nd30Check")
+    out = os.environ.get("ONEX_TOOLS_CHECK_OUT")
+    found = json.load(open(out, encoding="utf-8")) if out and os.path.exists(out) else []
+    keys = sorted(i["key"] for i in found)
+    check("Kiểm NĐ30 tìm ra lỗi trang", [k for k in keys if k in ("page_size", "margin_left_mm", "font")],
+          ["font", "margin_left_mm", "page_size"])
+    check("Kiểm NĐ30 báo thiếu Quốc hiệu", "quoc_hieu" in keys, True)
+    check("Kiểm NĐ30 sửa được phần trang", all(i["fix"] for i in found if i["key"] in
+                                                ("page_size", "margin_left_mm", "font")), True)
+    near = lambda got, want: all(abs(g - w) <= 2 for g, w in zip(got, want))  # noqa: E731
+    check("Kiểm NĐ30 đã sửa về A4", near((std.Width, std.Height), (21000, 29700)), True)
+    check("Kiểm NĐ30 đã sửa lề trái", abs(std.LeftMargin - 3000) <= 2, True)
+    check("Kiểm NĐ30 đã sửa phông", styles.getByName("Standard").CharFontName, "Times New Roman")
 
 
 def nd30_checks(desktop, prop, run, check):
@@ -172,6 +203,20 @@ def calc_checks(desktop, prop, run, check):
     bad = sheet.getCellRangeByName("D7")
     bad.setFormula("=DOCSO(10^20)")
     check("Calc =DOCSO(10^20) báo lỗi", bad.getError() != 0, True)
+    sheet.getCellByPosition(0, 6).setString("Nguyễn Thị Ánh Nguyệt")
+    for col, formula in ((1, "=TACHHO(A7)"), (2, "=TACHDEM(A7)"), (3, "=TACHTEN(A7)")):
+        sheet.getCellByPosition(col, 6).setFormula(formula)
+    calc.calculateAll()
+    check("Calc tách họ tên", tuple(sheet.getCellByPosition(c, 6).getString() for c in (1, 2, 3)),
+          ("Nguyễn", "Thị Ánh", "Nguyệt"))
+    sheet.getCellByPosition(0, 7).setString("Lê Đông")
+    sheet.getCellByPosition(0, 8).setString("Lê Dung")
+    sheet.getCellByPosition(1, 7).setFormula("=SAPTEN(A8)")
+    sheet.getCellByPosition(1, 8).setFormula("=SAPTEN(A9)")
+    calc.calculateAll()
+    # Thứ tự tiếng Việt: Dung đứng trước Đông, nên khoá của Dung phải nhỏ hơn.
+    check("Calc =SAPTEN sắp đúng d trước đ",
+          sheet.getCellByPosition(1, 8).getString() < sheet.getCellByPosition(1, 7).getString(), True)
     calc.close(True)
 
 

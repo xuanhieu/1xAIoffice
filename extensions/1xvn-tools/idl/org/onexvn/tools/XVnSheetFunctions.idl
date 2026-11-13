@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MPL-2.0 */
-/* Calc add-in functions of 1xVnOffice: DOCSO and DOCTIEN (Vietnamese numbers and amounts in words). */
+/* Calc add-in functions of 1xVnOffice: numbers and amounts in words, and Vietnamese name handling. */
 #ifndef ORG_ONEXVN_TOOLS_XVNSHEETFUNCTIONS_IDL
 #define ORG_ONEXVN_TOOLS_XVNSHEETFUNCTIONS_IDL
 
@@ -14,6 +14,18 @@ interface XVnSheetFunctions : com::sun::star::uno::XInterface
 
     /* DOCTIEN(Amount; [Currency]) - Currency defaults to "đồng". */
     string doctien( [in] double Amount, [in] any Currency );
+
+    /* TACHHO(FullName) - the family name ("Nguyễn Thị Ánh Nguyệt" -> "Nguyễn"). */
+    string tachho( [in] string FullName );
+
+    /* TACHDEM(FullName) - the middle name ("Nguyễn Thị Ánh Nguyệt" -> "Thị Ánh"). */
+    string tachdem( [in] string FullName );
+
+    /* TACHTEN(FullName) - the given name ("Nguyễn Thị Ánh Nguyệt" -> "Nguyệt"). */
+    string tachten( [in] string FullName );
+
+    /* SAPTEN(FullName) - a sort key: given name first, in Vietnamese letter and tone order. */
+    string sapten( [in] string FullName );
 };
 
 }; }; };
