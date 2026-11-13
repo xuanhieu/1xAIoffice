@@ -54,6 +54,8 @@ def main():
         xlsx_warning_checks(desktop, prop, run, check)
     elif part == "csv":
         csv_checks(desktop, prop, run, check)
+    elif part == "ai":
+        ai_checks(desktop, prop, run, check)
     else:
         calc_checks(desktop, prop, run, check)
     try:
@@ -90,6 +92,67 @@ def writer_checks(desktop, prop, run, check):
     check("Writer đọc số tiền", text.getString(), "Một triệu hai trăm năm mươi nghìn đồng")
 
     doc.close(True)
+
+
+def ai_checks(desktop, prop, run, check):
+    """Lệnh Hỏi AI chạy thật trong app, nhưng nói chuyện với một máy chủ giả chạy ngay trên máy này.
+
+    Không gọi ra Internet và không cần khoá thật: providers.json trỏ vào máy chủ giả, câu hỏi lấy từ
+    ONEX_AI_QUESTION, câu trả lời được ghi ra ONEX_TOOLS_WARN_OUT qua hộp thông báo ở chế độ im lặng.
+    """
+    import json as _json
+    import os
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    answer = "Đây là một tờ trình của Sở Khoa học và Công nghệ."
+    seen = []
+
+    class Fake(BaseHTTPRequestHandler):
+        def do_POST(self):
+            body = _json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or "{}")
+            seen.append(body)
+            payload = _json.dumps({"choices": [{"message": {"content": answer}}],
+                                   "usage": {"prompt_tokens": 20, "completion_tokens": 9}}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Fake)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        config_path = os.environ["ONEX_AI_CONFIG_PATH"]
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+        with open(config_path, "w", encoding="utf-8") as handle:
+            _json.dump({"providers": [{"id": "gia", "type": "openai",
+                                       "base_url": f"http://127.0.0.1:{server.server_port}/v1",
+                                       "secret_ref": "", "models": ["mo-hinh-gia"]}],
+                        "roles": {"soan_thao": "gia/mo-hinh-gia"},
+                        "limits": {"max_output_tokens": 500}}, handle, ensure_ascii=False)
+        out = os.environ.get("ONEX_TOOLS_WARN_OUT")
+        if out and os.path.exists(out):
+            os.remove(out)
+        doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+        doc.getText().setString("TỜ TRÌNH\nVề việc phê duyệt kế hoạch năm 2026.")
+        run(doc, "AiAsk")
+        check("Hỏi AI gửi được yêu cầu tới nhà cung cấp", len(seen), 1)
+        if seen:
+            sent = _json.dumps(seen[0], ensure_ascii=False)
+            check("Hỏi AI gửi kèm nội dung tài liệu", "TỜ TRÌNH" in sent, True)
+            check("Hỏi AI gửi kèm câu hỏi", os.environ.get("ONEX_AI_QUESTION", "") in sent, True)
+            check("Hỏi AI dùng đúng mô hình đã cấu hình", seen[0].get("model"), "mo-hinh-gia")
+            check("Hỏi AI tôn trọng hạn mức token", seen[0].get("max_tokens"), 500)
+        shown = open(out, encoding="utf-8").read() if out and os.path.exists(out) else ""
+        check("Hỏi AI hiện câu trả lời", answer in shown, True)
+        check("Hỏi AI không sửa tài liệu", doc.getText().getString().startswith("TỜ TRÌNH"), True)
+        doc.close(True)
+    finally:
+        server.shutdown()
+        server.server_close()
 
 
 def csv_checks(desktop, prop, run, check):

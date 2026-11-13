@@ -31,6 +31,31 @@ Mỗi lệnh là một bước hoàn tác. Chữ đã là Unicode không bao gi�
 
 Chưa làm (NĐ30): kiểm thể thức cho văn bản có sẵn, bố cục riêng của quyết định (căn cứ, điều khoản), nhớ thông tin cơ quan giữa các lần dùng, đường kẻ dài đúng từng dòng (hiện ước lượng theo bề rộng chữ). Chưa làm (khác): cảnh báo khi lưu `.xlsx` có ô dùng `DOCSO`/`DOCTIEN` (kèm lựa chọn đổi thành giá trị), chuyển mã VNI, icon riêng cho các nút.
 
+**Hỏi AI về tài liệu này...** (menu Tiếng Việt, và nút trên thẻ Trang đầu): hỏi một câu về tài liệu đang mở. Lệnh **chỉ đọc**, không sửa gì trong tài liệu. Gửi vùng đang chọn nếu có, nếu không thì cả tài liệu, cắt ở ranh giới đoạn khi vượt ngân sách, và nói rõ đã gửi bao nhiêu ký tự cùng số token đã dùng.
+
+Khoá API là **của chính bạn** (BYOK) và nằm trong kho bí mật của hệ điều hành, không bao giờ ghi vào tệp cấu hình. Khai báo nhà cung cấp trong `providers.json` ở hồ sơ người dùng:
+
+```json
+{
+  "providers": [
+    {"id": "claude", "type": "anthropic", "secret_ref": "1xvnoffice/anthropic", "models": ["claude-sonnet-5-5"]},
+    {"id": "local", "type": "ollama", "base_url": "http://127.0.0.1:11434/v1", "models": ["qwen3:8b"]}
+  ],
+  "roles": {"soan_thao": "claude/claude-sonnet-5-5"},
+  "limits": {"max_output_tokens": 2000}
+}
+```
+
+Lưu khoá vào Keychain bằng lệnh của macOS (lệnh tự hỏi giá trị, không hiện khoá trên màn hình):
+
+```bash
+security add-generic-password -U -a "$USER" -s 1xvnoffice/anthropic -w
+```
+
+Hỗ trợ bốn loại: `anthropic`, `openai` (dùng được cho Azure OpenAI, DeepSeek, vLLM, LM Studio và máy chủ nội bộ qua `base_url`), `gemini`, và `ollama` chạy cục bộ. Máy chủ tự dựng khai `base_url` thì không cần khoá; dịch vụ đám mây thì bắt buộc.
+
+Mọi kết nối mạng đi qua **1x Agent Host**, một tiến trình riêng (`agenthost/host.py`, chạy với cờ `-I`): lỗi hay treo ở phần AI không làm sập tài liệu đang mở, và chỉ tiến trình đó đọc khoá API. Lỗi được dịch sang tiếng Việt và nói rõ nguyên nhân (sai khoá, vượt hạn mức, quá giờ, mất mạng).
+
 **Kiểm thể thức NĐ30...** (menu Tiếng Việt, và nút trên thẻ Trang đầu): đọc văn bản đang mở rồi báo những điểm lệch chuẩn đo được: khổ giấy, bốn lề, phông mặc định, cỡ chữ và cách căn lề của nội dung, và sự có mặt của Quốc hiệu, Tiêu ngữ, mục "Nơi nhận:". Lệ thuộc khoảng cho phép trong `data/nd30.json` (lề trên/dưới 20–25 mm, trái 30–35, phải 15–20, nội dung 13–14 pt). Sửa tự động được phần trang (khổ giấy, lề, phông mặc định) sau khi hỏi, gom thành một bước hoàn tác. Công cụ chỉ kiểm trình bày, không kết luận về nội dung hay giá trị pháp lý.
 
 **Chuyển kiểu gõ VNI / VIQR sang Unicode** (menu Tiếng Việt): đổi chữ còn ở dạng gõ phím thành chữ có dấu, ví dụ `Tie^'ng Vie^.t` hoặc `Tie61ng Vie65t` thành `Tiếng Việt`. Dấu phải đứng ngay sau nguyên âm mang nó, nên dấu câu thường (dấu nháy trong `don't`, dấu chấm cuối câu) không bị đổi. Khác với lệnh TCVN3: TCVN3 là bảng mã phông chữ, còn VNI và VIQR ở đây là quy ước gõ phím bằng ký tự ASCII.

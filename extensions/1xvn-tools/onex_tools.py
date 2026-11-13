@@ -7,6 +7,7 @@ Logic chữ nằm trong pythonpath/vn1x (có test riêng, không cần UNO); fil
 Biến môi trường ONEX_TOOLS_SILENT=1 tắt hộp thông báo (dùng cho kiểm thử tự động).
 """
 import os
+import sys
 
 import uno
 import unohelper
@@ -17,6 +18,7 @@ from com.sun.star.task import XJob
 
 import datetime
 import json
+from pathlib import Path
 
 from vn1x import docops
 from vn1x import nd30
@@ -44,6 +46,13 @@ TEXTS = {
         "check_offer": "\n\nSet the page back to the rules now (paper size, margins, default font)?",
         "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Ctrl+Z undoes it.",
         "check_writer_only": "Open the document in 1xDoc first: this command checks a text document.",
+        "ai_question": "Ask about this document",
+        "ai_prompt": "What do you want to know? The answer only reads the document; it changes nothing.",
+        "ai_answer": "{text}\n\n— {provider}/{model}, sent {note}, {tokens} tokens.",
+        "ai_no_config": ("No AI provider is set up yet.\n\nWrite your own providers.json at:\n{path}\n\n"
+                         "Example (the key itself stays in the system keychain, never in this file):\n{example}"),
+        "ai_bad_config": "providers.json has problems:\n\n{list}\n\nFile: {path}",
+        "ai_failed": "{error}",
         "csv_title": "Open a CSV file safely",
         "csv_done": "Opened {name} as text: leading zeros, codes and dates are kept exactly as written, and cells starting with \"=\" are not run as formulas.",
         "csv_cancel": "",
@@ -66,6 +75,13 @@ TEXTS = {
         "check_offer": "\n\nSửa phần trang ngay bây giờ (khổ giấy, lề, phông mặc định)?",
         "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Ctrl+Z để hoàn tác.",
         "check_writer_only": "Hãy mở văn bản trong 1xDoc trước: lệnh này kiểm tài liệu văn bản.",
+        "ai_question": "Hỏi về tài liệu này",
+        "ai_prompt": "Bạn muốn biết điều gì? Câu trả lời chỉ đọc tài liệu, không sửa gì cả.",
+        "ai_answer": "{text}\n\n— {provider}/{model}, đã gửi {note}, {tokens} token.",
+        "ai_no_config": ("Chưa khai báo nhà cung cấp AI nào.\n\nTạo tệp providers.json của bạn tại:\n{path}\n\n"
+                         "Ví dụ (khoá API nằm trong kho bí mật của hệ điều hành, không bao giờ ghi vào tệp này):\n{example}"),
+        "ai_bad_config": "providers.json đang có lỗi:\n\n{list}\n\nTệp: {path}",
+        "ai_failed": "{error}",
         "csv_title": "Mở tệp CSV an toàn",
         "csv_done": "Đã mở {name} dưới dạng chữ: số 0 đầu, mã số và ngày tháng giữ nguyên như trong tệp, ô bắt đầu bằng \"=\" không bị chạy như công thức.",
         "csv_cancel": "",
@@ -238,6 +254,135 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     t.CharFontName = TCVN3_REPLACEMENT_FONT
         self.message(self.t["done"].format(n=changed))
 
+    def cmd_AiAsk(self, doc, is_writer):
+        """Hỏi mô hình AI về tài liệu đang mở. Chỉ đọc: không sửa gì trong tài liệu."""
+        from vn1x import aiconfig, aicontext
+        path = self._ai_config_path()
+        try:
+            config = aiconfig.load(path)
+        except aiconfig.ConfigError as exc:
+            self.message(self.t["ai_bad_config"].format(list=str(exc), path=path))
+            return
+        if not config.get("providers"):
+            self.message(self.t["ai_no_config"].format(path=path, example=AI_EXAMPLE))
+            return
+        found = aiconfig.problems(config)
+        if found:
+            self.message(self.t["ai_bad_config"].format(list="\n".join(f"- {p}" for p in found), path=path))
+            return
+        question = os.environ.get("ONEX_AI_QUESTION") or self._ask_text(self.t["ai_question"],
+                                                                        self.t["ai_prompt"])
+        if not question:
+            return
+        selection, whole = self._document_text(doc, is_writer)
+        try:
+            provider, model = aiconfig.resolve(config)
+            messages, note = aicontext.build(question, selection, whole)
+        except (aiconfig.ConfigError, ValueError) as exc:
+            self.message(self.t["ai_bad_config"].format(list=str(exc), path=path))
+            return
+        limit = (config.get("limits") or {}).get("max_output_tokens", 2000)
+        result = self._agent_host({"action": "ask", "provider": provider, "model": model,
+                                   "messages": messages, "max_tokens": limit})
+        if not result.get("ok"):
+            self.message(self.t["ai_failed"].format(error=result.get("error", "?")))
+            return
+        usage = result.get("usage") or {}
+        self.message(self.t["ai_answer"].format(text=result["text"], provider=provider.get("id", "?"), model=model,
+                                                note=note, tokens=usage.get("input", 0) + usage.get("output", 0)))
+
+    def _ai_config_path(self):
+        """providers.json trong hồ sơ người dùng (bước kiểm tự động trỏ chỗ khác qua ONEX_AI_CONFIG_PATH)."""
+        from vn1x import aiconfig
+        override = os.environ.get("ONEX_AI_CONFIG_PATH")
+        if override:
+            return override
+        subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+        profile = uno.fileUrlToSystemPath(subst.substituteVariables("$(userurl)", True))
+        return str(Path(profile) / aiconfig.FILENAME)
+
+    def _document_text(self, doc, is_writer):
+        """(chữ đang chọn, chữ cả tài liệu). Bảng tính lấy theo vùng ô đang dùng."""
+        selection = ""
+        try:
+            current = doc.getCurrentSelection()
+            if current is not None and hasattr(current, "getString"):
+                selection = current.getString()
+            elif current is not None and current.getCount() and hasattr(current.getByIndex(0), "getString"):
+                selection = current.getByIndex(0).getString()
+        except Exception:  # noqa: BLE001 - không có vùng chọn thì dùng cả tài liệu
+            selection = ""
+        if is_writer:
+            return selection, doc.getText().getString()
+        rows = []
+        sheets = doc.getSheets()
+        for index in range(sheets.getCount()):
+            sheet = sheets.getByIndex(index)
+            cursor = sheet.createCursor()
+            cursor.gotoEndOfUsedArea(False)
+            area = cursor.getRangeAddress()
+            rows.append(f"# {sheet.getName()}")
+            for row in range(area.EndRow + 1):
+                cells = [sheet.getCellByPosition(col, row).getString() for col in range(area.EndColumn + 1)]
+                if any(cells):
+                    rows.append("\t".join(cells))
+        return selection, "\n".join(rows)
+
+    def _agent_host(self, request):
+        """Gọi tiến trình Agent Host. Mọi kết nối mạng đi qua đây, không đi thẳng từ trong tài liệu."""
+        import subprocess
+        host = Path(__file__).resolve().parent / "agenthost" / "host.py"
+        if not host.is_file():
+            return {"ok": False, "error": f"không thấy Agent Host tại {host}"}
+        try:
+            done = subprocess.run([self._python_executable(), "-I", str(host)],
+                                  input=json.dumps(request), capture_output=True, text=True, timeout=120)
+        except (OSError, subprocess.SubprocessError) as exc:
+            return {"ok": False, "error": f"không chạy được Agent Host: {exc}"}
+        try:
+            return json.loads(done.stdout or "{}")
+        except ValueError:
+            return {"ok": False, "error": (done.stderr or done.stdout or "Agent Host không trả lời")[:400]}
+
+    def _python_executable(self):
+        candidates = [sys.executable]
+        subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+        inst = uno.fileUrlToSystemPath(subst.substituteVariables("$(inst)", True))
+        candidates += [str(Path(inst) / "Resources" / "python"), str(Path(inst) / "program" / "python"), "python3"]
+        for candidate in candidates:
+            if candidate and Path(candidate).is_file() and "soffice" not in Path(candidate).name:
+                return candidate
+        return "python3"
+
+    def _ask_text(self, title, prompt):
+        """Hộp nhập một dòng. Trả về chuỗi rỗng khi người dùng huỷ."""
+        if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
+            return ""
+        smgr = self.ctx.ServiceManager
+        model = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", self.ctx)
+        model.Width, model.Height, model.Title = 260, 90, title
+        label = model.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
+        label.PositionX, label.PositionY, label.Width, label.Height, label.MultiLine = 8, 8, 244, 24
+        label.Label = prompt
+        model.insertByName("lbl", label)
+        edit = model.createInstance("com.sun.star.awt.UnoControlEditModel")
+        edit.PositionX, edit.PositionY, edit.Width, edit.Height = 8, 36, 244, 16
+        model.insertByName("q", edit)
+        for name, text, kind, pos in (("ok", "OK", 1, 0), ("cancel", "Huỷ", 2, 1)):
+            button = model.createInstance("com.sun.star.awt.UnoControlButtonModel")
+            button.PositionX, button.PositionY = model.Width - (pos + 1) * 60, 60
+            button.Width, button.Height = 52, 14
+            button.Label, button.PushButtonType, button.DefaultButton = text, kind, kind == 1
+            model.insertByName(name, button)
+        dialog = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialog", self.ctx)
+        dialog.setModel(model)
+        dialog.createPeer(smgr.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx),
+                          self.frame.getContainerWindow())
+        try:
+            return dialog.getControl("q").getText().strip() if dialog.execute() == 1 else ""
+        finally:
+            dialog.dispose()
+
     def cmd_OpenCsvSafely(self):
         """Mở tệp CSV với mọi cột là chữ, bộ ký tự UTF-8 và không chạy công thức."""
         from vn1x import csvsafe
@@ -340,12 +485,25 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
 
     def message(self, text):
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
+            out = os.environ.get("ONEX_TOOLS_WARN_OUT")   # bước kiểm tự động đọc thông báo ở đây
+            if out:
+                with open(out, "a", encoding="utf-8") as handle:
+                    handle.write(text + "\n")
             return
         from com.sun.star.awt.MessageBoxType import INFOBOX
         toolkit = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx)
         box = toolkit.createMessageBox(self.frame.getContainerWindow(), INFOBOX, 1, self.t["title"], text)
         box.execute()
 
+
+AI_EXAMPLE = json.dumps({
+    "providers": [
+        {"id": "claude", "type": "anthropic", "secret_ref": "1xvnoffice/anthropic",
+         "models": ["claude-sonnet-5-5"]},
+        {"id": "local", "type": "ollama", "base_url": "http://127.0.0.1:11434/v1", "models": ["qwen3:8b"]},
+    ],
+    "roles": {"soan_thao": "claude/claude-sonnet-5-5"},
+}, ensure_ascii=False, indent=2)
 
 SHEET_IMPL = "org.onexvn.tools.SheetFunctions"
 
