@@ -10,6 +10,8 @@ Extension đi kèm 1xVnOffice (MPL-2.0). Menu **Vietnamese / Tiếng Việt** v�
 | Chuẩn hóa Unicode tiếng Việt | NFC cho vùng chọn, hoặc cả tài liệu (giữ định dạng) | Các ô chữ đang chọn |
 | Bỏ dấu tiếng Việt | Như trên | Như trên |
 
+**Văn bản hành chính NĐ30 mới...** (menu Tiếng Việt): hộp thoại nhập loại văn bản (công văn, tờ trình, báo cáo, thông báo, kế hoạch, giấy mời, quyết định), cơ quan chủ quản, cơ quan ban hành, số, ký hiệu, địa danh, ngày, trích yếu, kính gửi, quyền hạn ký (TM., Q., KT., TL., TUQ.), chức vụ, họ tên, nơi nhận. Văn bản được dựng theo Phụ lục I NĐ30: khổ A4, lề 20/20/30/15 mm, Times New Roman, cỡ chữ từng thành phần, bảng tiêu đề 2 cột, đường kẻ dưới tiêu ngữ, tên cơ quan và trích yếu, nội dung canh đều lùi đầu dòng 1,27 cm, cách đoạn 6pt, số trang canh giữa lề trên và không hiện ở trang đầu, khối nơi nhận và chữ ký. Ngày nhỏ hơn 10 và tháng 1, 2 có số 0 phía trước ("ngày 05 tháng 01", "tháng 3"). Tài liệu Writer đang trống thì dựng vào đó, còn không thì mở cửa sổ mới. Mẫu: `docs/ui/nd30-to-trinh-sample-2026-11-13.png`. Quy định dùng: `data/nd30.json`, trích nguồn ở `docs/legal/sources/nd-30-2020-phu-luc-i-trich-2026-11-13.txt` (thư mục Office-VN). Đây là công cụ trình bày; tính pháp lý của văn bản do người ban hành chịu trách nhiệm.
+
 Hàm bảng tính (nhóm **Text / Văn bản** trong Trình hướng dẫn hàm, có mô tả song ngữ):
 
 | Hàm | Ví dụ | Kết quả |
@@ -27,4 +29,4 @@ Mỗi lệnh là một bước hoàn tác. Chữ đã là Unicode không bao gi�
 - Bảng TCVN3: sinh bằng `tools/gen_tcvn3.py` từ bảng TCVN 5712:1993 của glibc (`data/sources/glibc-TCVN5712-1.charmap`, SHA-256 `e0249dfd…99a7`). Không dùng `iconv` của macOS vì bộ chuyển TCVN của nó trả byte NUL cho chữ ASCII.
 - Kiểm trên app thật: `scripts/build-macos.sh tools` (`tests/runtime_check.py`).
 
-Chưa làm: cảnh báo khi lưu `.xlsx` có ô dùng `DOCSO`/`DOCTIEN` (kèm lựa chọn đổi thành giá trị), chuyển mã VNI, icon riêng cho các nút.
+Chưa làm (NĐ30): kiểm thể thức cho văn bản có sẵn, bố cục riêng của quyết định (căn cứ, điều khoản), nhớ thông tin cơ quan giữa các lần dùng, đường kẻ dài đúng từng dòng (hiện ước lượng theo bề rộng chữ). Chưa làm (khác): cảnh báo khi lưu `.xlsx` có ô dùng `DOCSO`/`DOCTIEN` (kèm lựa chọn đổi thành giá trị), chuyển mã VNI, icon riêng cho các nút.

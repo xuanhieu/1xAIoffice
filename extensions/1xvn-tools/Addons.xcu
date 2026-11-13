@@ -7,6 +7,12 @@
         <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Vietnamese</value><value xml:lang="vi">Tiếng Việt</value></prop>
         <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
         <node oor:name="Submenu">
+          <node oor:name="m00a" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Document</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">New Administrative Document (Decree 30)...</value><value xml:lang="vi">Văn bản hành chính NĐ30 mới...</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
           <node oor:name="m00" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NumberToWords</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Number to Words</value><value xml:lang="vi">Đọc số thành chữ</value></prop>

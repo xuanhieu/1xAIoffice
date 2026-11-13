@@ -1,0 +1,24 @@
+{
+  "source": "Nghị định 30/2020/NĐ-CP, Phụ lục I Phần I; trích tại docs/legal/sources/nd-30-2020-phu-luc-i-trich-2026-11-13.txt",
+  "page": {"width_mm": 210, "height_mm": 297, "margin_top_mm": 20, "margin_bottom_mm": 20, "margin_left_mm": 30, "margin_right_mm": 15},
+  "font": "Times New Roman",
+  "sizes": {
+    "quoc_hieu": 13, "tieu_ngu": 14, "co_quan_chu_quan": 13, "co_quan_ban_hanh": 13, "so_ky_hieu": 13,
+    "dia_danh_ngay": 14, "ten_loai": 14, "trich_yeu": 14, "vv": 13, "noi_dung": 14, "chuc_vu": 14, "ho_ten": 14,
+    "noi_nhan_tieu_de": 12, "noi_nhan": 11, "so_trang": 13
+  },
+  "body": {"first_line_indent_mm": 12.7, "space_after_pt": 6, "line_spacing_percent": 100},
+  "quoc_hieu": "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM",
+  "tieu_ngu": "Độc lập - Tự do - Hạnh phúc",
+  "header_columns_percent": [40, 60],
+  "doc_types": {
+    "cong_van": {"name": "Công văn", "abbr": "", "title": false},
+    "to_trinh": {"name": "Tờ trình", "abbr": "TTr", "title": true},
+    "bao_cao": {"name": "Báo cáo", "abbr": "BC", "title": true},
+    "thong_bao": {"name": "Thông báo", "abbr": "TB", "title": true},
+    "ke_hoach": {"name": "Kế hoạch", "abbr": "KH", "title": true},
+    "giay_moi": {"name": "Giấy mời", "abbr": "GM", "title": true},
+    "quyet_dinh": {"name": "Quyết định", "abbr": "QĐ", "title": true}
+  },
+  "authority_prefixes": ["", "TM.", "Q.", "KT.", "TL.", "TUQ."]
+}

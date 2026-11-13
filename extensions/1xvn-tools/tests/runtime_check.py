@@ -46,6 +46,8 @@ def main():
 
     if part == "writer":
         writer_checks(desktop, prop, run, check)
+    elif part == "nd30":
+        nd30_checks(desktop, prop, run, check)
     else:
         calc_checks(desktop, prop, run, check)
     try:
@@ -81,6 +83,60 @@ def writer_checks(desktop, prop, run, check):
     run(doc, "MoneyToWords")
     check("Writer đọc số tiền", text.getString(), "Một triệu hai trăm năm mươi nghìn đồng")
 
+    doc.close(True)
+
+
+def nd30_checks(desktop, prop, run, check):
+    # The soffice process was started with ONEX_TOOLS_ND30_FIELDS (see scripts/build-macos.sh), so the command
+    # builds the document without opening the dialog.
+    start = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+    run(start, "Nd30Document")
+    doc = start  # a blank, unmodified Writer document is filled in place
+    check("NĐ30 dựng vào tài liệu trống", doc.getTextTables().getCount(), 2)
+    pages = doc.getStyleFamilies().getByName("PageStyles")
+    std = pages.getByName("Standard")
+    # Writer stores page sizes in twips: 1/100 mm values come back with ±0.01 mm rounding.
+    near = lambda got, want: all(abs(g - w) <= 2 for g, w in zip(got, want))  # noqa: E731
+    check("NĐ30 khổ A4 (±0,02 mm)", near((std.Width, std.Height), (21000, 29700)), True)
+    check("NĐ30 lề 20/20/30/15 mm (±0,02 mm)",
+          near((std.TopMargin, std.BottomMargin, std.LeftMargin, std.RightMargin), (2000, 2000, 3000, 1500)), True)
+    check("NĐ30 trang đầu không có số trang", pages.getByName("First Page").HeaderIsOn, False)
+    check("NĐ30 trang sau có số trang", std.HeaderIsOn, True)
+    tables = doc.getTextTables()
+    head = tables.getByIndex(0)
+    check("NĐ30 trang đầu dùng kiểu First Page", head.PageDescName, "First Page")
+    left = head.getCellByName("A1").getText().getString().replace("\r\n", "\n").split("\n")
+    right = head.getCellByName("B1").getText().getString().replace("\r\n", "\n").split("\n")
+    check("NĐ30 cơ quan chủ quản", left[0], "UBND TỈNH ĐÀ NẴNG")
+    check("NĐ30 cơ quan ban hành", left[1], "SỞ KHOA HỌC VÀ CÔNG NGHỆ")
+    check("NĐ30 số ký hiệu", [x for x in left if x.startswith("Số:")], ["Số: 05/TTr-SKHCN"])
+    check("NĐ30 quốc hiệu", right[0], "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM")
+    check("NĐ30 tiêu ngữ", right[1], "Độc lập - Tự do - Hạnh phúc")
+    check("NĐ30 địa danh ngày", [x for x in right if x.startswith("Đà Nẵng")], ["Đà Nẵng, ngày 05 tháng 01 năm 2026"])
+    first_para = head.getCellByName("B1").getText().createEnumeration().nextElement()
+    check("NĐ30 quốc hiệu Times New Roman 13 đậm",
+          (first_para.CharFontName, first_para.CharHeight, first_para.CharWeight), ("Times New Roman", 13.0, 150.0))
+    body = doc.getText().getString()
+    check("NĐ30 tên loại", "TỜ TRÌNH" in body, True)
+    check("NĐ30 trích yếu", "Về việc phê duyệt kế hoạch năm 2026" in body, True)
+    paras = doc.getText().createEnumeration()
+    content = None
+    while paras.hasMoreElements():
+        p = paras.nextElement()
+        if p.supportsService("com.sun.star.text.Paragraph") and p.getString() == "Đoạn một.":
+            content = p
+    check("NĐ30 nội dung canh đều, lùi đầu dòng 1,27 cm, cỡ 14",
+          content is not None and (content.ParaAdjust, content.ParaFirstLineIndent, content.CharHeight),
+          (2, 1270, 14.0))
+    sign = tables.getByIndex(1)
+    signer = sign.getCellByName("B1").getText().getString()
+    check("NĐ30 quyền hạn ký", signer.startswith("KT. GIÁM ĐỐC"), True)
+    check("NĐ30 họ tên", signer.rstrip().endswith("Nguyễn Văn A"), True)
+    receivers = sign.getCellByName("A1").getText().getString().replace("\r\n", "\n").split("\n")
+    check("NĐ30 nơi nhận", (receivers[0], receivers[-1]), ("Nơi nhận:", "- Lưu: VT, VP, 02b."))
+    out = __import__("os").environ.get("ONEX_TOOLS_ND30_PNG")
+    if out:
+        doc.storeToURL(uno.systemPathToFileUrl(out), (prop("FilterName", "writer_png_Export"),))
     doc.close(True)
 
 

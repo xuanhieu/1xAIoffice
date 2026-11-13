@@ -13,7 +13,11 @@ import unohelper
 from com.sun.star.frame import XDispatch, XDispatchProvider
 from com.sun.star.lang import XInitialization, XServiceInfo
 
+import datetime
+import json
+
 from vn1x import docops
+from vn1x import nd30
 from vn1x.numwords import NumberWordsError, money_to_words, number_to_words, parse_number_text
 from vn1x.vntext import normalize, remove_diacritics, tcvn3_to_unicode
 
@@ -30,6 +34,7 @@ TEXTS = {
         "select_number": "Select a number first.",
         "done": "Changed {n} text part(s).",
         "unsupported": "This command works in Writer and Calc documents.",
+        "nd30_error": "Cannot create the document: {err}",
     },
     "vi": {
         "title": "1xVnOffice",
@@ -39,6 +44,7 @@ TEXTS = {
         "select_number": "Hãy chọn một số trước.",
         "done": "Đã đổi {n} đoạn chữ.",
         "unsupported": "Lệnh này dùng trong tài liệu Writer và Calc.",
+        "nd30_error": "Không tạo được văn bản: {err}",
     },
 }
 
@@ -81,6 +87,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         pass
 
     def dispatch(self, url, args):
+        if url.Path == "Nd30Document":  # works from any module: creates a new Writer document
+            self.t = TEXTS[_ui_lang(self.ctx)]
+            self.cmd_Nd30Document()
+            return
         doc = self.frame.getController().getModel() if self.frame else None
         if doc is None:
             return
@@ -174,6 +184,38 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                 if not from_selection or new != old:
                     t.CharFontName = TCVN3_REPLACEMENT_FONT
         self.message(self.t["done"].format(n=changed))
+
+    def cmd_Nd30Document(self):
+        # ONEX_TOOLS_ND30_FIELDS (JSON) bypasses the dialog for automated tests.
+        raw = os.environ.get("ONEX_TOOLS_ND30_FIELDS")
+        if raw:
+            fields = json.loads(raw)
+            if fields.get("date"):
+                fields["date"] = datetime.date.fromisoformat(fields["date"])
+        else:
+            from vn1x import nd30_dialog
+            parent = self.frame.getContainerWindow() if self.frame else None
+            fields = nd30_dialog.run(self.ctx, parent, "vi" if self.t is TEXTS["vi"] else "en")
+            if fields is None:
+                return
+        try:
+            spec = nd30.build(fields)
+        except nd30.Nd30Error as exc:
+            self.message(self.t["nd30_error"].format(err=exc))
+            return
+        from vn1x import nd30_writer
+        # Fill the current Writer document when it is still blank and unmodified (like picking a template in a new
+        # document); otherwise open a new Writer window.
+        current = self.frame.getController().getModel() if self.frame else None
+        blank = (current is not None and current.supportsService("com.sun.star.text.TextDocument")
+                 and not current.isModified() and not current.getText().getString()
+                 and current.getTextTables().getCount() == 0)
+        if blank:
+            doc = current
+        else:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
+            doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, ())
+        nd30_writer.fill(doc, spec)
 
     def message(self, text):
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
