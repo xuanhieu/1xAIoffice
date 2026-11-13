@@ -15,10 +15,10 @@ def err(msg):
 
 
 def check_lock():
-    lock = json.loads((ROOT / "upstream/libreoffice-lock.json").read_text())
+    lock = json.loads((ROOT / "upstream/source-lock.json").read_text())
     version = lock.get("version", "")
     if not re.fullmatch(r"\d+\.\d+\.\d+\.\d+", version):
-        err(f"lock: version '{version}' is not a four-part LibreOffice version")
+        err(f"lock: version '{version}' is not a four-part upstream version")
     for key in ("gitTag", "gitCommit", "baseUrl", "signingKey", "tarballs"):
         if key not in lock:
             err(f"lock: missing '{key}'")
@@ -45,7 +45,7 @@ def check_lock():
 
 
 def check_patches():
-    folder = ROOT / "patches/libreoffice"
+    folder = ROOT / "patches/source"
     listed = []
     for line in (folder / "series").read_text().splitlines():
         line = line.strip()

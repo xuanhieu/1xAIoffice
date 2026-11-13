@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Measure how a notebookbar (ribbon) .ui file places the commands of a Word-style command map.
 
-For each row of the map (tab, group, command) it reports: the command is defined in LibreOffice; it appears on the
+For each row of the map (tab, group, command) it reports: the command is defined in upstream; it appears on the
 ribbon; and it sits on the expected tab. Exit code 1 when the share on the expected tab is below --min.
 
 Usage:
@@ -16,7 +16,7 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-# LibreOffice tab label ids -> the tab names used in the command map (Word layout, Vietnamese).
+# upstream tab label ids -> the tab names used in the command map (Word layout, Vietnamese).
 DEFAULT_TABS = {
     "HomeLabel": "Trang đầu", "InsertLabel": "Chèn", "DesignLabel": "Thiết kế", "LayoutLabel": "Bố cục",
     "ReferencesLabel": "Tham chiếu", "MailingsLabel": "Thư", "ReviewLabel": "Xem lại", "ViewLabel": "Xem",
@@ -83,7 +83,7 @@ def main():
     on_tab = on_ribbon = undefined = 0
     lines = ["| Thẻ mong đợi | Nhóm | Lệnh | Tên lệnh UNO | Đang ở | Kết quả |", "|---|---|---|---|---|---|"]
     for r in rows:
-        # A cell may list alternatives ("a|b"): LibreOffice often has several commands for one Office action.
+        # A cell may list alternatives ("a|b"): upstream often has several commands for one Office action.
         cmds, tab = r["command"].split("|"), r["tab"]
         here = sorted({t for c in cmds for t in where.get(c, [])})
         if not any(c in known for c in cmds):

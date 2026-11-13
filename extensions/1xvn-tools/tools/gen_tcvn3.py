@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Sinh data/tcvn3.json từ bảng mã TCVN 5712:1993 của glibc (data/sources/glibc-TCVN5712-1.charmap).
 
-Văn bản gõ bằng phông TCVN3 (.VnTime, .VnArial…) được Word và LibreOffice đọc như ký tự Windows-1252 của từng byte.
+Văn bản gõ bằng phông TCVN3 (.VnTime, .VnArial…) được Word và upstream đọc như ký tự Windows-1252 của từng byte.
 Vì vậy khoá của bảng là ký tự cp1252 ứng với byte (byte cp1252 không định nghĩa thì dùng Latin-1), giá trị là ký tự
 Unicode mà TCVN 5712 gán cho byte đó. Chỉ lấy byte 0x80–0xFF: phông TCVN3 để nguyên vùng ASCII, còn vùng điều khiển
 0x01–0x17 (chữ hoa có dấu của bản VN1) không gõ được trong phông TCVN3.

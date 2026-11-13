@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build 1xVnOffice for macOS from the locked LibreOffice tarballs.
+# Build 1xVnOffice for macOS from the locked upstream tarballs.
 # Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config brand ribbon guides extensions sign smoke defaults tools all
 set -euo pipefail
 # shellcheck source=scripts/env.sh
@@ -17,8 +17,8 @@ BUILD_TOOLS="autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames
 # GNU gettext (msgfmt and friends) for the Vietnamese UI translations.
 KEG_TOOLS_GETTEXT="gettext/bin/msgfmt gettext/bin/msgunfmt gettext/bin/msgcat gettext/bin/msguniq gettext/bin/xgettext"
 # meson is deliberately left out: Homebrew meson needs its own Python, while configure runs it with
-# /usr/bin/python3; without it, LibreOffice uses its bundled meson (only ninja is required).
-# Keg-only formulae (not linked into bin/): macOS ships bison 2.3, too old for LibreOffice.
+# /usr/bin/python3; without it, upstream uses its bundled meson (only ninja is required).
+# Keg-only formulae (not linked into bin/): macOS ships bison 2.3, too old for upstream.
 # flex is NOT taken from Homebrew: flex 2.6.10 generates code that breaks connectivity/source/parse/sqlflex.l
 # ("use of undeclared identifier yy_fatal_error"); the system /usr/bin/flex 2.6.4 works.
 KEG_TOOLS="$KEG_TOOLS_GETTEXT bison/bin/bison bison/bin/yacc"
@@ -80,21 +80,21 @@ step_extract() {
 }
 
 step_patch() {
-  local series="$REPO_ROOT/patches/libreoffice/series" marker="$SRC_DIR/.1x-patched"
+  local series="$REPO_ROOT/patches/source/series" marker="$SRC_DIR/.1x-patched"
   [ -d "$SRC_DIR" ] || die "Chưa có mã nguồn; chạy bước extract."
   : > "$marker.new"
   while IFS= read -r p; do
     case "$p" in ''|'#'*) continue ;; esac
     if grep -qxF "$p" "$marker" 2>/dev/null; then info "Đã áp: $p"; echo "$p" >> "$marker.new"; continue; fi
     info "Áp bản vá $p"
-    patch -d "$SRC_DIR" -p1 --forward --batch -i "$REPO_ROOT/patches/libreoffice/$p"
+    patch -d "$SRC_DIR" -p1 --forward --batch -i "$REPO_ROOT/patches/source/$p"
     echo "$p" >> "$marker.new"
   done < "$series"
   mv "$marker.new" "$marker"
 }
 
 step_l10n() {
-  # Merge the 1xVnOffice translation layer (l10n/) into the LibreOffice translations before building.
+  # Merge the 1xVnOffice translation layer (l10n/) into the upstream translations before building.
   [ -d "$SRC_DIR/translations/source" ] || die "Chưa có bản dịch; chạy bước extract."
   python3 "$REPO_ROOT/scripts/l10n-merge.py" --src "$SRC_DIR" --lang vi --strict
   # gbuild's MoTarget does not depend on its .po file, so a changed translation is never recompiled on its own.

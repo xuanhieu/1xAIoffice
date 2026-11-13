@@ -4,7 +4,7 @@
 # shellcheck disable=SC2034
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LOCK_FILE="$REPO_ROOT/upstream/libreoffice-lock.json"
+LOCK_FILE="$REPO_ROOT/upstream/source-lock.json"
 
 # Everything large (tarballs, source tree, ccache, logs) lives outside the repo, on the external SSD by default.
 ONEX_WORK="${ONEX_WORK:-/Volumes/SSD1Tb-Black-APFS/Developer/1xvnoffice-work}"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""List the strings of a LibreOffice translation file that still need a 1xVnOffice translation, and apply finished
+"""List the strings of a upstream translation file that still need a 1xVnOffice translation, and apply finished
 translations back into the l10n layer.
 
   export: scripts/l10n-todo.py export --src <lo src> --po sw/messages.po --out <dir> [--batch 250]
@@ -79,7 +79,7 @@ def cmd_apply(args):
     entries = po.load(ov) if ov.is_file() else []
     if not entries:
         hdr = po.Entry()
-        hdr.comments = ['# 1xVnOffice: lớp dịch tiếng Việt bổ sung cho LibreOffice (MPL-2.0).']
+        hdr.comments = ['# 1xVnOffice: lớp dịch tiếng Việt bổ sung cho upstream (MPL-2.0).']
         hdr.set_field('msgid', '')
         hdr.set_field('msgstr', 'Content-Type: text/plain; charset=UTF-8\n')
         entries.append(hdr)

@@ -1,6 +1,6 @@
 # Giao diện 1xVnOffice
 
-Chủ dự án chốt ngày 13/11/2026: **không dùng giao diện LibreOffice**. Bố cục và cách làm việc theo kiểu WPS Office, chất lượng hướng tới Microsoft Office 2026.
+Chủ dự án chốt ngày 13/11/2026: **không dùng giao diện upstream**. Bố cục và cách làm việc theo kiểu WPS Office, chất lượng hướng tới Microsoft Office 2026.
 
 ## Giới hạn pháp lý
 
@@ -20,7 +20,7 @@ Chủ dự án chốt ngày 13/11/2026: **không dùng giao diện LibreOffice**
 | Hình ảnh | Ảnh chụp từng thẻ ribbon, sáng và tối, 1x và 2x, được người duyệt chấp nhận | Bộ ảnh chụp tự động, so với ảnh đã duyệt |
 | Tốc độ | Đổi thẻ ribbon dưới 50 ms, mở thẻ tài liệu mới dưới 300 ms | Đo bằng bộ đo hiệu năng |
 
-Giới hạn thật: VCL (bộ giao diện của LibreOffice) không có hiệu ứng trong mờ và chuyển động như Office. Bản 1.0 nhắm tới bố cục, icon, khoảng cách và phông chữ ngang Office; không hứa giống từng điểm ảnh.
+Giới hạn thật: VCL (bộ giao diện của upstream) không có hiệu ứng trong mờ và chuyển động như Office. Bản 1.0 nhắm tới bố cục, icon, khoảng cách và phông chữ ngang Office; không hứa giống từng điểm ảnh.
 
 ## Các phần cần làm
 
@@ -33,27 +33,38 @@ Giới hạn thật: VCL (bộ giao diện của LibreOffice) không có hiệu 
 | 5 | Trang chủ thống nhất: tài liệu gần đây, mẫu NĐ30, nút tạo 1xDoc/1xSheet/1xSlide | Thay Start Center | 2 |
 | 6 | Bộ icon "1x Fluent" từ Fluent UI System Icons, bản sáng và tối | Sinh `images_1x.zip` bằng script, ánh xạ tên lệnh UNO sang icon Fluent | 2 |
 | 7 | Màu nhấn theo ứng dụng: 1xDoc xanh dương, 1xSheet xanh lá, 1xSlide cam | Lớp cấu hình giao diện | 2 |
-| 8 | Ô "Tìm lệnh" (Alt+Q) có tìm không dấu | Dùng tính năng tìm lệnh có sẵn của LibreOffice, thêm chuẩn hoá tiếng Việt | 3 |
+| 8 | Ô "Tìm lệnh" (Alt+Q) có tìm không dấu | Dùng tính năng tìm lệnh có sẵn của upstream, thêm chuẩn hoá tiếng Việt | 3 |
 | 9 | Thanh truy cập nhanh trên thanh tiêu đề (Lưu, Hoàn tác, Làm lại) | Cấu hình notebookbar | 2 |
 | 10 | Khung trợ lý AI bên phải | Giai đoạn 8 (`ai-platform-design.md`) | 8 |
 
 ## Nhận diện và theme "Sơn mài" (13/11/2026)
 
-Chủ dự án không muốn theme mặc định của LibreOffice. Hướng đã làm:
+Chủ dự án không muốn theme mặc định của upstream. Hướng đã làm:
 
-- **Brief:** nền than chì ánh xanh (`#17181C`–`#24252B`), một màu nhấn cobalt `#4C7DFF`, vàng chỉ dùng trong logo. Lấy cảm hứng từ sơn mài Việt (nền sẫm, vàng), để có bản sắc riêng, khác cả xám trắng của LibreOffice lẫn đỏ của WPS.
+- **Brief:** nền than chì ánh xanh (`#17181C`–`#24252B`), một màu nhấn cobalt `#4C7DFF`, vàng chỉ dùng trong logo. Lấy cảm hứng từ sơn mài Việt (nền sẫm, vàng), để có bản sắc riêng, khác cả xám trắng của upstream lẫn đỏ của WPS.
 - **Một nguồn token:** `branding/tokens.json`. `scripts/brand/make-brand.py` sinh ra mọi thứ từ đó:
   - logo "1x" (khối squircle, nét x màu vàng), wordmark Noto Sans (OFL) đã đổi thành đường nét;
   - logo sáng và tối cho About và Start Center, nền About, splash hai cỡ, icon app `main.icns`;
   - icon theme `images_1x.zip`;
   - lớp cấu hình `config/1x-theme.xcd`.
-- **Theme:** dùng cơ chế ColorScheme của LibreOffice 26.8 (`LibreOfficeTheme=1`, scheme `1xVnOffice`). Plugin macOS có áp các màu này. Không vá mã lõi. Người dùng vẫn đổi về Automatic/Light/Dark được trong Options.
-- **Icon theme "1x":** chỉ chứa icon đã thay, ở dạng SVG nên sắc nét trên Retina. Icon nào chưa có thì LibreOffice tự lấy từ `colibre_dark`. Vì vậy có thể thay dần sang bộ Fluent (mục 6) mà không phải làm hết một lần.
+- **Theme:** dùng cơ chế ColorScheme của upstream 26.8 (`LibreOfficeTheme=1`, scheme `1xVnOffice`). Plugin macOS có áp các màu này. Không vá mã lõi. Người dùng vẫn đổi về Automatic/Light/Dark được trong Options.
+- **Icon theme "1x":** chỉ chứa icon đã thay, ở dạng SVG nên sắc nét trên Retina. Icon nào chưa có thì upstream tự lấy từ `colibre_dark`. Vì vậy có thể thay dần sang bộ Fluent (mục 6) mà không phải làm hết một lần.
 - **Start Center:**
   - Bản vá `0001-startcenter-1x-labels.patch` đổi tên ứng dụng thành 1xDoc/1xSheet/1xSlide.
   - Bản dịch tiếng Việt cho Start Center nằm ở `l10n/vi/sfx2/messages.po`. `l10n-merge.py` khớp theo msgctxt khi chữ gốc tiếng Anh do chính 1x đổi.
   - Nút quyên góp cho TDF đã tắt (`ShowDonation=false`).
 - **Còn thiếu so với trang chủ kiểu WPS:** ô tìm tài liệu ở đầu trang, thẻ tài liệu (mục 4), khung đề xuất bên phải, danh sách gần đây dạng bảng (tên, nơi lưu, ngày sửa). Các phần này cần viết lại `BackingWindow` (sfx2, C++) hoặc làm trang chủ riêng. Đây là việc kế tiếp của mục 5.
+
+## Logo "tất cả trong một" và bộ nhận diện riêng (13/11/2026)
+
+- **Logo:** số 1 ở giữa, vòng quỹ đạo nghiêng quanh nó, ba vệ tinh là ba ứng dụng: 1xDoc (xanh dương, trang chữ), 1xSheet (xanh lá, bảng), 1xSlide (cam, màn chiếu). Nửa trước của vòng đi qua phía trước số 1. Sinh bằng `scripts/brand/make-brand.py` từ `branding/tokens.json`; chữ "1x" vàng trong wordmark.
+- **Gỡ thương hiệu cũ khỏi những gì người dùng nhìn thấy:**
+  - Hộp About: `patches/source/0002-about-1x.patch` đổi mô tả, dòng bản quyền, dòng nhà phát hành và bỏ liên kết build id về kho upstream; bản dịch ở `l10n/vi/cui`.
+  - Địa chỉ web của Trợ giúp, About, Start Center và Extension Manager: `config/1x-identity.xcd` (chỉ dùng gốc `1xag.com`, `xuanhieu.org` và kho GitHub công khai, không dựa vào trang con chưa có).
+  - README, NOTICE, hướng dẫn trong app và tài liệu kỹ thuật không nhắc tên cũ; thư mục `upstream/` và `patches/source/` đổi tên theo.
+- **Nội dung giới thiệu** (chủ sở hữu, sứ mệnh, tầm nhìn, điểm khác biệt) nằm ở `branding/about.json`, một nguồn cho README và hướng dẫn trong app. Phần "đã dùng được" chỉ liệt kê thứ chạy thật; thứ chưa xong nằm ở "đang làm tiếp".
+- **Phần phải giữ theo giấy phép:** hộp License của ứng dụng (thông báo MPL-2.0 và giấy phép bên thứ ba), tệp `LICENSE`, `NOTICE`, `CREDITS` trong thư mục tài nguyên của bộ cài, và tiêu đề bản quyền trong từng file nguồn. Đây là điều kiện của giấy phép, không phải thương hiệu, nên không gỡ.
+- **Còn sót, không nhìn thấy trong giao diện:** tên khoá cấu hình `LibreOfficeTheme`, mã định danh gói macOS `org.libreoffice.script`, tên tarball và địa chỉ tải trong `upstream/source-lock.json`. Đổi mã định danh gói cần build lại cả bộ cài.
 
 ## Ribbon gọn kiểu WPS / Office (13/11/2026)
 
@@ -74,7 +85,7 @@ Chủ dự án không muốn theme mặc định của LibreOffice. Hướng đ�
 - `scripts/guides/make-guides.py` dùng chính 1xVnOffice sinh ra 1xDoc (.docx, kèm .pdf), 1xSheet (.xlsx) và 1xSlide (.pptx), mỗi file có bản tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp 1xVnOffice. Bước build `guides` cài chúng vào `App/Contents/Resources/guides/<lang>/`, kèm ảnh xem trước trang đầu.
 - Hướng dẫn 1xSheet là bảng chạy được: đổi số lượng thì thành tiền, số tiền bằng chữ (DOCTIEN) và biểu đồ tự cập nhật. Bảng có sẵn lọc, cố định dòng tiêu đề và định dạng có điều kiện.
 - Lần chạy đầu, job `GuideSeeder` (sự kiện `onFirstRunInitialization`) đưa ba hướng dẫn vào mục Gần đây theo ngôn ngữ giao diện, rồi nạp lại Start Center. Job chỉ chạy khi mục Gần đây còn trống.
-- Bài học: LibreOffice headless trên macOS bị abort trong `AquaSalMenu::setMainMenu` khi mở một tài liệu ẩn (`Hidden=True`) hoặc một cửa sổ tài liệu thứ hai. Vì vậy mỗi tệp được sinh trong một phiên soffice riêng, với tài liệu hiển thị.
+- Bài học: upstream headless trên macOS bị abort trong `AquaSalMenu::setMainMenu` khi mở một tài liệu ẩn (`Hidden=True`) hoặc một cửa sổ tài liệu thứ hai. Vì vậy mỗi tệp được sinh trong một phiên soffice riêng, với tài liệu hiển thị.
 
 ## Số đo gốc (13/11/2026)
 
@@ -82,23 +93,23 @@ Chủ dự án không muốn theme mặc định của LibreOffice. Hướng đ�
 
 | Ribbon | Đúng thẻ | Sai thẻ | Thiếu | Chi tiết |
 |---|---|---|---|---|
-| LibreOffice 26.8 Writer, `notebookbar.ui` gốc | 70/86 (81%) | 15 | 1 | `docs/ui/baseline-writer-libreoffice-26.8.md` |
+| upstream 26.8 Writer, `notebookbar.ui` gốc | 70/86 (81%) | 15 | 1 | `docs/ui/baseline-writer-upstream-26.8.md` |
 | Mục tiêu 1xDoc 1.0 | 86/86 (100%) | 0 | 0 | CI chạy script với `--min 1.0` khi ribbon của 1x nằm trong repo |
 
-Những lệnh lệch chính: đầu trang, chân trang, số trang, ngày giờ, chú thích, dòng chữ ký đang ở thẻ khác thay vì "Chèn"; hình mờ ở "Bố cục" thay vì "Thiết kế" (LibreOffice không có thẻ Thiết kế); trộn thư ở "Công cụ" thay vì "Thư"; "Sắp xếp" không có trên ribbon.
+Những lệnh lệch chính: đầu trang, chân trang, số trang, ngày giờ, chú thích, dòng chữ ký đang ở thẻ khác thay vì "Chèn"; hình mờ ở "Bố cục" thay vì "Thiết kế" (upstream không có thẻ Thiết kế); trộn thư ở "Công cụ" thay vì "Thư"; "Sắp xếp" không có trên ribbon.
 
 ### Bản build đầu tiên (13/11/2026)
 
-- Ribbon dạng thẻ đã là mặc định trong cả bốn ứng dụng nhờ `config/1x-defaults.xcd`. Ảnh: `docs/ui/writer-ribbon-baseline-2026-11-13.png` (so với giao diện cổ điển trước đó: `docs/ui/writer-classic-libreoffice-2026-11-13.png`).
-- **Bản dịch tiếng Việt của LibreOffice 26.8 mới đạt 62% giao diện** (20.444/32.460 chuỗi; Writer `sw` 38%, `svx` 50%, `sfx2` 54%, `vcl` 55%, `cui` 85%). Hậu quả: ribbon lẫn Anh–Việt ("Home", "Insert", "Cut" chưa dịch; "Dán", "Tiêu đề 1" đã dịch).
-- Tên sản phẩm vẫn là "LibreOfficeDev", hộp chào mừng của LibreOffice vẫn hiện. Cả hai sửa ở phần thương hiệu (giai đoạn 2).
+- Ribbon dạng thẻ đã là mặc định trong cả bốn ứng dụng nhờ `config/1x-defaults.xcd`. Ảnh: `docs/ui/writer-ribbon-baseline-2026-11-13.png` (so với giao diện cổ điển trước đó: `docs/ui/writer-classic-upstream-2026-11-13.png`).
+- **Bản dịch tiếng Việt của upstream 26.8 mới đạt 62% giao diện** (20.444/32.460 chuỗi; Writer `sw` 38%, `svx` 50%, `sfx2` 54%, `vcl` 55%, `cui` 85%). Hậu quả: ribbon lẫn Anh–Việt ("Home", "Insert", "Cut" chưa dịch; "Dán", "Tiêu đề 1" đã dịch).
+- Đã sửa (13/11/2026): tên sản phẩm, hộp chào mừng, hộp About và các địa chỉ web đều là của 1xVnOffice (xem mục Nhận diện và Bộ nhận diện riêng).
 
 ### Bản dịch tiếng Việt của 1x (việc mới, giai đoạn 2)
 
 1. Lớp dịch riêng `l10n/vi/` (các file `.po` bổ sung) được trộn vào `translations/source/vi` trước khi build. Script kiểm: không chuỗi nào của các module giao diện chính bị thiếu.
 2. Bảng thuật ngữ theo cách gọi quen thuộc của Word, Excel, PowerPoint tiếng Việt (Trang đầu, Chèn, Bố cục, Tham chiếu, Xem lại…); đặt dấu thanh theo một quy ước thống nhất (cần chủ dự án chốt: "hóa" hay "hoá"); phím tắt không trùng trong cùng hộp thoại.
 3. Dịch khoảng 12.000 chuỗi còn thiếu bằng AI theo bảng thuật ngữ, người duyệt lại phần hiện trên ribbon và hộp thoại phổ biến trước.
-4. Gửi bản dịch về Weblate của LibreOffice để giảm phần phải tự giữ.
+4. Gửi bản dịch về Weblate của upstream để giảm phần phải tự giữ.
 5. Mục tiêu bản 1.0: 100% chuỗi của `sfx2 sw sc sd svx cui vcl framework` có tiếng Việt.
 
 Tiến độ:
@@ -112,13 +123,13 @@ Kết quả trên bản build release (ảnh `docs/ui/writer-1xvnoffice-vi-2026-
 
 Còn tiếng Anh, làm ở lượt sau: tên kiểu đoạn ("Default Paragraph Style", "Body Text", "Block Quotation"), thanh trạng thái ("0 words, 0 characters", "Default Page Style", "Insert"). Ngôn ngữ tài liệu mặc định vẫn là "Anh (Mỹ)", cần đổi sang tiếng Việt để kiểm tra chính tả đúng.
 
-Bài học: kiểm tra `msgfmt` là chưa đủ. Bộ đọc của LibreOffice (`cfgex`) bỏ qua không báo lỗi khi chuỗi nhiều dòng bị ghi gộp một dòng, nên bước `defaults` giờ đọc thẳng nhãn lệnh tiếng Việt từ ứng dụng đang chạy.
+Bài học: kiểm tra `msgfmt` là chưa đủ. Bộ đọc của upstream (`cfgex`) bỏ qua không báo lỗi khi chuỗi nhiều dòng bị ghi gộp một dòng, nên bước `defaults` giờ đọc thẳng nhãn lệnh tiếng Việt từ ứng dụng đang chạy.
 
 Cách làm: `scripts/l10n-merge.py` trộn `l10n/vi/**.po` vào cây dịch trước khi build (bước `l10n` của `build-macos.sh`); bộ đọc/ghi PO tự viết (`scripts/po.py`) giữ nguyên dòng gốc, ghi lại file không đổi giống hệt từng byte.
 
 ## Thứ tự làm
 
-1. Đo trước: chụp ribbon Tabbed hiện có của LibreOffice 26.8 sau khi build xong, lập `command-map.csv` cho Writer.
+1. Đo trước: chụp ribbon Tabbed hiện có của upstream 26.8 sau khi build xong, lập `command-map.csv` cho Writer.
 2. Viết lại `notebookbar.ui` của Writer theo bảng đối chiếu, rồi tới Calc và Impress.
 3. Sinh bộ icon Fluent cho các lệnh có mặt trên ribbon (khoảng 400 icon), sau đó mới tới phần còn lại.
 4. Backstage "Tệp" và trang chủ.

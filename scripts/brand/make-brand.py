@@ -29,9 +29,41 @@ OUT = REPO / "branding" / "out"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 
+def _orbit_points(cx, cy, rx, ry, rot_deg, angles_deg):
+    import math
+    th = math.radians(rot_deg)
+    out = []
+    for a in angles_deg:
+        t = math.radians(a)
+        x, y = rx * math.cos(t), ry * math.sin(t)
+        out.append((cx + x * math.cos(th) - y * math.sin(th), cy + x * math.sin(th) + y * math.cos(th)))
+    return out
+
+
+# Hình nét trắng trên ô vệ tinh 24x24 (Doc: trang chữ, Sheet: bảng, Slide: màn chiếu).
+SAT_GLYPHS = {
+    "doc": '<path d="M7.5 8h9M7.5 12h9M7.5 16h5.5"/>',
+    "sheet": '<rect x="6.5" y="6.5" width="11" height="11" rx="1.2"/><path d="M6.5 12h11M12 6.5v11"/>',
+    "slide": '<rect x="5.5" y="7" width="13" height="8.5" rx="1.4"/><path d="M12 15.5V18.5M9 18.5h6"/>',
+}
+
+
 def mark_group(x, y, size, uid):
-    """Biểu tượng: khối squircle sơn mài, chữ "1" màu giấy và chữ "x" có một nét vàng. Hệ toạ độ gốc 256."""
+    """Biểu tượng "tất cả trong một": số 1 ở giữa, vòng quỹ đạo nghiêng và ba vệ tinh Doc (xanh dương), Sheet (xanh lá),
+    Slide (cam) quay quanh. Nửa trước của vòng đi qua phía trước số 1 để có chiều sâu. Hệ toạ độ gốc 256."""
     s = size / 256
+    cx, cy, rx, ry, rot = 128, 130, 96, 36, -24
+    sats = _orbit_points(cx, cy, rx, ry, rot, (205, -35, 65))
+    kinds = (("doc", APPS["doc"]), ("sheet", APPS["sheet"]), ("slide", APPS["slide"]))
+    badges = []
+    for (px, py), (key, color) in zip(sats, kinds):
+        badges.append(f"""<g transform="translate({px - 17:.2f} {py - 17:.2f}) scale(1.4167)">
+      <rect x="0.5" y="0.5" width="23" height="23" rx="6.5" fill="{color}" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="1.3"/>
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{SAT_GLYPHS[key]}</g>
+    </g>""")
+    ring = f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" transform="rotate({rot} {cx} {cy})" fill="none"'
+    front = (f'<path d="M{cx - rx} {cy} A{rx} {ry} 0 0 0 {cx + rx} {cy}" transform="rotate({rot} {cx} {cy})" '
+             f'fill="none" stroke="url(#gold{uid})" stroke-width="3.2" stroke-linecap="round"/>')
     return f"""<defs>
   <linearGradient id="ink{uid}" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="{B['ink_top']}"/><stop offset="1" stop-color="{B['ink_bottom']}"/>
@@ -43,11 +75,10 @@ def mark_group(x, y, size, uid):
 <g transform="translate({x:.2f} {y:.2f}) scale({s:.5f})">
   <rect x="0" y="0" width="256" height="256" rx="60" fill="url(#ink{uid})"/>
   <rect x="1.5" y="1.5" width="253" height="253" rx="58.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="3"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M78 94 L104 76 L104 182" stroke="{B['paper']}" stroke-width="21"/>
-    <path d="M134 122 L180 182" stroke="{B['paper']}" stroke-width="19"/>
-    <path d="M180 122 L134 182" stroke="url(#gold{uid})" stroke-width="19"/>
-  </g>
+  {ring} stroke="{B['gold']}" stroke-opacity="0.38" stroke-width="3"/>
+  <path d="M104 100 L132 80 L132 188" fill="none" stroke="{B['paper']}" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+  {front}
+  {chr(10).join(badges)}
 </g>"""
 
 
@@ -159,7 +190,7 @@ def icon_file(kind, key):
 
 
 ICON_FG = "#E3E5EB"  # màu nét icon lệnh trên nền than chì
-# Cỡ icon lệnh của LibreOffice -> cỡ Fluent gần nhất (nút lớn 32px dùng bản 28px để nét không quá đậm).
+# Cỡ icon lệnh của upstream -> cỡ Fluent gần nhất (nút lớn 32px dùng bản 28px để nét không quá đậm).
 CMD_SIZES = {"cmd/sc_{}.svg": 16, "cmd/lc_{}.svg": 24, "cmd/32/{}.svg": 28}
 
 
@@ -185,8 +216,29 @@ def fluent_icons(fluent_dir):
     return out, sorted(set(missing))
 
 
+# Icon cho lệnh của extension 1xvn-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
+ADDON_ICONS = {"Nd30Document": "document_ribbon", "NumberToWords": "number_symbol_square",
+               "MoneyToWords": "money", "ConvertTCVN3": "arrow_swap", "NormalizeUnicode": "text_grammar_wand",
+               "RemoveDiacritics": "text_clear_formatting"}
+
+
+def addon_icons(fluent_dir, out_dir):
+    """Ghi icon 16px và 26px cho từng lệnh của extension vào extensions/1xvn-tools/icons/."""
+    import re
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for cmd, name in ADDON_ICONS.items():
+        for px, size in ((16, 16), (26, 24)):
+            src = next((Path(fluent_dir) / f"{name}_{s}_regular.svg" for s in (size, 20, 24)
+                        if (Path(fluent_dir) / f"{name}_{s}_regular.svg").is_file()), None)
+            if src is None:
+                raise SystemExit(f"thiếu icon Fluent cho {cmd}: {name}")
+            text = re.sub(r"<svg ", f'<svg fill="{ICON_FG}" ', src.read_text(encoding="utf-8"), count=1)
+            text = re.sub(r'width="\d+" height="\d+"', f'width="{px}" height="{px}"', text, count=1)
+            (out_dir / f"{cmd}_{px}.svg").write_text(text, encoding="utf-8")
+
+
 def icon_theme_zip(path, fluent_dir=None):
-    """Icon theme "1x": chỉ chứa icon được thay; mọi icon khác LibreOffice tự lấy từ colibre/colibre_dark."""
+    """Icon theme "1x": chỉ chứa icon được thay; mọi icon khác upstream tự lấy từ colibre/colibre_dark."""
     import zipfile
     extra, missing = fluent_icons(fluent_dir) if fluent_dir else ({}, [])
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
@@ -274,6 +326,8 @@ def main():
     (OUT / "mark.svg").write_text(svg(256, 256, mark_group(0, 0, 256, "m")), encoding="utf-8")
     (REPO / "config" / "1x-theme.xcd").write_text(theme_xcd(), encoding="utf-8")
     icon_theme_zip(OUT / "images_1x.zip", a.fluent)
+    if a.fluent:
+        addon_icons(a.fluent, REPO / "extensions" / "1xvn-tools" / "icons")
     if a.no_png:
         return
     with tempfile.TemporaryDirectory() as tmp:

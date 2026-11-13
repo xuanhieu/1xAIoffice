@@ -10,9 +10,9 @@
   "gitCommitSource": "git ls-remote --tags https://git.libreoffice.org/core (2026-11-12)",
   "baseUrl": "https://download.documentfoundation.org/libreoffice/src/26.8.3",
   "signingKey": {
-    "note": "LibreOffice Build Team key, stored in upstream/libreoffice-signing-key.asc (fetched from keyserver.ubuntu.com; keys.openpgp.org strips its user ID). scripts/fetch-source.sh checks every .asc with sqv and requires this exact signer fingerprint.",
+    "note": "LibreOffice Build Team key, stored in upstream/source-signing-key.asc (fetched from keyserver.ubuntu.com; keys.openpgp.org strips its user ID). scripts/fetch-source.sh checks every .asc with sqv and requires this exact signer fingerprint.",
     "fingerprint": "C2839ECAD9408FBE9531C3E9F434A1EFAFEEAEA3",
-    "keyFile": "upstream/libreoffice-signing-key.asc"
+    "keyFile": "upstream/source-signing-key.asc"
   },
   "tarballs": [
     {"name": "libreoffice-26.8.3.1.tar.xz", "sha256": "83006a81376988d04a73eaa4dcf44f6f12774a81fd763726406a831905a9de28", "size": 303031904, "required": true},

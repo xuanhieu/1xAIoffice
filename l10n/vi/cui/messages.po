@@ -1,0 +1,17 @@
+# 1xVnOffice Vietnamese overlay for cui (About dialog). MPL-2.0.
+# Entries whose msgid differs from the upstream text come from patches/libreoffice/0002-about-1x.patch.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgctxt "aboutdialog|description"
+msgid "%PRODUCTNAME is a free, private, all-in-one office suite for Vietnam: documents, spreadsheets and presentations in one app (1xDoc, 1xSheet, 1xSlide), with Vietnamese tools built in."
+msgstr "%PRODUCTNAME là bộ văn phòng trọn gói, miễn phí và riêng tư, làm cho người Việt: văn bản, bảng tính và trình chiếu trong một ứng dụng (1xDoc, 1xSheet, 1xSlide), có sẵn công cụ tiếng Việt."
+
+msgctxt "aboutdialog|copyright"
+msgid "© 2026 xuanhieu.org · 1xag.com"
+msgstr "© 2026 xuanhieu.org · 1xag.com"
+
+msgctxt "aboutdialog|vendor"
+msgid "Made in Vietnam by xuanhieu.org and 1xag.com."
+msgstr "Sản phẩm của xuanhieu.org và 1xag.com, làm tại Việt Nam."

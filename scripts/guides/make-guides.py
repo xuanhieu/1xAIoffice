@@ -15,6 +15,7 @@ from com.sun.star.awt import Size
 from com.sun.star.beans import PropertyValue
 
 REPO = Path(__file__).resolve().parents[2]
+ABOUT = __import__("json").loads((REPO / "branding" / "about.json").read_text(encoding="utf-8"))
 UI = REPO / "docs" / "ui"
 SHOTS = {"start": "startcenter-{lang}-2026-11-13.png", "writer": "writer-theme-2026-11-13.png",
          "calc": "calc-theme-2026-11-13.png", "impress": "impress-theme-2026-11-13.png"}
@@ -286,13 +287,26 @@ def make_doc(office, lang, out):
     para(t["intro"], center=True)
     image(shot("start", lang), "① " + t["callouts"][0])
     image(shot("writer", lang), "② " + t["callouts"][1])
-    # Bullets are drawn by hand: applying the "List Bullet" style over UNO aborts LibreOffice 26.8 on macOS.
+    # Bullets are drawn by hand: applying the "List Bullet" style over UNO aborts upstream 26.8 on macOS.
     for heading, items in t["sections"]:
         para(heading, "Heading 1")
         for item in items:
             para("•\t" + item)
             cur.ParaLeftMargin, cur.ParaFirstLineIndent = 700, -500
     cur.ParaLeftMargin = cur.ParaFirstLineIndent = 0
+    about = ABOUT[lang]
+    para(about["title"], "Heading 1")
+    para(about["tagline"])
+    para(about["who_title"] + ": " + " ".join(about["who"]))
+    para(about["mission_title"] + ": " + about["mission"])
+    para(about["vision_title"] + ": " + about["vision"])
+    for key in ("available", "roadmap", "different"):
+        para(about[key + "_title"], "Heading 2")
+        for item in about[key]:
+            para("•\t" + item)
+            cur.ParaLeftMargin, cur.ParaFirstLineIndent = 700, -500
+        cur.ParaLeftMargin = cur.ParaFirstLineIndent = 0
+    para(about["footer"])
     para(t["shortcuts_title"], "Heading 1")
     rows = [t["shortcuts_head"]] + t["shortcuts"]
     table = doc.createInstance("com.sun.star.text.TextTable")

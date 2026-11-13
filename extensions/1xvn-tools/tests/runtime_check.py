@@ -2,7 +2,7 @@
 # Run with the office's bundled Python against a headless soffice started with ONEX_TOOLS_SILENT=1
 # (scripts/build-macos.sh step "tools"). Calls the 1xvn-tools commands through the dispatcher on real documents.
 # Usage: runtime_check.py <pipe> writer|calc. Writer and Calc run in separate office sessions: on macOS a headless
-# LibreOffice 26.8 aborts in AquaSalMenu::setMainMenu when a Calc document is created after a Writer one.
+# upstream 26.8 aborts in AquaSalMenu::setMainMenu when a Calc document is created after a Writer one.
 import sys
 import time
 

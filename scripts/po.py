@@ -1,8 +1,8 @@
-"""Minimal reader and writer for the gettext PO files used by LibreOffice translations (no external packages).
+"""Minimal reader and writer for the gettext PO files used by upstream translations (no external packages).
 
 An entry keeps its original lines. Only a field that is changed is re-rendered, in the layout gettext and
-LibreOffice's own l10ntools use (multi-line values as `msgstr ""` followed by one quoted line per "\\n"), because
-LibreOffice's cfgex silently drops a file whose multi-line msgctxt is written on a single line. An unchanged file is
+upstream's own l10ntools use (multi-line values as `msgstr ""` followed by one quoted line per "\\n"), because
+upstream's cfgex silently drops a file whose multi-line msgctxt is written on a single line. An unchanged file is
 written back byte for byte.
 """
 import re

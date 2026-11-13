@@ -9,7 +9,7 @@
   <dependency file="calc"/>
   <dependency file="impress"/>
 
-  <!-- Ribbon (tabbed notebookbar) instead of LibreOffice's classic menus and toolbars, in every module.
+  <!-- Ribbon (tabbed notebookbar) instead of upstream's classic menus and toolbars, in every module.
        The ribbon content itself is redesigned in phase 2 (docs/UI_DESIGN.md).
        "Active" holds the mode's CommandArg (notebookbar.ui = Tabbed), not the mode name. -->
   <oor:component-data oor:package="org.openoffice.Office.UI" oor:name="ToolbarMode">
@@ -32,7 +32,7 @@
   <!-- Personal and business profiles save in Microsoft Office formats without the "keep format?" prompt.
        The government profile overrides these with ODF 1.2 (docs/legal/STATUS.md, Circulars 19/2011 and 39/2017). -->
   <oor:component-data oor:package="org.openoffice" oor:name="Setup">
-    <!-- No LibreOffice welcome / what's-new dialog, and no TDF "Get involved" / "Donate" infobars: the timestamps
+    <!-- No upstream welcome / what's-new dialog, and no TDF "Get involved" / "Donate" infobars: the timestamps
          are set far in the future and finalized, so the 90-day reminders never come due. -->
     <node oor:name="Product">
       <prop oor:name="WhatsNew" oor:op="fuse"><value>false</value></prop>
@@ -64,11 +64,22 @@
       </node>
     </node>
   </oor:component-data>
-  <!-- 1xSlide opens on an empty slide like PowerPoint and WPS, without LibreOffice's "Select a Template" dialog. -->
+  <!-- 1xSlide opens on an empty slide like PowerPoint and WPS, without upstream's "Select a Template" dialog. -->
   <oor:component-data oor:package="org.openoffice.Office" oor:name="Impress">
     <node oor:name="Misc">
       <node oor:name="NewDoc">
         <prop oor:name="AutoPilot" oor:op="fuse"><value>false</value></prop>
+      </node>
+    </node>
+  </oor:component-data>
+  <!-- 1xSlide hides upstream's docked Drawing toolbar: shapes, lines and text boxes are on the ribbon's Insert tab,
+       like PowerPoint and WPS. -->
+  <oor:component-data oor:package="org.openoffice.Office.UI" oor:name="ImpressWindowState">
+    <node oor:name="UIElements">
+      <node oor:name="States">
+        <node oor:name="private:resource/toolbar/toolbar" oor:op="fuse">
+          <prop oor:name="Visible" oor:op="fuse"><value>false</value></prop>
+        </node>
       </node>
     </node>
   </oor:component-data>

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Download the LibreOffice tarballs named in upstream/libreoffice-lock.json and verify size, SHA-256 and OpenPGP signature (sqv).
+# Download the upstream tarballs named in upstream/source-lock.json and verify size, SHA-256 and OpenPGP signature (sqv).
 # Usage: scripts/fetch-source.sh [--dry-run] [--skip-optional] [--allow-no-gpg]
 set -euo pipefail
 # shellcheck source=scripts/env.sh
@@ -32,9 +32,9 @@ require_work_volume
 [ "$(free_gib "$ONEX_WORK")" -ge 2 ] || die "Cần ít nhất 2 GiB trống trên $ONEX_WORK."
 
 # Signatures are checked with sqv (Sequoia), from the private Homebrew on the SSD (scripts/bootstrap-tools.sh),
-# against the LibreOffice Build Team key kept in the repo. sqv prints the fingerprint of the key that made a good
+# against the upstream Build Team key kept in the repo. sqv prints the fingerprint of the key that made a good
 # signature; it must equal the fingerprint in the lock file.
-KEYRING="$REPO_ROOT/upstream/libreoffice-signing-key.asc"
+KEYRING="$REPO_ROOT/upstream/source-signing-key.asc"
 SQV="$ONEX_BREW/bin/sqv"
 HAVE_SQV=1
 if [ ! -x "$SQV" ]; then

@@ -6,3 +6,4 @@
 #   Test: <how it is checked>
 # Rule: prefer configure options and .xcu configuration over patching code.
 0001-startcenter-1x-labels.patch
+0002-about-1x.patch

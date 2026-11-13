@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Đổi một dòng chữ thành đường SVG từ font TrueType (bảng glyf), thuần Python, không cần fontTools.
 
-Dùng cho wordmark để logo hiện giống nhau trên mọi máy (trình vẽ SVG của LibreOffice không chắc có font).
+Dùng cho wordmark để logo hiện giống nhau trên mọi máy (trình vẽ SVG của upstream không chắc có font).
 Hỗ trợ cmap format 4, glyph đơn và glyph ghép (chỉ dịch chuyển), không kerning.
 """
 import struct

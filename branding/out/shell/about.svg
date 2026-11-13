@@ -25,10 +25,20 @@
 <g transform="translate(236.00 70.00) scale(0.50000)">
   <rect x="0" y="0" width="256" height="256" rx="60" fill="url(#inka)"/>
   <rect x="1.5" y="1.5" width="253" height="253" rx="58.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="3"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M78 94 L104 76 L104 182" stroke="#F5F6FA" stroke-width="21"/>
-    <path d="M134 122 L180 182" stroke="#F5F6FA" stroke-width="19"/>
-    <path d="M180 122 L134 182" stroke="url(#golda)" stroke-width="19"/>
-  </g>
+  <ellipse cx="128" cy="130" rx="96" ry="36" transform="rotate(-24 128 130)" fill="none" stroke="#E8B954" stroke-opacity="0.38" stroke-width="3"/>
+  <path d="M104 100 L132 80 L132 188" fill="none" stroke="#F5F6FA" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 130 A96 36 0 0 0 224 130" transform="rotate(-24 128 130)" fill="none" stroke="url(#golda)" stroke-width="3.2" stroke-linecap="round"/>
+  <g transform="translate(25.33 134.49) scale(1.4167)">
+      <rect x="0.5" y="0.5" width="23" height="23" rx="6.5" fill="#3D7BFD" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="1.3"/>
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 8h9M7.5 12h9M7.5 16h5.5"/></g>
+    </g>
+<g transform="translate(174.44 62.15) scale(1.4167)">
+      <rect x="0.5" y="0.5" width="23" height="23" rx="6.5" fill="#1FA463" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="1.3"/>
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="6.5" width="11" height="11" rx="1.2"/><path d="M6.5 12h11M12 6.5v11"/></g>
+    </g>
+<g transform="translate(161.33 126.30) scale(1.4167)">
+      <rect x="0.5" y="0.5" width="23" height="23" rx="6.5" fill="#F07A28" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="1.3"/>
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="7" width="13" height="8.5" rx="1.4"/><path d="M12 15.5V18.5M9 18.5h6"/></g>
+    </g>
 </g>
 </svg>
