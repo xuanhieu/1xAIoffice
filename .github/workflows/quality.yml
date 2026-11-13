@@ -18,6 +18,8 @@ jobs:
         run: python3 scripts/check-repo.py
       - name: Extension logic tests
         run: python3 -m unittest discover -s extensions/1xvn-tools/tests -p 'test_*.py' -v
+      - name: Brand and QR tests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
       - name: Package extensions
         run: python3 scripts/build-extensions.py --out "$RUNNER_TEMP/dist"
       - name: Shell lint

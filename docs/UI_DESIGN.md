@@ -66,6 +66,19 @@ Chủ dự án không muốn theme mặc định của upstream. Hướng đã l
 - **Phần phải giữ theo giấy phép:** hộp License của ứng dụng (thông báo MPL-2.0 và giấy phép bên thứ ba), tệp `LICENSE`, `NOTICE`, `CREDITS` trong thư mục tài nguyên của bộ cài, và tiêu đề bản quyền trong từng file nguồn. Đây là điều kiện của giấy phép, không phải thương hiệu, nên không gỡ.
 - **Còn sót, không nhìn thấy trong giao diện:** tên khoá cấu hình `LibreOfficeTheme`, mã định danh gói macOS `org.libreoffice.script`, tên tarball và địa chỉ tải trong `upstream/source-lock.json`. Đổi mã định danh gói cần build lại cả bộ cài.
 
+## Mã VietQR trong hướng dẫn (13/11/2026)
+
+Mục "Ủng hộ tác giả" trong hướng dẫn 1xDoc có mã VietQR nằm sẵn trong tệp, không cần mạng và không gửi số tài khoản ra dịch vụ ngoài khi build.
+
+- `scripts/brand/vietqr.py` dựng chuỗi theo chuẩn EMVCo của NAPAS (CRC-16/CCITT-FALSE); `scripts/brand/qr.py` vẽ mã QR thuần Python (chế độ byte, phiên bản 1–10, mức L/M).
+- Mã sinh ra là **mã tĩnh**, không ghi sẵn số tiền, để người ủng hộ tự chọn mức; các mức gợi ý vẫn in bằng chữ bên cạnh.
+- **Ba lớp kiểm**, vì một mã QR sai sẽ đưa tiền đi đâu không biết:
+  1. `scripts/tests/test_qr.py` (chạy cả trên CI): chuỗi dựng ra phải trùng từng ký tự với một mã VietQR thật của chủ tài khoản, kể cả CRC; bit thông tin định dạng và phiên bản phải khớp bảng trong tiêu chuẩn.
+  2. `scripts/check-vietqr.sh` (macOS): vẽ ảnh rồi giải mã lại bằng CoreImage và so với chuỗi gốc.
+  3. Trước khi phát hành: lấy ảnh ra khỏi chính tệp .docx và .pdf đã sinh rồi giải mã (đã làm ngày 13/11/2026, cả hai ngôn ngữ đều đúng).
+- Bộ vẽ đã được quét đủ 20 tổ hợp phiên bản 1–10 × mức L/M ở sức chứa tối đa, giải mã lại đúng hết. Chuỗi dài hơn sức chứa phiên bản 10 thì báo lỗi thay vì vẽ sai.
+- Bài học: phần dư BCH của thông tin định dạng và phiên bản phải tính từ **dữ liệu gốc**, không phải dữ liệu đã dịch trái. Sai chỗ này thì mã vẫn ra hình đúng kiểu nhưng máy quét không đọc được.
+
 ## Ribbon gọn kiểu WPS / Office (13/11/2026)
 
 - **Icon Fluent:** `branding/fluent-map.json` ánh xạ 232 lệnh ribbon sang Fluent UI System Icons (MIT). `make-brand.py --fluent <icons>` sinh đủ ba cỡ (`cmd/sc_`, `cmd/lc_`, `cmd/32/`) vào `images_1x.zip`, nét màu `#E3E5EB` hợp nền than chì. Lệnh chưa có trong bảng dùng icon `colibre_dark`; muốn thêm lệnh thì chỉ cần sửa file JSON.

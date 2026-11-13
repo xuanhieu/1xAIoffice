@@ -85,6 +85,7 @@
   },
   "donate": {
     "bank": "MB Bank",
+    "bank_bin": "970422",
     "account": "9112233449",
     "holder": "PHAM XUAN HIEU",
     "amounts": [
@@ -95,6 +96,7 @@
     ],
     "minimum": "50.000đ",
     "url_vi": "https://1xag.com/?donate",
-    "url_en": "https://1xag.com/en/?donate"
+    "url_en": "https://1xag.com/en/?donate",
+    "purpose": "Ung ho 1xHieu"
   }
 }

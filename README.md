@@ -40,8 +40,10 @@ Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 
 
 1xVnOffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.
 
-> **MB Bank** · `9112233449` · PHAM XUAN HIEU  
-> 50.000đ · 100.000đ · 200.000đ · 500.000đ · [Trang ủng hộ](https://1xag.com/?donate)
+<img src="branding/out/vietqr.svg" alt="VietQR" width="180">
+
+**MB Bank** · `9112233449` · PHAM XUAN HIEU  
+50.000đ · 100.000đ · 200.000đ · 500.000đ · [Trang ủng hộ](https://1xag.com/?donate)
 
 ---
 
@@ -81,8 +83,10 @@ The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSli
 
 1xVnOffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.
 
-> **MB Bank** · `9112233449` · PHAM XUAN HIEU  
-> 50.000đ · 100.000đ · 200.000đ · 500.000đ · [Donation page](https://1xag.com/en/?donate)
+<img src="branding/out/vietqr.svg" alt="VietQR" width="180">
+
+**MB Bank** · `9112233449` · PHAM XUAN HIEU  
+50.000đ · 100.000đ · 200.000đ · 500.000đ · [Donation page](https://1xag.com/en/?donate)
 
 ---
 

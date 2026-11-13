@@ -272,13 +272,13 @@ def make_doc(office, lang, out):
         if color is not None:
             cur.setPropertyToDefault("CharColor")
 
-    def image(path, caption):
+    def image(path, caption, width_mm100=None):
         para("", center=True)
         g = office.graphic(path)
         obj = doc.createInstance("com.sun.star.text.TextGraphicObject")
         obj.Graphic = g
         obj.AnchorType = uno.Enum("com.sun.star.text.TextContentAnchorType", "AS_CHARACTER")
-        obj.Size = fit(g, width)
+        obj.Size = fit(g, width_mm100 or width)
         text.insertTextContent(cur, obj, False)
         para(caption, "Caption" if paras.hasByName("Caption") else "Text body", center=True)
 
@@ -309,8 +309,9 @@ def make_doc(office, lang, out):
     d = ABOUT["donate"]
     para(about["support_title"], "Heading 2")
     para(about["support"])
-    para(f'{d["bank"]} · {d["account"]} · {d["holder"]}')
-    para(f'{about["support_link"]}: {d["url_" + lang]}')
+    # Mã VietQR tĩnh, sinh bởi scripts/brand/make-brand.py và kiểm bằng scripts/check-vietqr.sh.
+    image(REPO / "branding" / "out" / "vietqr.svg", f'{d["bank"]} · {d["account"]} · {d["holder"]}', 4000)
+    para(f'{about["support_link"]}: {d["url_" + lang]}', center=True)
     para(about["footer"])
     para(t["shortcuts_title"], "Heading 1")
     rows = [t["shortcuts_head"]] + t["shortcuts"]

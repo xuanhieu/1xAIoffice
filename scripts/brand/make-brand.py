@@ -250,6 +250,15 @@ def icon_theme_zip(path, fluent_dir=None):
         print(f"icon Fluent: {len(extra) // len(CMD_SIZES)} lệnh; không có icon: {', '.join(missing) or 'không'}")
 
 
+def vietqr_svg():
+    """Mã VietQR cho mục Ủng hộ tác giả, dựng từ branding/about.json. Mã tĩnh (không ghi sẵn số tiền) để người ủng hộ
+    tự chọn mức. Kiểm lại bằng scripts/check-vietqr.sh."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import vietqr
+    d = json.loads((REPO / "branding" / "about.json").read_text(encoding="utf-8"))["donate"]
+    return vietqr.svg(d["bank_bin"], d["account"], purpose=d["purpose"], size=320, dark=B["ink_bottom"])
+
+
 def theme_xcd():
     t = TOKENS["theme_dark"]
     ui = "\n".join(
@@ -323,6 +332,7 @@ def main():
     for name, text in {"logo": light, "logo-sc": light, "logo_inverted": dark, "logo-sc_inverted": dark,
                        "about": about_bg()}.items():
         (OUT / "shell" / f"{name}.svg").write_text(text, encoding="utf-8")
+    (OUT / "vietqr.svg").write_text(vietqr_svg(), encoding="utf-8")
     (OUT / "mark.svg").write_text(svg(256, 256, mark_group(0, 0, 256, "m")), encoding="utf-8")
     (REPO / "config" / "1x-theme.xcd").write_text(theme_xcd(), encoding="utf-8")
     icon_theme_zip(OUT / "images_1x.zip", a.fluent)
