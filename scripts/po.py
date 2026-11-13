@@ -50,7 +50,8 @@ class Entry:
             self.order.append(name)
 
     def set_translation(self, text):
-        self.set_field('msgstr', text)
+        # Plural entries (msgid_plural) keep their translation in msgstr[0]; Vietnamese has a single plural form.
+        self.set_field('msgstr[0]' if 'msgid_plural' in self.fields else 'msgstr', text)
         cleaned = []
         for c in self.comments:
             if c.startswith('#,') and 'fuzzy' in c:
@@ -118,4 +119,9 @@ def save(path, entries):
 
 
 def is_translated(entry):
-    return bool(entry.fields.get('msgstr')) and not entry.fuzzy
+    text = entry.fields.get('msgstr[0]' if 'msgid_plural' in entry.fields else 'msgstr')
+    return bool(text) and not entry.fuzzy
+
+
+def translation(entry):
+    return entry.fields.get('msgstr[0]' if 'msgid_plural' in entry.fields else 'msgstr', '')

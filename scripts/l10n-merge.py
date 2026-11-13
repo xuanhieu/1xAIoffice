@@ -50,7 +50,7 @@ def main():
                 print(f"LỖI THỜI {rel}: {o.key[0].splitlines()[1] if chr(10) in o.key[0] else o.key[0]} / {o.key[1]!r}")
                 stale += 1
                 continue
-            if t.fields.get("msgstr") == o.fields["msgstr"] and not t.fuzzy:
+            if po.translation(t) == o.fields["msgstr"] and not t.fuzzy:
                 unchanged += 1
                 continue
             t.set_translation(o.fields["msgstr"])

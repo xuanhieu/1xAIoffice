@@ -19,8 +19,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import po  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-# %1 %2, %s %d, $(ARG1), %PRODUCTNAME, %{name}, $1, ${name}, <tags>
-PLACEHOLDER = re.compile(r'%[0-9]+|%[sdu]|%\{?[A-Z][A-Z0-9_]*\}?|\$\([A-Za-z0-9_]+\)|\$[0-9]+|\$\{[^}]+\}|</?[a-zA-Z][^>]*>')
+# %1 %2, %s %d, $(ARG1), %PRODUCTNAME, %{name}, $1, ${name}, lowercase markup tags (<b>, <a href=...>).
+# Display text in angle brackets such as "<None>" is translatable and not a placeholder.
+PLACEHOLDER = re.compile(r'%[0-9]+|%[sdu]|%\{?[A-Z][A-Z0-9_]*\}?|\$\([A-Za-z0-9_]+\)|\$[0-9]+|\$\{[^}]+\}|</?[a-z][a-z0-9]*(?:\s[^>]*)?>')
 
 
 def esc(s):
@@ -44,7 +45,7 @@ def problems(en, vi):
             out.append(f"thiếu phím tắt {m}")
     if en.count('\n') != vi.count('\n'):
         out.append("số dòng khác bản gốc")
-    if not vi.strip():
+    if not vi.strip() and vi != en:
         out.append("rỗng")
     return out
 

@@ -66,6 +66,7 @@ Tiến độ:
 
 | Ngày | Phạm vi | Số chuỗi | Ghi chú |
 |---|---|---|---|
+| 13/11/2026 | Toàn bộ Writer (`sw/messages.po`): 3.214 chuỗi còn thiếu, dịch song song bằng 11 subagent theo bảng thuật ngữ, qua bước kiểm biến và phím tắt; `sw` đạt 5.353/5.353 (100%) | 3.214 | Ảnh `docs/ui/writer-vi-full-2026-11-13.png`. Mặc định giao diện là tiếng Anh (chủ dự án chốt 13/11/2026), tiếng Việt chọn trong Tùy chọn |
 | 13/11/2026 | Ribbon Writer (`notebookbar.ui`) và nhãn của 415 lệnh trên ribbon đó | 97 + 353 | Nhiều bản dịch nháp cũ sai nghĩa ("Reject All" → "Chọn tất cả", "Orientation" → "Trình chiếu", "Next" → "Văn bản"); đã dịch lại theo `l10n/vi/glossary.csv` |
 
 Kết quả trên bản build release (ảnh `docs/ui/writer-1xvnoffice-vi-2026-11-13.png`): toàn bộ thẻ, nhóm và nút của ribbon Writer đã tiếng Việt; tên sản phẩm 1xVnOffice; không còn hộp chào mừng, mẹo hằng ngày hay thanh mời quyên góp khi mở app.
