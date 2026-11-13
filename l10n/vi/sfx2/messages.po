@@ -1,0 +1,109 @@
+# 1xVnOffice Vietnamese overlay for sfx2 (Start Center). MPL-2.0.
+# Entries whose msgid differs from LibreOffice come from patches/libreoffice/0001-startcenter-1x-labels.patch.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgctxt "startcenter|clear_all"
+msgid "Clear Recent Documents"
+msgstr "Xoá danh sách gần đây"
+
+msgctxt "startcenter|clear_unavailable"
+msgid "Clear Unavailable Files"
+msgstr "Xoá các tệp không còn"
+
+msgctxt "startcenter|open_all"
+msgid "_Open"
+msgstr "_Mở"
+
+msgctxt "startcenter|open_remote"
+msgid "Remote File_s"
+msgstr "Tệp từ _xa"
+
+msgctxt "startcenter|open_recent"
+msgid "_Recent"
+msgstr "_Gần đây"
+
+msgctxt "startcenter|templates_all"
+msgid "T_emplates"
+msgstr "_Mẫu"
+
+msgctxt "startcenter|create_label"
+msgid "New"
+msgstr "Tạo mới"
+
+msgctxt "startcenter|writer_all"
+msgid "_Document (1xDoc)"
+msgstr "_Văn bản (1xDoc)"
+
+msgctxt "startcenter|calc_all"
+msgid "_Spreadsheet (1xSheet)"
+msgstr "_Bảng tính (1xSheet)"
+
+msgctxt "startcenter|impress_all"
+msgid "_Presentation (1xSlide)"
+msgstr "_Trình chiếu (1xSlide)"
+
+msgctxt "startcenter|draw_all"
+msgid "D_rawing"
+msgstr "Bản _vẽ"
+
+msgctxt "startcenter|math_all"
+msgid "_Formula"
+msgstr "_Công thức"
+
+msgctxt "startcenter|database_all"
+msgid "Data_base"
+msgstr "Cơ sở _dữ liệu"
+
+msgctxt "startcenter|althelplabel"
+msgid "He_lp"
+msgstr "_Trợ giúp"
+
+msgctxt "startcenter|extensions"
+msgid "E_xtensions"
+msgstr "_Tiện ích mở rộng"
+
+msgctxt "startcenter|all_recent_label"
+msgid "Recent Files List"
+msgstr "Danh sách tệp gần đây"
+
+msgctxt "startcenter|local_view_label"
+msgid "Templates List"
+msgstr "Danh sách mẫu"
+
+msgctxt "startcenter|filter_label"
+msgid "Filter:"
+msgstr "Lọc:"
+
+msgctxt "startcenter|filter_none"
+msgid "All Documents"
+msgstr "Mọi tài liệu"
+
+msgctxt "startcenter|filter_writer"
+msgid "Text Documents"
+msgstr "Văn bản"
+
+msgctxt "startcenter|filter_calc"
+msgid "Spreadsheets"
+msgstr "Bảng tính"
+
+msgctxt "startcenter|filter_impress"
+msgid "Presentations"
+msgstr "Trình chiếu"
+
+msgctxt "startcenter|filter_draw"
+msgid "Drawings"
+msgstr "Bản vẽ"
+
+msgctxt "startcenter|mbActions|tool_tip"
+msgid "Actions"
+msgstr "Thao tác"
+
+msgctxt "STR_WELCOME_LINE1"
+msgid "Welcome to %PRODUCTNAME!"
+msgstr "Chào mừng đến với %PRODUCTNAME!"
+
+msgctxt "STR_WELCOME_LINE2"
+msgid "Drop a document here or open an app to create one."
+msgstr "Kéo tài liệu vào đây, hoặc chọn một ứng dụng bên trái để tạo mới."

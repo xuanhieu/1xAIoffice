@@ -37,6 +37,24 @@ Giới hạn thật: VCL (bộ giao diện của LibreOffice) không có hiệu 
 | 9 | Thanh truy cập nhanh trên thanh tiêu đề (Lưu, Hoàn tác, Làm lại) | Cấu hình notebookbar | 2 |
 | 10 | Khung trợ lý AI bên phải | Giai đoạn 8 (`ai-platform-design.md`) | 8 |
 
+## Nhận diện và theme "Sơn mài" (13/11/2026)
+
+Chủ dự án không muốn theme mặc định của LibreOffice. Hướng đã làm:
+
+- **Brief:** nền than chì ánh xanh (`#17181C`–`#24252B`), một màu nhấn cobalt `#4C7DFF`, vàng chỉ dùng trong logo. Lấy cảm hứng từ sơn mài Việt (nền sẫm, vàng), để có bản sắc riêng, khác cả xám trắng của LibreOffice lẫn đỏ của WPS.
+- **Một nguồn token:** `branding/tokens.json`. `scripts/brand/make-brand.py` sinh ra mọi thứ từ đó:
+  - logo "1x" (khối squircle, nét x màu vàng), wordmark Noto Sans (OFL) đã đổi thành đường nét;
+  - logo sáng và tối cho About và Start Center, nền About, splash hai cỡ, icon app `main.icns`;
+  - icon theme `images_1x.zip`;
+  - lớp cấu hình `config/1x-theme.xcd`.
+- **Theme:** dùng cơ chế ColorScheme của LibreOffice 26.8 (`LibreOfficeTheme=1`, scheme `1xVnOffice`). Plugin macOS có áp các màu này. Không vá mã lõi. Người dùng vẫn đổi về Automatic/Light/Dark được trong Options.
+- **Icon theme "1x":** chỉ chứa icon đã thay, ở dạng SVG nên sắc nét trên Retina. Icon nào chưa có thì LibreOffice tự lấy từ `colibre_dark`. Vì vậy có thể thay dần sang bộ Fluent (mục 6) mà không phải làm hết một lần.
+- **Start Center:**
+  - Bản vá `0001-startcenter-1x-labels.patch` đổi tên ứng dụng thành 1xDoc/1xSheet/1xSlide.
+  - Bản dịch tiếng Việt cho Start Center nằm ở `l10n/vi/sfx2/messages.po`. `l10n-merge.py` khớp theo msgctxt khi chữ gốc tiếng Anh do chính 1x đổi.
+  - Nút quyên góp cho TDF đã tắt (`ShowDonation=false`).
+- **Còn thiếu so với trang chủ kiểu WPS:** ô tìm tài liệu ở đầu trang, thẻ tài liệu (mục 4), khung đề xuất bên phải, danh sách gần đây dạng bảng (tên, nơi lưu, ngày sửa). Các phần này cần viết lại `BackingWindow` (sfx2, C++) hoặc làm trang chủ riêng. Đây là việc kế tiếp của mục 5.
+
 ## Số đo gốc (13/11/2026)
 
 `scripts/ui-coverage.py` so ribbon với bảng đối chiếu `docs/ui/writer-command-map.csv` (86 lệnh chính của Word: Trang đầu, Chèn, Thiết kế, Bố cục, Tham chiếu, Thư, Xem lại, Xem).

@@ -5,3 +5,4 @@
 #   Upstream: <link to the Gerrit change, or "not suitable: <reason>">
 #   Test: <how it is checked>
 # Rule: prefer configure options and .xcu configuration over patching code.
+0001-startcenter-1x-labels.patch

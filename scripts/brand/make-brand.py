@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: MPL-2.0
+"""Sinh toàn bộ nhận diện 1xVnOffice từ branding/tokens.json.
+
+Kết quả:
+  branding/out/shell/{logo,logo_inverted,logo-sc,logo-sc_inverted,about}.svg   -> App/Contents/Resources/shell/
+  branding/out/{intro,intro-highres}.png, main.icns                            -> App/Contents/Resources/
+  branding/out/mark.svg, mark-1024.png                                         (tài liệu, trang tải)
+  config/1x-theme.xcd                                                          (theme giao diện, bước "config")
+
+Dùng: scripts/brand/make-brand.py --font <NotoSans-Bold.ttf> --font-regular <NotoSans-Regular.ttf>
+PNG được vẽ bằng Chrome headless (cần --use-mock-keychain --password-store=basic để macOS không hỏi Keychain).
+"""
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from ttf_outline import Font, text_path  # noqa: E402
+
+REPO = Path(__file__).resolve().parents[2]
+TOKENS = json.loads((REPO / "branding" / "tokens.json").read_text(encoding="utf-8"))
+B, APPS = TOKENS["brand"], TOKENS["apps"]
+OUT = REPO / "branding" / "out"
+CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+
+def mark_group(x, y, size, uid):
+    """Biểu tượng: khối squircle sơn mài, chữ "1" màu giấy và chữ "x" có một nét vàng. Hệ toạ độ gốc 256."""
+    s = size / 256
+    return f"""<defs>
+  <linearGradient id="ink{uid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="{B['ink_top']}"/><stop offset="1" stop-color="{B['ink_bottom']}"/>
+  </linearGradient>
+  <linearGradient id="gold{uid}" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="{B['gold']}"/><stop offset="1" stop-color="{B['gold_deep']}"/>
+  </linearGradient>
+</defs>
+<g transform="translate({x:.2f} {y:.2f}) scale({s:.5f})">
+  <rect x="0" y="0" width="256" height="256" rx="60" fill="url(#ink{uid})"/>
+  <rect x="1.5" y="1.5" width="253" height="253" rx="58.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="3"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M78 94 L104 76 L104 182" stroke="{B['paper']}" stroke-width="21"/>
+    <path d="M134 122 L180 182" stroke="{B['paper']}" stroke-width="19"/>
+    <path d="M180 122 L134 182" stroke="url(#gold{uid})" stroke-width="19"/>
+  </g>
+</g>"""
+
+
+def svg(w, h, body, px_w=None, px_h=None):
+    size = f' width="{px_w}" height="{px_h}"' if px_w else ""
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w:.1f} {h:.1f}"{size}>\n{body}\n</svg>\n')
+
+
+def wordmark(bold, regular, x, baseline, size, fg, accent):
+    """"1x" đậm màu nhấn + "VnOffice" thường. Trả về (svg, bề rộng)."""
+    d1, w1 = text_path(bold, "1x", size, x, baseline, tracking=-0.01)
+    d2, w2 = text_path(regular, "VnOffice", size, x + w1 + size * 0.02, baseline, tracking=-0.005)
+    return (f'<path d="{d1}" fill="{accent}"/><path d="{d2}" fill="{fg}"/>', w1 + w2 + size * 0.02)
+
+
+def logo(bold, regular, dark):
+    fg = B["paper"] if dark else "#1C1D22"
+    accent = B["gold"] if dark else B["gold_deep"]
+    h = 100
+    words, ww = wordmark(bold, regular, 112, 68, 50, fg, accent)
+    w = 112 + ww + 6
+    return svg(w, h, mark_group(4, 8, 84, "l") + "\n" + words, f"{w * 0.72:.1f}", f"{h * 0.72:.1f}")
+
+
+def about_bg():
+    """Nền hộp thoại About: tấm sơn mài với vòng cung vàng mảnh, không chữ."""
+    w, h = 600, 400
+    body = f"""<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="{B['ink_top']}"/><stop offset="1" stop-color="{B['ink_bottom']}"/>
+  </linearGradient>
+  <linearGradient id="arc" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="{B['gold']}" stop-opacity="0"/><stop offset="0.5" stop-color="{B['gold']}" stop-opacity="0.75"/>
+    <stop offset="1" stop-color="{B['gold']}" stop-opacity="0"/>
+  </linearGradient>
+</defs>
+<rect width="{w}" height="{h}" rx="24" fill="url(#bg)"/>
+<g fill="none" stroke="url(#arc)" stroke-width="1.6">
+  <path d="M-40 330 C 160 210, 420 210, 640 300"/>
+  <path d="M-40 352 C 170 236, 430 236, 640 324" stroke-opacity="0.55"/>
+  <path d="M-40 374 C 180 262, 440 262, 640 348" stroke-opacity="0.3"/>
+</g>
+{mark_group(236, 70, 128, 'a')}"""
+    return svg(w, h, body)
+
+
+def splash(bold, regular, w, h):
+    words, ww = wordmark(bold, regular, 0, 0, h * 0.22, B["paper"], B["gold"])
+    mark = h * 0.34
+    total = mark + h * 0.06 + ww
+    x0 = (w - total) / 2
+    words_x = x0 + mark + h * 0.06
+    words = words.replace('<path d="', f'<path transform="translate({words_x:.1f} {h * 0.5:.1f})" d="')
+    body = f"""<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="{B['ink_top']}"/><stop offset="1" stop-color="{B['ink_bottom']}"/>
+  </linearGradient>
+</defs>
+<rect width="{w}" height="{h}" fill="url(#bg)"/>
+{mark_group(x0, h * 0.5 - mark * 0.72, mark, 's')}
+{words}"""
+    return svg(w, h, body, w, h)
+
+
+def icon_svg(size=1024):
+    """Icon app theo lưới macOS: phần thân 824/1024, có bóng mềm."""
+    pad = size * 100 / 1024
+    body = f"""<defs><filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+  <feDropShadow dx="0" dy="{size * 0.012:.1f}" stdDeviation="{size * 0.018:.1f}" flood-color="#000" flood-opacity="0.35"/>
+</filter></defs>
+<g filter="url(#sh)">{mark_group(pad, pad, size - 2 * pad, 'i')}</g>"""
+    return svg(size, size, body, size, size)
+
+
+GLYPHS = {  # hình vẽ nét trắng trên ô 32x32
+    "doc": '<path d="M10 11h12M10 15h12M10 19h12M10 23h7"/>',
+    "sheet": '<rect x="9" y="9" width="14" height="14" rx="1.5"/><path d="M9 14h14M9 18.5h14M14 9v14"/>',
+    "slide": '<rect x="8.5" y="9.5" width="15" height="10" rx="1.5"/><path d="M16 19.5v3.5M12.5 23h7"/>',
+    "draw": '<path d="M10 22l2.5-.6L21.5 12.4a1.8 1.8 0 0 0-2.5-2.5L10 18.9z"/><path d="M17.5 11.4l3.1 3.1"/>',
+    "formula": '<path d="M8.5 17h2.5l2.5 5 4-12h6"/><path d="M18.5 15.5l4 5M22.5 15.5l-4 5"/>',
+    "base": '<ellipse cx="16" cy="11" rx="6.5" ry="2.5"/><path d="M9.5 11v10c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5V11M9.5 16c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5"/>',
+}
+NAV = {  # icon điều hướng: nét mảnh, không ô nền
+    "folder": '<path d="M5 10.5a2 2 0 0 1 2-2h5l2.5 2.5H25a2 2 0 0 1 2 2V22a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/>',
+    "recent": '<circle cx="16" cy="16" r="10"/><path d="M16 10.5V16l3.5 2.5"/>',
+    "remote": '<path d="M10 23h12.5a5 5 0 0 0 .8-9.9A7 7 0 0 0 9.8 14 4.5 4.5 0 0 0 10 23z"/>',
+    "templates": '<rect x="6" y="6" width="8.5" height="8.5" rx="2"/><rect x="17.5" y="6" width="8.5" height="8.5" rx="2"/><rect x="6" y="17.5" width="8.5" height="8.5" rx="2"/><rect x="17.5" y="17.5" width="8.5" height="8.5" rx="2"/>',
+}
+ICON_FILES = {  # đường dẫn trong icon theme -> (kiểu, khoá)
+    "res/odt_32_8.svg": ("app", "doc"), "res/ods_32_8.svg": ("app", "sheet"), "res/odp_32_8.svg": ("app", "slide"),
+    "res/odg_32_8.svg": ("app", "draw"), "res/odf_32_8.svg": ("app", "formula"), "res/odb_32_8.svg": ("app", "base"),
+    "framework/res/folder_32.svg": ("nav", "folder"), "framework/res/recent-documents.svg": ("nav", "recent"),
+    "framework/res/remote-documents.svg": ("nav", "remote"), "framework/res/templates_32.svg": ("nav", "templates"),
+}
+APP_COLOR = {"doc": "doc", "sheet": "sheet", "slide": "slide", "draw": "ai", "formula": "pdf", "base": "ai"}
+
+
+def icon_file(kind, key):
+    if kind == "nav":
+        return svg(32, 32, f'<g fill="none" stroke="#C9CCD6" stroke-width="1.8" stroke-linecap="round" '
+                           f'stroke-linejoin="round">{NAV[key]}</g>', 32, 32)
+    c = APPS[APP_COLOR[key]]
+    return svg(32, 32, f"""<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="{c}"/><stop offset="1" stop-color="{c}" stop-opacity="0.82"/></linearGradient></defs>
+<rect x="2" y="2" width="28" height="28" rx="7.5" fill="url(#g)"/>
+<rect x="2.5" y="2.5" width="27" height="27" rx="7" fill="none" stroke="#FFFFFF" stroke-opacity="0.18"/>
+<g fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{GLYPHS[key]}</g>""",
+               32, 32)
+
+
+def icon_theme_zip(path):
+    """Icon theme "1x": chỉ chứa icon được thay; mọi icon khác LibreOffice tự lấy từ colibre/colibre_dark."""
+    import zipfile
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+        for name, (kind, key) in sorted(ICON_FILES.items()):
+            z.writestr(name, icon_file(kind, key))
+
+
+def theme_xcd():
+    t = TOKENS["theme_dark"]
+    ui = "\n".join(
+        f'          <node oor:name="{k}"><prop oor:name="Color"><value>{int(v[1:], 16)}</value></prop></node>'
+        f'  <!-- {v} -->' for k, v in t.items())
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<!-- 1xVnOffice theme layer (MPL-2.0). GENERATED by scripts/brand/make-brand.py from branding/tokens.json; edit the
+     tokens, not this file. Installed into the app's registry folder by scripts/build-macos.sh (step "config").
+     Direction "Sơn mài": blue-tinted graphite surfaces, one cobalt accent; gold is reserved for the logo.
+     Users can still switch to Automatic/Light/Dark in Tools > Options > Appearance. -->
+<oor:data xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oor="http://openoffice.org/2001/registry">
+  <dependency file="main"/>
+  <oor:component-data oor:package="org.openoffice.Office" oor:name="UI">
+    <node oor:name="ColorScheme">
+      <prop oor:name="CurrentColorScheme" oor:op="fuse"><value>1xVnOffice</value></prop>
+      <node oor:name="ColorSchemes">
+        <node oor:name="1xVnOffice" oor:op="replace">
+{ui}
+        </node>
+      </node>
+    </node>
+  </oor:component-data>
+  <!-- Theme on (1 = Enabled), dark application colors (2) so unset document-area colors use their dark variants;
+       pages stay white (UseOnlyWhiteDocBackground). -->
+  <oor:component-data oor:package="org.openoffice.Office" oor:name="Common">
+    <node oor:name="Appearance">
+      <prop oor:name="LibreOfficeTheme" oor:op="fuse"><value>1</value></prop>
+      <prop oor:name="ApplicationAppearance" oor:op="fuse"><value>2</value></prop>
+      <prop oor:name="UseOnlyWhiteDocBackground" oor:op="fuse"><value>true</value></prop>
+    </node>
+    <!-- Icon theme "1x" (images_1x.zip): only the replaced icons, the rest falls back to colibre_dark. -->
+    <node oor:name="Misc">
+      <prop oor:name="SymbolStyle" oor:op="fuse"><value>1x</value></prop>
+      <prop oor:name="ShowDonation" oor:op="fuse"><value>false</value></prop>
+      <!-- Ribbon background: 235/255 theme color, only a hint of the app's own color. -->
+      <prop oor:name="NotebookbarColorTransparency" oor:op="fuse"><value>235</value></prop>
+    </node>
+    <!-- Recent documents area of the Start Center uses its own colors. -->
+    <node oor:name="Help">
+      <node oor:name="StartCenter">
+        <prop oor:name="StartCenterThumbnailsBackgroundColor" oor:op="fuse"><value>{int(t["MenuBarColor"][1:], 16)}</value></prop>
+        <prop oor:name="StartCenterThumbnailsTextColor" oor:op="fuse"><value>{int(t["WindowTextColor"][1:], 16)}</value></prop>
+      </node>
+    </node>
+  </oor:component-data>
+</oor:data>
+"""
+
+
+def render_png(svg_text, w, h, out, tmp):
+    html = Path(tmp) / f"r{w}x{h}.html"
+    html.write_text(f'<!doctype html><html><body style="margin:0;background:transparent">{svg_text}</body></html>',
+                    encoding="utf-8")
+    subprocess.run([CHROME, "--headless=new", "--use-mock-keychain", "--password-store=basic", "--disable-gpu",
+                    "--no-first-run", "--no-default-browser-check", f"--user-data-dir={tmp}/chrome",
+                    "--hide-scrollbars", "--default-background-color=00000000", "--force-device-scale-factor=1",
+                    f"--window-size={w},{h}", f"--screenshot={out}", html.as_uri()],
+                   check=True, capture_output=True, timeout=60)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--font", required=True, help="Noto Sans Bold .ttf")
+    ap.add_argument("--font-regular", required=True, help="Noto Sans Regular .ttf")
+    ap.add_argument("--no-png", action="store_true")
+    a = ap.parse_args()
+    bold, regular = Font(a.font), Font(a.font_regular)
+    (OUT / "shell").mkdir(parents=True, exist_ok=True)
+    light, dark = logo(bold, regular, False), logo(bold, regular, True)
+    for name, text in {"logo": light, "logo-sc": light, "logo_inverted": dark, "logo-sc_inverted": dark,
+                       "about": about_bg()}.items():
+        (OUT / "shell" / f"{name}.svg").write_text(text, encoding="utf-8")
+    (OUT / "mark.svg").write_text(svg(256, 256, mark_group(0, 0, 256, "m")), encoding="utf-8")
+    (REPO / "config" / "1x-theme.xcd").write_text(theme_xcd(), encoding="utf-8")
+    icon_theme_zip(OUT / "images_1x.zip")
+    if a.no_png:
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        render_png(splash(bold, regular, 644, 199), 644, 199, OUT / "intro.png", tmp)
+        render_png(splash(bold, regular, 990, 254), 990, 254, OUT / "intro-highres.png", tmp)
+        render_png(icon_svg(1024), 1024, 1024, OUT / "mark-1024.png", tmp)
+        iconset = Path(tmp) / "main.iconset"
+        iconset.mkdir()
+        for px in (16, 32, 128, 256, 512):
+            for scale in (1, 2):
+                n = px * scale
+                render_png(icon_svg(n), n, n, iconset / f"icon_{px}x{px}{'@2x' if scale == 2 else ''}.png", tmp)
+        subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(OUT / "main.icns")], check=True)
+    print("branding/out và config/1x-theme.xcd đã sinh lại")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,90 @@
+Subject: Start Center: 1xVnOffice app names and shorter labels
+Why: The Start Center listed LibreOffice module names (Writer, Calc, Impress, Draw, Math, Base). 1xVnOffice names its
+  apps 1xDoc, 1xSheet and 1xSlide and labels the rest by what they make, like WPS and Microsoft Office do. Labels only;
+  widget ids and structure are unchanged, so no code depends on this patch. Vietnamese text: l10n/vi/sfx2/messages.po.
+Upstream: not suitable: product branding.
+Test: scripts/build-macos.sh smoke opens the Start Center; docs/ui screenshots show the labels.
+
+--- a/sfx2/uiconfig/ui/startcenter.ui
++++ b/sfx2/uiconfig/ui/startcenter.ui
+@@ -112,7 +112,7 @@
+                     <property name="spacing">3</property>
+                     <child>
+                       <object class="GtkButton" id="open_all">
+-                        <property name="label" translatable="yes" context="startcenter|open_all">_Open File</property>
++                        <property name="label" translatable="yes" context="startcenter|open_all">_Open</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -166,7 +166,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkToggleButton" id="open_recent">
+-                        <property name="label" translatable="yes" context="startcenter|open_recent">_Recent Documents</property>
++                        <property name="label" translatable="yes" context="startcenter|open_recent">_Recent</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -223,7 +223,7 @@
+                         <property name="can-focus">False</property>
+                         <property name="margin-start">12</property>
+                         <property name="margin-bottom">6</property>
+-                        <property name="label" translatable="yes" context="startcenter|create_label">Create:</property>
++                        <property name="label" translatable="yes" context="startcenter|create_label">New</property>
+                         <property name="xalign">0</property>
+                       </object>
+                       <packing>
+@@ -234,7 +234,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkButton" id="writer_all">
+-                        <property name="label" translatable="yes" context="startcenter|writer_all">_Writer Document</property>
++                        <property name="label" translatable="yes" context="startcenter|writer_all">_Document (1xDoc)</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -254,7 +254,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkButton" id="calc_all">
+-                        <property name="label" translatable="yes" context="startcenter|calc_all">_Calc Spreadsheet</property>
++                        <property name="label" translatable="yes" context="startcenter|calc_all">_Spreadsheet (1xSheet)</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -274,7 +274,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkButton" id="impress_all">
+-                        <property name="label" translatable="yes" context="startcenter|impress_all">_Impress Presentation</property>
++                        <property name="label" translatable="yes" context="startcenter|impress_all">_Presentation (1xSlide)</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -294,7 +294,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkButton" id="draw_all">
+-                        <property name="label" translatable="yes" context="startcenter|draw_all">_Draw Drawing</property>
++                        <property name="label" translatable="yes" context="startcenter|draw_all">D_rawing</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -314,7 +314,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkButton" id="math_all">
+-                        <property name="label" translatable="yes" context="startcenter|math_all">_Math Formula</property>
++                        <property name="label" translatable="yes" context="startcenter|math_all">_Formula</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>
+@@ -334,7 +334,7 @@
+                     </child>
+                     <child>
+                       <object class="GtkButton" id="database_all">
+-                        <property name="label" translatable="yes" context="startcenter|database_all">_Base Database</property>
++                        <property name="label" translatable="yes" context="startcenter|database_all">Data_base</property>
+                         <property name="visible">True</property>
+                         <property name="can-focus">True</property>
+                         <property name="receives-default">True</property>

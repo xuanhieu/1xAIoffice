@@ -23,6 +23,11 @@ EXPECTED = [
     ("/org.openoffice.Setup/Product", "LastTimeGetInvolvedShown", 32503680000),
     ("/org.openoffice.Setup/Product", "LastTimeDonateShown", 32503680000),
     ("/org.openoffice.Setup/Product", "ooName", "1xVnOffice"),
+    ("/org.openoffice.Office.UI/ColorScheme", "CurrentColorScheme", "1xVnOffice"),
+    ("/org.openoffice.Office.UI/ColorScheme/ColorSchemes/1xVnOffice/AccentColor", "Color", 0x4C7DFF),
+    ("/org.openoffice.Office.Common/Appearance", "LibreOfficeTheme", 1),
+    ("/org.openoffice.Office.Common/Misc", "SymbolStyle", "1x"),
+    ("/org.openoffice.Office.Common/Misc", "ShowDonation", False),
 ]
 
 

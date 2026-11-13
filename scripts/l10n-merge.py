@@ -3,7 +3,9 @@
 
 Each overlay file mirrors a path under translations/source/<lang>/ (for example l10n/vi/sw/messages.po ->
 translations/source/vi/sw/messages.po). An overlay entry replaces the msgstr of the entry with the same msgctxt and
-msgid and clears its fuzzy flag. Overlay entries that match nothing are reported (the English source changed) and make
+msgid and clears its fuzzy flag. When 1xVnOffice patches the English text itself (patches/libreoffice), the overlay
+entry carries the new msgid: it is matched by its msgctxt alone if that context is unique in the target file, and the
+target's msgid is rewritten (reported as "ĐỔI CHỮ GỐC"). Overlay entries that match nothing are reported (the English source changed) and make
 the run fail with --strict.
 
 Usage: scripts/l10n-merge.py --src <libreoffice source dir> [--lang vi] [--strict] [--dry-run]
@@ -41,11 +43,24 @@ def main():
             continue
         entries = po.load(target)
         index = {e.key: e for e in entries if e.fields.get("msgid")}
+        by_ctxt = {}
+        for e in entries:
+            if e.fields.get("msgid"):
+                by_ctxt.setdefault(e.fields.get("msgctxt", ""), []).append(e)
         changed = False
         for o in po.load(overlay):
             if not o.fields.get("msgid"):
                 continue
             t = index.get(o.key)
+            same_ctxt = by_ctxt.get(o.fields.get("msgctxt", ""), [])
+            if t is None and o.fields.get("msgctxt") and len(same_ctxt) == 1:
+                t = same_ctxt[0]
+                print(f"ĐỔI CHỮ GỐC {rel}: {o.fields['msgctxt']}: {t.fields['msgid']!r} -> {o.fields['msgid']!r}")
+                t.set_field("msgid", o.fields["msgid"])
+                t.set_translation(o.fields["msgstr"])
+                applied += 1
+                changed = True
+                continue
             if t is None:
                 print(f"LỖI THỜI {rel}: {o.key[0].splitlines()[1] if chr(10) in o.key[0] else o.key[0]} / {o.key[1]!r}")
                 stale += 1
