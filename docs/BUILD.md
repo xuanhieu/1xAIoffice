@@ -27,13 +27,15 @@ scripts/build-macos.sh preflight extract patch l10n configure
 ```
 
 ```bash
-scripts/build-macos.sh build config sign smoke defaults
+scripts/build-macos.sh build config extensions sign smoke defaults tools
 ```
 
 - `fetch-source.sh` tải bốn tarball (khoảng 625 MB), kiểm kích thước, SHA-256 trong `upstream/libreoffice-lock.json` và chữ ký OpenPGP của LibreOffice Build Team (kiểm bằng `sqv`, khoá lưu ở `upstream/libreoffice-signing-key.asc`). Sai một trong ba là dừng.
 - `build` lần đầu mất vài giờ; ccache nằm ở `$ONEX_WORK/ccache` (tối đa 20 GB) nên các lần sau nhanh hơn nhiều.
 - `sign` ký ad-hoc (`codesign -s -`), đủ để chạy trên Apple Silicon. Developer ID và notarization làm khi có doanh thu.
 - `smoke` chuyển một file chữ tiếng Việt sang PDF ở chế độ không giao diện để xác nhận bản build chạy được.
+- `extensions` đóng gói `extensions/*` thành `.oxt` (`scripts/build-extensions.py`) và cài vào app dạng extension đi kèm.
+- `tools` gọi các lệnh tiếng Việt trên tài liệu Writer và Calc thật, mỗi loại trong một phiên soffice riêng (trên macOS, LibreOffice 26.8 chạy headless bị dừng khi tạo tài liệu Calc sau tài liệu Writer).
 - `l10n` trộn lớp dịch `l10n/vi/` vào bản dịch LibreOffice và xoá file `.mo` của các module bị đổi (gbuild không tự biên dịch lại khi `.po` đổi).
 - `defaults` mở một profile mới ở chế độ không giao diện, kiểm 15 giá trị mặc định của `config/1x-defaults.xcd` và đọc nhãn tiếng Việt của lệnh Cắt từ ứng dụng đang chạy.
 

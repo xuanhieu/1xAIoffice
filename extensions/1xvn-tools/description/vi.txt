@@ -1,0 +1,1 @@
+Công cụ tiếng Việt: đọc số và số tiền thành chữ, chuyển mã TCVN3 sang Unicode, chuẩn hóa Unicode, bỏ dấu. Chạy ngoại tuyến.

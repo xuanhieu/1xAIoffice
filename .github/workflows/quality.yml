@@ -16,6 +16,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Repository checks
         run: python3 scripts/check-repo.py
+      - name: Extension logic tests
+        run: python3 -m unittest discover -s extensions/1xvn-tools/tests -p 'test_*.py' -v
+      - name: Package extensions
+        run: python3 scripts/build-extensions.py --out "$RUNNER_TEMP/dist"
       - name: Shell lint
         run: shellcheck -x scripts/*.sh
       - name: Dry-run fetch plan

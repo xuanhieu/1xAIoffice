@@ -1,0 +1,1 @@
+Vietnamese tools: numbers and amounts in words, TCVN3 to Unicode conversion, Unicode normalization, diacritics removal. Works offline.

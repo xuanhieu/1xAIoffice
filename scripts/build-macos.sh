@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build 1xVnOffice for macOS from the locked LibreOffice tarballs.
-# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config sign smoke defaults all
+# Usage: scripts/build-macos.sh <step>...   steps: preflight extract patch l10n configure build config extensions sign smoke defaults tools all
 set -euo pipefail
 # shellcheck source=scripts/env.sh
 source "$(dirname "$0")/env.sh"
@@ -144,6 +144,45 @@ step_config() {
   done
 }
 
+step_extensions() {
+  # Package extensions/* and install them as bundled extensions of the app (unpacked, so no user action is needed).
+  local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
+  python3 "$REPO_ROOT/scripts/build-extensions.py" --out "$ONEX_WORK/dist"
+  local oxt name dest
+  for oxt in "$ONEX_WORK"/dist/*.oxt; do
+    name="$(basename "$oxt" .oxt)"
+    dest="$app/Contents/Resources/extensions/$name"
+    rm -rf "$dest"; mkdir -p "$dest"
+    (cd "$dest" && unzip -q "$oxt")
+    info "Cài extension đi kèm: $name"
+  done
+}
+
+run_tools_check() {  # run_tools_check <app> writer|calc
+  local app="$1" part="$2" profile pipe="onex_tools_$$_$2" rc=0
+  profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
+  rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
+  ONEX_TOOLS_SILENT=1 "$app/Contents/MacOS/soffice" --headless --norestore -env:UserInstallation="file://$profile" \
+    "--accept=pipe,name=$pipe;urp;" >/dev/null 2>&1 &
+  local pid=$!
+  "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xvn-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
+  sleep 2; kill -9 "$pid" 2>/dev/null || true
+  # A crashed office leaves its pipe socket behind and blocks the next session with the same name.
+  rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
+  rm -rf "$profile"
+  return "$rc"
+}
+
+step_tools() {
+  # Call the 1xvn-tools commands on real Writer and Calc documents, each in its own headless office.
+  local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
+  local rc=0
+  run_tools_check "$app" writer || rc=1
+  run_tools_check "$app" calc || rc=1
+  [ "$rc" = 0 ] || die "Lệnh tiếng Việt chạy sai trên app."
+  info "Lệnh tiếng Việt chạy đúng trên app."
+}
+
 step_sign() {
   local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
   # Ad-hoc signature: enough to run on Apple Silicon. Developer ID and notarization come once there is revenue.
@@ -193,11 +232,11 @@ XCU
   info "Cấu hình mặc định và bản dịch có hiệu lực."
 }
 
-[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config sign smoke defaults all"
+[ $# -gt 0 ] || die "Cần ít nhất một bước: preflight extract patch l10n configure build config extensions sign smoke defaults tools all"
 for s in "$@"; do
   case "$s" in
-    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_sign; step_smoke; step_defaults ;;
-    preflight|extract|patch|l10n|configure|build|config|sign|smoke|defaults) "step_$s" ;;
+    all) step_preflight; step_extract; step_patch; step_l10n; step_configure; step_build; step_config; step_extensions; step_sign; step_smoke; step_defaults; step_tools ;;
+    preflight|extract|patch|l10n|configure|build|config|extensions|sign|smoke|defaults|tools) "step_$s" ;;
     *) die "Bước lạ: $s" ;;
   esac
 done

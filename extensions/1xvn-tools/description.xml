@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://openoffice.org/extensions/description/2006" xmlns:d="http://openoffice.org/extensions/description/2006" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <identifier value="org.1xvnoffice.tools"/>
+  <version value="0.1.0"/>
+  <display-name>
+    <name lang="en-US">1xVnOffice Vietnamese tools</name>
+    <name lang="vi">Công cụ tiếng Việt 1xVnOffice</name>
+  </display-name>
+  <publisher><name xlink:href="https://github.com/xuanhieu/1xvnoffice" lang="en-US">1xVnOffice</name></publisher>
+  <extension-description>
+    <src xlink:href="description/en-US.txt" lang="en-US"/>
+    <src xlink:href="description/vi.txt" lang="vi"/>
+  </extension-description>
+  <dependencies><OpenOffice.org-minimal-version value="4.1" d:name="OpenOffice.org 4.1"/></dependencies>
+</description>
