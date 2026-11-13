@@ -15,6 +15,7 @@ from com.sun.star.frame import XDispatch, XDispatchProvider
 from com.sun.star.lang import XInitialization, XServiceInfo
 from com.sun.star.document import XDocumentEventListener
 from com.sun.star.task import XJob
+from com.sun.star.bridge import XInstanceProvider
 
 import datetime
 import json
@@ -50,6 +51,15 @@ TEXTS = {
                      "It takes the same shape as claude_desktop_config.json:\n{example}"),
         "mcp_ask": "{description}\n\nAllow this tool from now on?",
         "mcp_report": "MCP servers ({n}):\n\n{list}",
+        "mcpsrv_off": ("The MCP server is off, so no assistant can read or change your documents.\n\n"
+                       "Turn it on? You will still approve each assistant, and each change."),
+        "mcpsrv_on": ("The MCP server is on ({pipe}).\n\nConfiguration for Claude Desktop / Cursor "
+                      "(claude_desktop_config.json):\n{config}\n\n{clients}"),
+        "mcpsrv_started": "The MCP server is on. Assistant configuration:\n{config}",
+        "mcpsrv_stop": "Turn the MCP server off?",
+        "mcpsrv_stopped": "The MCP server is off.",
+        "mcpsrv_pair": "“{name}” asked to read and change your documents through MCP.\n\nAllow it from now on?",
+        "mcpsrv_clients": "Assistants allowed: {allowed}",
         "mcp_server_failed": "{id}: {error}",
         "rewrite_title": "Rewrite with AI",
         "rewrite_prompt": "How should it be rewritten? Leave empty for: clearer, keeping the meaning and the terms.",
@@ -92,6 +102,16 @@ TEXTS = {
                      "Cấu trúc giống claude_desktop_config.json nên chép thẳng từ Claude Desktop sang được:\n{example}"),
         "mcp_ask": "{description}\n\nCho phép dùng công cụ này từ giờ?",
         "mcp_report": "Máy chủ MCP ({n}):\n\n{list}",
+        "mcpsrv_off": ("Máy chủ MCP đang TẮT, nên chưa trợ lý nào đọc hay sửa được tài liệu của bạn.\n\n"
+                       "Bật lên? Bật rồi thì mỗi trợ lý vẫn phải được bạn cho phép, và mỗi lần sửa tài liệu "
+                       "vẫn hỏi bạn."),
+        "mcpsrv_on": ("Máy chủ MCP đang BẬT ({pipe}).\n\nCấu hình để dán vào Claude Desktop / Cursor "
+                      "(claude_desktop_config.json):\n{config}\n\n{clients}"),
+        "mcpsrv_started": "Đã bật máy chủ MCP. Cấu hình cho trợ lý:\n{config}",
+        "mcpsrv_stop": "Tắt máy chủ MCP?",
+        "mcpsrv_stopped": "Đã tắt máy chủ MCP.",
+        "mcpsrv_pair": "“{name}” xin được đọc và sửa tài liệu của bạn qua MCP.\n\nCho phép từ giờ?",
+        "mcpsrv_clients": "Trợ lý đã được phép: {allowed}",
         "mcp_server_failed": "{id}: {error}",
         "rewrite_title": "Viết lại bằng AI",
         "rewrite_prompt": "Viết lại theo hướng nào? Để trống thì: rõ ràng hơn, giữ nguyên ý và thuật ngữ.",
@@ -299,6 +319,67 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     mcpperm.decide(store, server["id"], tool), "sẽ hỏi khi dùng")
                 lines.append(f"    - {tool['name']} [{state}]: {tool.get('description') or '(không có mô tả)'}")
         self.message(self.t["mcp_report"].format(n=len(servers), list="\n".join(lines)))
+
+    def cmd_McpServer(self, doc, is_writer):
+        """Bật/tắt máy chủ MCP của 1xVnOffice và duyệt những trợ lý đang xin phép.
+
+        Mặc định TẮT (ai-platform-design.md mục 8 và bảng mục 14): chưa bật thì không trợ lý nào vào được.
+        """
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parent / "mcpserver"))
+        state = self._mcp_server_state()
+        if not state.get("enabled"):
+            if not self.ask(self.t["mcpsrv_off"]):
+                return
+            state = {"enabled": True, "pipe": state.get("pipe") or f"1xvnoffice-{os.getuid()}"}
+            self._write_json(self._profile_file("mcp_server.json"), state)
+            _start_acceptor(self.ctx, state["pipe"])
+            self.message(self.t["mcpsrv_started"].format(config=self._mcp_server_config(state["pipe"])))
+            return
+        self._approve_pending_clients()
+        allowed = ", ".join(sorted(self._mcp_clients().get("clients", {}))) or "(chưa có)"
+        self.message(self.t["mcpsrv_on"].format(pipe=state["pipe"],
+                                                config=self._mcp_server_config(state["pipe"]),
+                                                clients=self.t["mcpsrv_clients"].format(allowed=allowed)))
+        if self.ask(self.t["mcpsrv_stop"]):
+            self._write_json(self._profile_file("mcp_server.json"), {"enabled": False, "pipe": state["pipe"]})
+            self.message(self.t["mcpsrv_stopped"])
+
+    def _mcp_server_state(self):
+        try:
+            return json.loads(Path(self._profile_file("mcp_server.json")).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {"enabled": False}
+
+    def _mcp_server_config(self, pipe):
+        script = Path(__file__).resolve().parent / "mcpserver" / "server.py"
+        return json.dumps({"mcpServers": {"1xvnoffice": {"command": self._python_executable(),
+                                                         "args": [str(script), "--pipe", pipe]}}},
+                          ensure_ascii=False, indent=2)
+
+    def _mcp_clients(self):
+        import server as mcpserver
+        try:
+            data = json.loads(Path(mcpserver.clients_path()).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {"clients": {}, "pending": {}}
+        return {"clients": data.get("clients") or {}, "pending": data.get("pending") or {}}
+
+    def _approve_pending_clients(self):
+        """Trợ lý nào đã gõ cửa mà chưa được trả lời thì hỏi người dùng ngay ở đây."""
+        import server as mcpserver
+        data = self._mcp_clients()
+        if not data["pending"]:
+            return
+        for name in sorted(data["pending"]):
+            data["clients"][name] = "allow" if self.ask(self.t["mcpsrv_pair"].format(name=name)) else "deny"
+        self._write_json(mcpserver.clients_path(), {"clients": data["clients"], "pending": {}})
+
+    @staticmethod
+    def _write_json(path, data):
+        file = Path(path)
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     def _profile_file(self, name):
         """Đường dẫn một tệp cấu hình trong hồ sơ người dùng (bước kiểm tự động trỏ chỗ khác)."""
@@ -841,6 +922,60 @@ if XVnSheetFunctions is not None:
             return ("com.sun.star.sheet.AddIn",)
 
 
+MCP_ACCEPTOR_IMPL = "org.1xvnoffice.tools.McpAcceptor"
+_ACCEPTING = set()        # tên pipe đang nghe, để không mở hai lần trong một phiên
+
+
+def _start_acceptor(ctx, pipe):
+    """Mở cửa cho máy chủ MCP nối vào phiên này, qua một UNO pipe cục bộ.
+
+    Pipe là socket của riêng người dùng trên máy này, KHÔNG phải cổng mạng: không máy nào khác với tới được.
+    Chỉ chạy khi người dùng đã bật máy chủ MCP (mặc định tắt). Lỗi ở đây không được làm hỏng phiên làm việc.
+    """
+    import threading
+    if pipe in _ACCEPTING:
+        return
+    _ACCEPTING.add(pipe)
+
+    class Provider(unohelper.Base, XInstanceProvider):
+        def getInstance(self, name):      # noqa: N802 - tên theo UNO
+            if name in ("StarOffice.ComponentContext", "StarOffice.ServiceManager"):
+                return ctx if name.endswith("ComponentContext") else ctx.ServiceManager
+            return ctx.ServiceManager.createInstanceWithContext(name, ctx)
+
+    def listen():
+        try:
+            acceptor = ctx.ServiceManager.createInstanceWithContext("com.sun.star.connection.Acceptor", ctx)
+            factory = ctx.ServiceManager.createInstanceWithContext("com.sun.star.bridge.BridgeFactory", ctx)
+            while pipe in _ACCEPTING:
+                connection = acceptor.accept(f"pipe,name={pipe}")
+                if connection is None:
+                    break
+                factory.createBridge("", "urp", connection, Provider())
+        except Exception:  # noqa: BLE001 - cửa không mở được thì thôi, phiên làm việc vẫn chạy bình thường
+            _ACCEPTING.discard(pipe)
+
+    threading.Thread(target=listen, daemon=True).start()
+
+
+class McpAcceptor(unohelper.Base, XJob):
+    """Mở lại cửa MCP khi khởi động, nhưng CHỈ khi người dùng đã bật (mcp_server.json, mặc định tắt)."""
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def execute(self, args):
+        try:
+            subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+            base = Path(uno.fileUrlToSystemPath(subst.substituteVariables("$(userurl)", True)))
+            state = json.loads((base / "mcp_server.json").read_text(encoding="utf-8"))
+            if state.get("enabled") and state.get("pipe"):
+                _start_acceptor(self.ctx, state["pipe"])
+        except Exception:  # noqa: BLE001 - chưa bật, chưa có tệp, hay tệp hỏng: im lặng bỏ qua
+            pass
+        return ()
+
+
 GUIDES_IMPL = "org.1xvnoffice.tools.GuideSeeder"
 
 
@@ -1008,5 +1143,6 @@ g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationHelper.addImplementation(Handler, IMPL, ("com.sun.star.frame.ProtocolHandler",))
 g_ImplementationHelper.addImplementation(GuideSeeder, GUIDES_IMPL, ("com.sun.star.task.Job",))
 g_ImplementationHelper.addImplementation(XlsxWarner, WARNER_IMPL, ("com.sun.star.task.Job",))
+g_ImplementationHelper.addImplementation(McpAcceptor, MCP_ACCEPTOR_IMPL, ("com.sun.star.task.Job",))
 if XVnSheetFunctions is not None:
     g_ImplementationHelper.addImplementation(SheetFunctions, SHEET_IMPL, ("com.sun.star.sheet.AddIn",))

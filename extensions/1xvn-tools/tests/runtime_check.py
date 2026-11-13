@@ -56,6 +56,8 @@ def main():
         csv_checks(desktop, prop, run, check)
     elif part == "ai":
         ai_checks(desktop, prop, run, check)
+    elif part == "mcpserver":
+        mcp_server_checks(desktop, prop, run, check)
     elif part == "mcp":
         mcp_checks(desktop, prop, run, check)
     elif part == "airewrite":
@@ -332,6 +334,132 @@ def mcp_checks(desktop, prop, run, check):
     finally:
         server.shutdown()
         server.server_close()
+
+
+class McpClient:
+    """Client MCP tối giản, nói chuyện với mcpserver/server.py qua stdio, đúng như Claude Desktop làm."""
+
+    def __init__(self, command, name, clients_path, auto_apply=True):
+        import os
+        import subprocess
+        env = dict(os.environ, ONEX_MCP_CLIENTS_PATH=clients_path)
+        if auto_apply:
+            env["ONEX_MCP_AUTO_APPLY"] = "1"
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, text=True, encoding="utf-8", bufsize=1, env=env)
+        self.next_id = 0
+        self.name = name
+
+    def request(self, method, params=None):
+        import json as _json
+        self.next_id += 1
+        self.process.stdin.write(_json.dumps({"jsonrpc": "2.0", "id": self.next_id, "method": method,
+                                              "params": params or {}}, ensure_ascii=False) + "\n")
+        self.process.stdin.flush()
+        while True:
+            line = (self.process.stdout.readline() or "").strip()
+            if not line:
+                return {"error": {"message": "máy chủ MCP đóng kết nối"}}
+            try:
+                message = _json.loads(line)
+            except ValueError:
+                continue
+            if message.get("id") == self.next_id:
+                return message
+
+    def hello(self):
+        return self.request("initialize", {"protocolVersion": "2025-06-18", "clientInfo": {"name": self.name}})
+
+    def call(self, name, arguments=None):
+        return self.request("tools/call", {"name": name, "arguments": arguments or {}})
+
+    def close(self):
+        try:
+            self.process.stdin.close()
+            self.process.wait(timeout=5)
+        except Exception:  # noqa: BLE001 - dọn dẹp, không ảnh hưởng kết quả kiểm
+            self.process.kill()
+
+
+def mcp_server_checks(desktop, prop, run, check):
+    """Mốc M4: một trợ lý ngoài (Claude Desktop) đọc và sửa được tài liệu đang mở, nhưng chỉ khi được cho phép.
+
+    Chạy máy chủ MCP như một tiến trình riêng, nối vào chính phiên office này qua UNO pipe mà lệnh
+    "Cho trợ lý AI dùng 1xVnOffice" vừa mở.
+    """
+    import json as _json
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    server_py = os.path.join(os.path.dirname(here), "mcpserver", "server.py")
+    state_path = os.environ["ONEX_MCP_SERVER_PATH"]
+    clients_path = os.environ["ONEX_MCP_CLIENTS_PATH"]
+    pipe = f"1xvnoffice-check-{os.getpid()}"
+    for path in (state_path, clients_path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(state_path, "w", encoding="utf-8") as handle:
+        _json.dump({"enabled": False, "pipe": pipe}, handle)      # tắt sẵn: lệnh sẽ hỏi rồi bật
+    if os.path.exists(clients_path):
+        os.remove(clients_path)
+
+    doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+    text = doc.getText()
+    cursor = text.createTextCursor()
+    text.insertString(cursor, "TỜ TRÌNH", False)
+    text.insertControlCharacter(cursor, 0, False)      # ngắt đoạn: cần hai đoạn thật cho doc.replace
+    text.insertString(cursor, "Về việc áp dụng Nghị định 30/2020/NĐ-CP.", False)
+    run(doc, "McpServer")
+    state = _json.load(open(state_path, encoding="utf-8"))
+    check("Máy chủ MCP: lệnh đã bật và nhớ lại", (state.get("enabled"), state.get("pipe")), (True, pipe))
+
+    command = [sys.executable, server_py, "--pipe", pipe]
+    # 1) Trợ lý lạ: xem được danh sách công cụ, nhưng KHÔNG gọi được gì.
+    stranger = McpClient(command, "Trợ lý lạ", clients_path)
+    try:
+        stranger.hello()
+        tools = stranger.request("tools/list")["result"]["tools"]
+        check("Máy chủ MCP: công bố bộ công cụ tài liệu", "docs.list_open" in [t["name"] for t in tools], True)
+        check("Máy chủ MCP: công cụ ghi có nhãn không chỉ-đọc",
+              [t["annotations"]["readOnlyHint"] for t in tools if t["name"] == "doc.replace"], [False])
+        refused = stranger.call("doc.replace", {"doc": "d1", "anchor": 0, "text": "BỊ SỬA TRỘM"})
+        check("Máy chủ MCP: trợ lý chưa được phép thì không gọi được công cụ", "error" in refused, True)
+        check("Máy chủ MCP: tài liệu không đổi sau khi từ chối",
+              doc.getText().getString().startswith("TỜ TRÌNH"), True)
+    finally:
+        stranger.close()
+    pending = _json.load(open(clients_path, encoding="utf-8")).get("pending", {})
+    check("Máy chủ MCP: ghi lại trợ lý đang xin phép để hỏi người dùng", "Trợ lý lạ" in pending, True)
+
+    # 2) Người dùng cho phép (lệnh trên menu hỏi; ở chế độ im lặng coi như đồng ý).
+    run(doc, "McpServer")
+    allowed = _json.load(open(clients_path, encoding="utf-8"))
+    check("Máy chủ MCP: lệnh trên menu duyệt được trợ lý đang chờ",
+          allowed.get("clients", {}).get("Trợ lý lạ"), "allow")
+
+    # 3) Trợ lý đã được phép: đọc và sửa được, và sửa gom vào MỘT bước hoàn tác.
+    friend = McpClient(command, "Trợ lý lạ", clients_path)
+    try:
+        friend.hello()
+        listed = friend.call("docs.list_open")["result"]["content"][0]["text"]
+        check("Máy chủ MCP: thấy tài liệu đang mở", "văn bản" in listed, True)
+        read = friend.call("doc.read", {"doc": "d1"})["result"]["content"][0]["text"]
+        check("Máy chủ MCP: đọc đúng nội dung tài liệu", "TỜ TRÌNH" in read, True)
+        issues = friend.call("doc.nd30_check", {"doc": "d1"})["result"]["content"][0]["text"]
+        check("Máy chủ MCP: chạy được kiểm thể thức NĐ30", "Nơi nhận" in issues or "lỗi" in issues, True)
+        bad = friend.call("doc.read", {})
+        check("Máy chủ MCP: thiếu tham số thì báo lỗi, không chết", bad["result"].get("isError"), True)
+        written = friend.call("doc.replace", {"doc": "d1", "anchor": 1, "text": "Đoạn đã được trợ lý sửa."})
+        answer = written.get("result", written)["content"][0]["text"] if "result" in written else str(written)
+        check("Máy chủ MCP: sửa được tài liệu khi đã được phép", answer.split("\n")[0][:160], "Đã thay. "
+              "Người dùng bấm Ctrl+Z một lần là trả lại như cũ.")
+        paragraphs = [p.getString() for p in doc.getText().createEnumeration()]
+        check("Máy chủ MCP: đoạn đã đổi đúng", paragraphs[1], "Đoạn đã được trợ lý sửa.")
+        doc.UndoManager.undo()
+        paragraphs = [p.getString() for p in doc.getText().createEnumeration()]
+        check("Máy chủ MCP: Ctrl+Z một lần trả lại như cũ", paragraphs[1],
+              "Về việc áp dụng Nghị định 30/2020/NĐ-CP.")
+    finally:
+        friend.close()
+    doc.close(True)
 
 
 def csv_checks(desktop, prop, run, check):

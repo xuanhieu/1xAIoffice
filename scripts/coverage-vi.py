@@ -18,7 +18,7 @@ PYTHONPATH = ROOT / "extensions" / "1xvn-tools" / "pythonpath"
 TESTS = ROOT / "extensions" / "1xvn-tools" / "tests"
 # Module thuần Python, đo được ở đây. Những module còn lại trong vn1x cần UNO.
 PURE = ["numwords.py", "vntext.py", "vnname.py", "nd30.py", "nd30_check.py", "csvsafe.py", "guides.py",
-        "aiconfig.py", "aicontext.py", "changeset.py"]
+        "doctools.py", "aiconfig.py", "aicontext.py", "changeset.py"]
 
 
 def executable_lines(path):
