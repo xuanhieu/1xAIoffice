@@ -33,7 +33,17 @@ class FakeProvider(BaseHTTPRequestHandler):
             "gemini": {"candidates": [{"content": {"parts": [{"text": ANSWER}]}}],
                        "usageMetadata": {"promptTokenCount": 12, "candidatesTokenCount": 7}},
             "broken": {"khong": "dung dang"},
+            "tool_then_text": None,      # đặt riêng bên dưới
+            "always_tool": None,
         }
+        if BEHAVIOUR["shape"] in ("tool_then_text", "always_tool"):
+            first = BEHAVIOUR["shape"] == "always_tool" or len(SEEN) == 1   # SEEN đã có yêu cầu đang xử lý
+            bodies[BEHAVIOUR["shape"]] = (
+                {"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+                    {"id": "goi-1", "type": "function",
+                     "function": {"name": "tra_cuu_van_ban", "arguments": "{\"so_hieu\": \"30/2020\"}"}}]}}]}
+                if first else
+                {"choices": [{"message": {"content": ANSWER}}], "usage": {"prompt_tokens": 12, "completion_tokens": 7}})
         payload = json.dumps(bodies[BEHAVIOUR["shape"]] if status < 400 else {"error": "hong"}).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
@@ -176,3 +186,85 @@ class EndToEndTests(HostTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ToolLoopTests(HostTestCase):
+    """Vòng gọi công cụ: mô hình xin dùng công cụ MCP, host chạy nó rồi đưa kết quả lại cho mô hình."""
+
+    FAKE_MCP = str(Path(__file__).resolve().parent / "fakes" / "mcp_server.py")
+
+    def tool(self, name="tra_cuu_van_ban", mode="ok"):
+        return {"name": name, "description": "Tra cứu văn bản.", "schema": {"type": "object", "properties": {}},
+                "server": {"command": sys.executable, "args": [self.FAKE_MCP], "env": {"FAKE_MCP_MODE": mode}}}
+
+    def ask_with_tools(self, tools, **extra):
+        provider = {"type": "openai", "base_url": self.base}
+        return host.ask({"action": "ask", "provider": provider, "model": "m",
+                         "messages": [{"role": "user", "content": "Nghị định 30 còn hiệu lực không?"}],
+                         "tools": tools, "timeout": 10, **extra})
+
+    def test_tools_are_declared_to_the_model(self):
+        BEHAVIOUR["shape"] = "openai"
+        self.ask_with_tools([self.tool()])
+        declared = SEEN[0]["body"]["tools"]
+        self.assertEqual(declared[0]["function"]["name"], "tra_cuu_van_ban")
+
+    def test_no_tools_means_no_tools_field(self):
+        self.ask_with_tools([])
+        self.assertNotIn("tools", SEEN[0]["body"])
+
+    def test_model_calls_a_tool_and_gets_the_result_back(self):
+        BEHAVIOUR["shape"] = "tool_then_text"
+        out = self.ask_with_tools([self.tool()])
+        self.assertTrue(out["ok"], out)
+        self.assertEqual(out["steps"], [{"tool": "tra_cuu_van_ban", "ok": True}])
+        # Lượt thứ hai phải mang kết quả công cụ trở lại cho mô hình.
+        second = _json_dumps(SEEN[1]["body"])
+        self.assertIn("còn hiệu lực", second)
+        self.assertEqual(out["text"], ANSWER)
+
+    def test_tool_loop_works_when_host_runs_as_its_own_isolated_process(self):
+        """Cách app gọi thật: `python -I host.py`. Chế độ -I bỏ thư mục của script khỏi sys.path, nên nếu host.py
+        không tự thêm lại thì `import mcpclient` hỏng và vòng gọi công cụ chết ngay ở bước đầu."""
+        import subprocess
+        BEHAVIOUR["shape"] = "tool_then_text"
+        request = {"action": "ask", "provider": {"type": "openai", "base_url": self.base}, "model": "m",
+                   "messages": [{"role": "user", "content": "Nghị định 30 còn hiệu lực không?"}],
+                   "tools": [self.tool()], "timeout": 10}
+        done = subprocess.run([sys.executable, "-I", str(Path(host.__file__).resolve())],
+                              input=json.dumps(request), capture_output=True, text=True, timeout=60)
+        self.assertEqual(done.stderr, "")
+        out = json.loads(done.stdout or "{}")
+        self.assertTrue(out.get("ok"), done.stdout + done.stderr)
+        self.assertEqual(out.get("steps"), [{"tool": "tra_cuu_van_ban", "ok": True}])
+        self.assertEqual(out.get("text"), ANSWER)
+
+    def test_tool_result_is_data_even_when_it_contains_an_order(self):
+        BEHAVIOUR["shape"] = "tool_then_text"
+        out = self.ask_with_tools([self.tool()])
+        second = _json_dumps(SEEN[1]["body"])
+        self.assertIn("xoá tài liệu", second)      # câu ra lệnh chỉ nằm trong nội dung gửi cho mô hình
+        self.assertEqual(out["steps"][0]["ok"], True)
+
+    def test_tool_the_user_did_not_allow_is_refused(self):
+        BEHAVIOUR["shape"] = "tool_then_text"
+        out = self.ask_with_tools([])              # mô hình đòi công cụ nhưng danh sách cho phép rỗng
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["steps"], [{"tool": "tra_cuu_van_ban", "ok": False}])
+        self.assertIn("chưa được cho phép", _json_dumps(SEEN[1]["body"]))
+
+    def test_broken_mcp_server_does_not_break_the_answer(self):
+        BEHAVIOUR["shape"] = "tool_then_text"
+        out = self.ask_with_tools([self.tool(mode="crash")])
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["steps"][0]["ok"], False)
+
+    def test_endless_tool_loop_is_stopped(self):
+        BEHAVIOUR["shape"] = "always_tool"
+        out = self.ask_with_tools([self.tool()])
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["code"], "tool_steps")
+
+
+def _json_dumps(value):
+    return json.dumps(value, ensure_ascii=False)

@@ -46,6 +46,11 @@ TEXTS = {
         "check_offer": "\n\nSet the page back to the rules now (paper size, margins, default font)?",
         "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Ctrl+Z undoes it.",
         "check_writer_only": "Open the document in 1xDoc first: this command checks a text document.",
+        "mcp_none": ("No MCP server is set up yet.\n\nWrite mcp_servers.json at:\n{path}\n\n"
+                     "It takes the same shape as claude_desktop_config.json:\n{example}"),
+        "mcp_ask": "{description}\n\nAllow this tool from now on?",
+        "mcp_report": "MCP servers ({n}):\n\n{list}",
+        "mcp_server_failed": "{id}: {error}",
         "rewrite_title": "Rewrite with AI",
         "rewrite_prompt": "How should it be rewritten? Leave empty for: clearer, keeping the meaning and the terms.",
         "rewrite_default": "clearer and easier to read, keeping the meaning, the terms and the tone",
@@ -83,6 +88,11 @@ TEXTS = {
         "check_offer": "\n\nSửa phần trang ngay bây giờ (khổ giấy, lề, phông mặc định)?",
         "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Ctrl+Z để hoàn tác.",
         "check_writer_only": "Hãy mở văn bản trong 1xDoc trước: lệnh này kiểm tài liệu văn bản.",
+        "mcp_none": ("Chưa khai báo máy chủ MCP nào.\n\nTạo tệp mcp_servers.json tại:\n{path}\n\n"
+                     "Cấu trúc giống claude_desktop_config.json nên chép thẳng từ Claude Desktop sang được:\n{example}"),
+        "mcp_ask": "{description}\n\nCho phép dùng công cụ này từ giờ?",
+        "mcp_report": "Máy chủ MCP ({n}):\n\n{list}",
+        "mcp_server_failed": "{id}: {error}",
         "rewrite_title": "Viết lại bằng AI",
         "rewrite_prompt": "Viết lại theo hướng nào? Để trống thì: rõ ràng hơn, giữ nguyên ý và thuật ngữ.",
         "rewrite_default": "rõ ràng và dễ đọc hơn, giữ nguyên ý, thuật ngữ và giọng văn",
@@ -270,6 +280,101 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     t.CharFontName = TCVN3_REPLACEMENT_FONT
         self.message(self.t["done"].format(n=changed))
 
+    def cmd_McpTools(self, doc, is_writer):
+        """Liệt kê máy chủ MCP đã khai và công cụ của chúng, kèm trạng thái quyền. Chỉ đọc, không chạy công cụ nào."""
+        from vn1x import mcpperm
+        servers = self._mcp_servers()
+        if servers is None:
+            return
+        store = mcpperm.load(self._profile_file(mcpperm.FILENAME))
+        lines = []
+        for server in servers:
+            tools, error = self._mcp_list(server)
+            if error:
+                lines.append(self.t["mcp_server_failed"].format(id=server["id"], error=error))
+                continue
+            lines.append(f"• {server['id']} ({len(tools)} công cụ)")
+            for tool in tools:
+                state = {mcpperm.ALLOW: "đã cho phép", mcpperm.DENY: "đã từ chối"}.get(
+                    mcpperm.decide(store, server["id"], tool), "sẽ hỏi khi dùng")
+                lines.append(f"    - {tool['name']} [{state}]: {tool.get('description') or '(không có mô tả)'}")
+        self.message(self.t["mcp_report"].format(n=len(servers), list="\n".join(lines)))
+
+    def _profile_file(self, name):
+        """Đường dẫn một tệp cấu hình trong hồ sơ người dùng (bước kiểm tự động trỏ chỗ khác)."""
+        override = os.environ.get("ONEX_" + name.replace(".json", "").upper() + "_PATH")
+        if override:
+            return override
+        subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+        return str(Path(uno.fileUrlToSystemPath(subst.substituteVariables("$(userurl)", True))) / name)
+
+    def _mcp_servers(self):
+        """Danh sách máy chủ MCP đã khai, hoặc None (đã báo cho người dùng)."""
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parent / "agenthost"))
+        import mcpclient
+        path = self._profile_file("mcp_servers.json")
+        try:
+            raw = json.loads(Path(path).read_text(encoding="utf-8")) if Path(path).is_file() else {}
+        except ValueError as exc:
+            self.message(self.t["ai_bad_config"].format(list=str(exc), path=path))
+            return None
+        servers = mcpclient.from_claude_desktop(raw)
+        if not servers:
+            self.message(self.t["mcp_none"].format(path=path, example=MCP_EXAMPLE))
+            return None
+        return servers
+
+    def _mcp_list(self, server):
+        """(danh sách công cụ, lỗi). Mở máy chủ, hỏi công cụ, rồi tắt ngay."""
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parent / "agenthost"))
+        import mcpclient
+        try:
+            with mcpclient.StdioServer(server["command"], server.get("args") or [],
+                                       env=server.get("env") or {}, cwd=server.get("cwd")) as mcp:
+                return mcp.list_tools(), None
+        except mcpclient.McpError as exc:
+            return [], str(exc)
+
+    def _allowed_mcp_tools(self):
+        """Công cụ MCP người dùng đã cho phép, kèm cách chạy máy chủ, để đưa cho Agent Host."""
+        from vn1x import mcpperm
+        servers = self._mcp_servers_quiet()
+        if not servers:
+            return []
+        path = self._profile_file(mcpperm.FILENAME)
+        store = mcpperm.load(path)
+        out = []
+        for server in servers:
+            tools, error = self._mcp_list(server)
+            if error:
+                continue
+            for tool in tools:
+                state = mcpperm.decide(store, server["id"], tool)
+                if state == mcpperm.ASK:
+                    answer = self.ask(self.t["mcp_ask"].format(description=mcpperm.describe(server["id"], tool)))
+                    state = mcpperm.ALLOW if answer else mcpperm.DENY
+                    store = mcpperm.remember(store, server["id"], tool, state)
+                    mcpperm.save(path, store)
+                if state == mcpperm.ALLOW:
+                    out.append(dict(tool, server={"command": server["command"], "args": server.get("args") or [],
+                                                  "env": server.get("env") or {}, "cwd": server.get("cwd")}))
+        return out
+
+    def _mcp_servers_quiet(self):
+        """Như _mcp_servers nhưng im lặng khi chưa khai báo gì: dùng trong lệnh hỏi AI."""
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parent / "agenthost"))
+        import mcpclient
+        path = self._profile_file("mcp_servers.json")
+        if not Path(path).is_file():
+            return []
+        try:
+            return mcpclient.from_claude_desktop(json.loads(Path(path).read_text(encoding="utf-8")))
+        except ValueError:
+            return []
+
     def cmd_AiRewrite(self, doc, is_writer):
         """AI viết lại đoạn đang chọn. Không sửa thẳng: dựng ChangeSet, cho xem trước, rồi áp trong một bước hoàn tác."""
         from vn1x import aicontext, changeset
@@ -433,7 +538,8 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             return
         limit = (config.get("limits") or {}).get("max_output_tokens", 2000)
         result = self._agent_host({"action": "ask", "provider": provider, "model": model,
-                                   "messages": messages, "max_tokens": limit})
+                                   "messages": messages, "max_tokens": limit,
+                                   "tools": self._allowed_mcp_tools()})
         if not result.get("ok"):
             self.message(self.t["ai_failed"].format(error=result.get("error", "?")))
             return
@@ -645,6 +751,12 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         box = toolkit.createMessageBox(self.frame.getContainerWindow(), INFOBOX, 1, self.t["title"], text)
         box.execute()
 
+
+MCP_EXAMPLE = json.dumps({
+    "mcpServers": {
+        "giay-to": {"command": "python3", "args": ["/duong/dan/toi/may_chu_mcp.py"], "env": {}},
+    },
+}, ensure_ascii=False, indent=2)
 
 AI_EXAMPLE = json.dumps({
     "providers": [
