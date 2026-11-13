@@ -56,6 +56,8 @@ def main():
         csv_checks(desktop, prop, run, check)
     elif part == "ai":
         ai_checks(desktop, prop, run, check)
+    elif part == "skill":
+        skill_checks(desktop, prop, run, check)
     elif part == "mcpserver":
         mcp_server_checks(desktop, prop, run, check)
     elif part == "mcp":
@@ -330,6 +332,68 @@ def mcp_checks(desktop, prop, run, check):
         # Kết quả công cụ có câu ra lệnh xoá tài liệu. Tài liệu phải còn nguyên.
         check("MCP: lệnh nhúng trong kết quả công cụ không đụng được vào tài liệu",
               doc.getText().getString().replace("\r\n", "\n"), original)
+        doc.close(True)
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def skill_checks(desktop, prop, run, check):
+    """Mốc M5: chạy một skill đi kèm trong app thật, với nhà cung cấp AI giả chạy trên máy này.
+
+    Điều phải chứng minh: thân SKILL.md tới được mô hình (nạp từng phần đúng lúc), skill không khớp loại tài liệu
+    thì không chạy, và lệnh này KHÔNG sửa tài liệu.
+    """
+    import json as _json
+    import os
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    answer = "Đã rà xong, không thấy lỗi chính tả nào."
+    seen = []
+
+    class Fake(BaseHTTPRequestHandler):
+        def do_POST(self):
+            seen.append(_json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or "{}"))
+            payload = _json.dumps({"choices": [{"message": {"content": answer}}],
+                                   "usage": {"prompt_tokens": 40, "completion_tokens": 10}}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Fake)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        config_path = os.environ["ONEX_AI_CONFIG_PATH"]
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+        with open(config_path, "w", encoding="utf-8") as handle:
+            _json.dump({"providers": [{"id": "gia", "type": "openai",
+                                       "base_url": f"http://127.0.0.1:{server.server_port}/v1",
+                                       "secret_ref": "", "models": ["mo-hinh-gia"]}],
+                        "roles": {"soan_thao": "gia/mo-hinh-gia"},
+                        "limits": {"max_output_tokens": 500}}, handle, ensure_ascii=False)
+        out = os.environ.get("ONEX_TOOLS_WARN_OUT")
+        if out and os.path.exists(out):
+            os.remove(out)
+        doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+        original = "Céng hoà xã hội chủ nghĩa Việt Nam ,  độc lập tự do."
+        doc.getText().setString(original)
+        run(doc, "AiSkill")
+        check("Skill: gọi được mô hình", len(seen), 1)
+        if seen:
+            system = next((m["content"] for m in seen[0]["messages"] if m["role"] == "system"), "")
+            check("Skill: thân SKILL.md được nạp vào lời nhắc hệ thống", "chính tả" in system.lower(), True)
+            check("Skill: nói rõ đang chạy skill nào", "kiem-chinh-ta-tieng-viet" in system, True)
+            check("Skill: câu người dùng đi kèm", os.environ.get("ONEX_SKILL_QUESTION", "") in system, True)
+            sent = _json.dumps(seen[0], ensure_ascii=False)
+            check("Skill: gửi kèm nội dung tài liệu", "độc lập tự do" in sent, True)
+        shown = open(out, encoding="utf-8").read() if out and os.path.exists(out) else ""
+        check("Skill: hiện câu trả lời kèm tên skill", answer in shown and "kiem-chinh-ta-tieng-viet" in shown, True)
+        check("Skill: không sửa tài liệu", doc.getText().getString(), original)
         doc.close(True)
     finally:
         server.shutdown()

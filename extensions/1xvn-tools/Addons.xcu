@@ -31,13 +31,25 @@
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
           </node>
+          <node oor:name="m000e" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiSkill</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Run a Skill...</value><value xml:lang="vi">Chạy một skill...</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
           <node oor:name="m00a" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Document</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">New Administrative Document (Decree 30)...</value><value xml:lang="vi">Văn bản hành chính NĐ30 mới...</value></prop>
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
           </node>
-          <node oor:name="m00b" oor:op="replace">
+          <node oor:name="m000e" oor:op="replace">
+          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiSkill</value></prop>
+          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Skill</value><value xml:lang="vi">Skill</value></prop>
+          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+        </node>
+        <node oor:name="m00b" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Check</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Check Decree 30 Format...</value><value xml:lang="vi">Kiểm thể thức NĐ30...</value></prop>
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
@@ -195,6 +207,13 @@
       <node oor:name="UserDefinedImages">
         <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/McpServer_16.svg</value></prop>
         <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/McpServer_26.svg</value></prop>
+      </node>
+    </node>
+    <node oor:name="img_AiSkill" oor:op="replace">
+      <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiSkill</value></prop>
+      <node oor:name="UserDefinedImages">
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiSkill_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiSkill_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_AiRewrite" oor:op="replace">

@@ -60,6 +60,12 @@ TEXTS = {
         "mcpsrv_stopped": "The MCP server is off.",
         "mcpsrv_pair": "“{name}” asked to read and change your documents through MCP.\n\nAllow it from now on?",
         "mcpsrv_clients": "Assistants allowed: {allowed}",
+        "skill_title": "Skills",
+        "skill_prompt": "Which skill? ({names})",
+        "skill_none": "No skill is installed for this kind of document.",
+        "skill_unknown": "There is no skill called “{name}”. Installed: {names}",
+        "skill_broken": "Skipped {n} broken skill(s): {list}",
+        "skill_answer": "{answer}\n\n— skill “{name}” {version}",
         "mcp_server_failed": "{id}: {error}",
         "rewrite_title": "Rewrite with AI",
         "rewrite_prompt": "How should it be rewritten? Leave empty for: clearer, keeping the meaning and the terms.",
@@ -112,6 +118,12 @@ TEXTS = {
         "mcpsrv_stopped": "Đã tắt máy chủ MCP.",
         "mcpsrv_pair": "“{name}” xin được đọc và sửa tài liệu của bạn qua MCP.\n\nCho phép từ giờ?",
         "mcpsrv_clients": "Trợ lý đã được phép: {allowed}",
+        "skill_title": "Skill",
+        "skill_prompt": "Dùng skill nào? ({names})",
+        "skill_none": "Chưa có skill nào dùng được cho loại tài liệu này.",
+        "skill_unknown": "Không có skill tên “{name}”. Đang có: {names}",
+        "skill_broken": "Bỏ qua {n} skill hỏng: {list}",
+        "skill_answer": "{answer}\n\n— skill “{name}” {version}",
         "mcp_server_failed": "{id}: {error}",
         "rewrite_title": "Viết lại bằng AI",
         "rewrite_prompt": "Viết lại theo hướng nào? Để trống thì: rõ ràng hơn, giữ nguyên ý và thuật ngữ.",
@@ -319,6 +331,48 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     mcpperm.decide(store, server["id"], tool), "sẽ hỏi khi dùng")
                 lines.append(f"    - {tool['name']} [{state}]: {tool.get('description') or '(không có mô tả)'}")
         self.message(self.t["mcp_report"].format(n=len(servers), list="\n".join(lines)))
+
+    def cmd_AiSkill(self, doc, is_writer):
+        """Chạy một skill: gói hướng dẫn sẵn cho trợ lý (ai-platform-design.md mục 9).
+
+        Nạp từng phần: chỗ này chỉ đọc tên và mô tả của mọi skill; thân SKILL.md chỉ được đọc khi skill đã chọn.
+        Lệnh **chỉ đọc**: nó trả lời bằng hộp thông báo, không tự sửa tài liệu. Muốn sửa thì dùng Viết lại bằng AI.
+        """
+        from vn1x import aicontext, skills
+        config = self._ai_ready()
+        if config is None:
+            return
+        found, problems = skills.discover(Path(__file__).resolve().parent / "skills",
+                                          Path(self._profile_file("skills")))
+        if problems:
+            self.message(self.t["skill_broken"].format(n=len(problems), list="; ".join(problems)))
+        app = "doc" if is_writer else "sheet"
+        usable = skills.summaries(found, app=app)
+        if not usable:
+            self.message(self.t["skill_none"])
+            return
+        names = ", ".join(item["name"] for item in usable)
+        wanted = os.environ.get("ONEX_SKILL_NAME")
+        if wanted is None:
+            wanted = self._ask_text(self.t["skill_title"], self.t["skill_prompt"].format(names=names))
+            if not wanted:
+                return
+        skill = next((s for s in found if s["name"] == wanted.strip() and app in s["apps"]), None)
+        if skill is None:
+            self.message(self.t["skill_unknown"].format(name=wanted, names=names))
+            return
+        question = os.environ.get("ONEX_SKILL_QUESTION")
+        if question is None:
+            question = self._ask_text(skill["name"], skill["description"]) or ""
+        selection, whole = self._document_text(doc, is_writer)
+        document, _ = aicontext.trim(selection or whole)
+        messages = [{"role": "system", "content": skills.prompt(skill, question)},
+                    {"role": "user", "content": f"Tài liệu đang mở:\n\n{document}"}]
+        answer = self._call_model(config, messages)
+        if answer is None:
+            return
+        self.message(self.t["skill_answer"].format(answer=answer.strip(), name=skill["name"],
+                                                   version=skill["version"]))
 
     def cmd_McpServer(self, doc, is_writer):
         """Bật/tắt máy chủ MCP của 1xVnOffice và duyệt những trợ lý đang xin phép.

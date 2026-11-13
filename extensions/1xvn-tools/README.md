@@ -120,3 +120,28 @@ Ba lớp chặn, theo đúng thứ tự một trợ lý phải đi qua:
 Đường nối là **UNO pipe cục bộ** của riêng tài khoản bạn trên máy này, không phải cổng mạng, nên không máy nào khác với tới được. Bản nối qua HTTP kèm token, resources và prompts để sau.
 
 Kiểm trên app thật: `scripts/build-macos.sh tools`, phần `mcpserver` — chạy máy chủ như tiến trình riêng, thử một trợ lý chưa được phép (bị chặn, tài liệu không đổi), rồi duyệt và thử lại (đọc, kiểm NĐ30, sửa một đoạn, Ctrl+Z một lần trả lại như cũ).
+
+**Chạy một skill...** (menu Tiếng Việt, và nút Skill trên thẻ Trang đầu): skill là một gói hướng dẫn sẵn cho trợ lý, ví dụ "soạn văn bản NĐ30" hay "kiểm lỗi chính tả tiếng Việt". Chọn skill, nói việc cần làm, trợ lý làm theo đúng cách làm đã đóng gói sẵn. Lệnh này **chỉ đọc**: nó trả lời bằng hộp thông báo, không tự sửa tài liệu.
+
+Tám skill đi kèm (`skills/`): soạn văn bản NĐ30, tóm tắt văn bản pháp luật, viết lại trang trọng hoặc dễ hiểu, dịch Việt–Anh giữ thuật ngữ hành chính, lập bảng dự toán, bảng lương có thuế TNCN, tạo slide từ văn bản, kiểm lỗi chính tả tiếng Việt.
+
+Skill của riêng bạn đặt trong thư mục `skills` ở hồ sơ người dùng; trùng tên thì bản của bạn thắng. Một skill là một thư mục có `SKILL.md`, đầu tệp là khối front matter:
+
+```markdown
+---
+name: soan-van-ban-nd30
+description: Soạn công văn, tờ trình hoặc quyết định đúng thể thức NĐ30 từ vài ý chính người dùng đưa.
+version: 1.0.0
+apps: [doc]
+tools: [doc.read, doc.insert, doc.nd30_check]
+permissions: {network: [], process: false}
+---
+# Soạn văn bản hành chính theo NĐ30
+1. Hỏi cho đủ: cơ quan ban hành, số ký hiệu, nơi nhận, trích yếu…
+```
+
+Định dạng giống Agent Skills của Anthropic, thêm ba trường riêng `apps`, `tools`, `permissions`, nên skill viết cho Claude chạy được ở đây với rất ít sửa đổi.
+
+**Nạp từng phần:** mô hình chỉ thấy `name` và `description` của mọi skill đã cài (mỗi skill khoảng 100 token). Thân `SKILL.md` chỉ được đọc khi bạn chọn skill đó, và thư mục `references/` chỉ đọc khi thân skill xin — đường dẫn trỏ ra ngoài thư mục skill bị chặn.
+
+**Mặc định an toàn:** skill không khai `tools` thì không dùng được công cụ nào; `permissions.network` rỗng và `process` tắt. Thư mục `scripts/` của skill **chưa được chạy** ở bản này: một skill tải về từ mạng mà chạy được lệnh trên máy bạn là rủi ro lớn, và kho skill có duyệt thì chưa có.
