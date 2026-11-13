@@ -36,3 +36,11 @@ Chưa làm (NĐ30): kiểm thể thức cho văn bản có sẵn, bố cục ri�
 **Chuyển kiểu gõ VNI / VIQR sang Unicode** (menu Tiếng Việt): đổi chữ còn ở dạng gõ phím thành chữ có dấu, ví dụ `Tie^'ng Vie^.t` hoặc `Tie61ng Vie65t` thành `Tiếng Việt`. Dấu phải đứng ngay sau nguyên âm mang nó, nên dấu câu thường (dấu nháy trong `don't`, dấu chấm cuối câu) không bị đổi. Khác với lệnh TCVN3: TCVN3 là bảng mã phông chữ, còn VNI và VIQR ở đây là quy ước gõ phím bằng ký tự ASCII.
 
 **Hàm họ tên trong 1xSheet:** `=TACHHO(họ tên)`, `=TACHDEM(...)`, `=TACHTEN(...)` tách ba phần; `=SAPTEN(...)` trả về khoá sắp xếp để sắp danh sách theo tên trước, đúng thứ tự chữ cái tiếng Việt (ă, â sau a; đ sau d) và đúng thứ tự dấu thanh (ngang, huyền, hỏi, ngã, sắc, nặng). Sắp bằng hàm sẵn có của bảng tính thì sai cả hai chỗ này.
+
+**Mở CSV an toàn (UTF-8, dạng chữ)...** (menu Tiếng Việt): mở tệp CSV với mọi cột là chữ. Số điện thoại `0912...` giữ số 0 đầu, số căn cước không thành số khoa học, `1/2` không thành ngày tháng, và ô bắt đầu bằng `=` không bị chạy như công thức. Dấu ngăn cột được đoán từ dòng đầu (phẩy, chấm phẩy, tab hoặc gạch đứng).
+
+**Nhắc khi lưu sang định dạng Excel:** bảng tính có dùng hàm riêng của 1xVnOffice, khi lưu thành .xlsx, .xls hay .csv sẽ hiện một lời nhắc rằng Excel thấy giá trị đã tính nhưng không tính lại được. Mỗi tài liệu chỉ nhắc một lần trong phiên; lưu .ods thì không nhắc.
+
+**Dấu thanh kiểu cũ / kiểu mới** (menu Tiếng Việt): đổi qua lại giữa `hòa, thủy, hòe` và `hoà, thuỷ, hoè`. Chữ `quý`, `quỹ` và các tiếng có phụ âm cuối như `nguyệt` giữ nguyên vì hai kiểu viết giống nhau. Lệnh **Chuẩn hoá tiếng Việt** không đụng tới kiểu đặt dấu, chỉ dựng sẵn NFC và sửa khoảng trắng quanh dấu câu.
+
+**Hàm bỏ dấu và xưng hô trong 1xSheet:** `=BODAU(chữ)` bỏ dấu tiếng Việt; `=XUNGHO(giới tính; họ tên)` cho lời xưng hô dùng khi trộn thư, ví dụ `XUNGHO("Nam";"Nguyễn Văn A")` thành `Ông Nguyễn Văn A`. Giới tính không đọc được thì trả về `Ông/Bà` thay vì đoán.

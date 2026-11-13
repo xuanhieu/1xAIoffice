@@ -26,6 +26,12 @@ interface XVnSheetFunctions : com::sun::star::uno::XInterface
 
     /* SAPTEN(FullName) - a sort key: given name first, in Vietnamese letter and tone order. */
     string sapten( [in] string FullName );
+
+    /* BODAU(Text) - the text without diacritics ("Đường Lê Lợi" -> "Duong Le Loi"). */
+    string bodau( [in] string Text );
+
+    /* XUNGHO(Gender; [FullName]) - a salutation for mail merge ("Ông Nguyễn Văn A"). */
+    string xungho( [in] string Gender, [in] any FullName );
 };
 
 }; }; };

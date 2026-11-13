@@ -49,3 +49,18 @@ def sort_key(full):
     ho, dem, ten = split_name(full)
     order = [ten] + dem.split() + ([ho] if ho else [])
     return "\x00".join(_syllable_key(word) for word in order if word)
+
+
+# Xưng hô trong trộn thư: cột giới tính của danh sách thường ghi nhiều kiểu.
+_MALE = {"nam", "m", "male", "ông", "ong", "anh", "1", "true"}
+_FEMALE = {"nữ", "nu", "f", "female", "bà", "ba", "chị", "chi", "0", "false"}
+
+
+def salutation(gender, full_name="", male="Ông", female="Bà", unknown="Ông/Bà"):
+    """Lời xưng hô cho trộn thư: "Kính gửi {XUNGHO(giới tính; họ tên)}".
+
+    Giới tính không đọc được (ô trống, chữ lạ) trả về "Ông/Bà" thay vì đoán bừa."""
+    key = " ".join(str(gender).split()).casefold()
+    title = male if key in _MALE else female if key in _FEMALE else unknown
+    name = " ".join(str(full_name).split())
+    return f"{title} {name}".strip()

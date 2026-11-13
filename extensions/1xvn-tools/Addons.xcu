@@ -19,6 +19,12 @@
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
           </node>
+          <node oor:name="m00c" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:OpenCsvSafely</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Open CSV Safely (UTF-8, as text)...</value><value xml:lang="vi">Mở CSV an toàn (UTF-8, dạng chữ)...</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
           <node oor:name="m00" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NumberToWords</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Number to Words</value><value xml:lang="vi">Đọc số thành chữ</value></prop>
@@ -52,6 +58,18 @@
           <node oor:name="m03" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NormalizeUnicode</value></prop>
             <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Normalize Vietnamese Unicode</value><value xml:lang="vi">Chuẩn hóa Unicode tiếng Việt</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
+          <node oor:name="m03a" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:ToneStyleOld</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Tone Marks, Old Style (hòa)</value><value xml:lang="vi">Dấu thanh kiểu cũ (hòa)</value></prop>
+            <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
+            <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
+          </node>
+          <node oor:name="m03b" oor:op="replace">
+            <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:ToneStyleNew</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Tone Marks, New Style (hoà)</value><value xml:lang="vi">Dấu thanh kiểu mới (hoà)</value></prop>
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
           </node>

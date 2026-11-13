@@ -102,6 +102,40 @@
             </node>
           </node>
         </node>
+        <node oor:name="bodau" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">BODAU</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">Removes Vietnamese diacritics: "Đường Lê Lợi" becomes "Duong Le Loi". Useful for file names, codes and e-mail addresses.</value>
+            <value xml:lang="vi">Bỏ dấu tiếng Việt: "Đường Lê Lợi" thành "Duong Le Loi". Dùng cho tên tệp, mã số, địa chỉ thư.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">BODAU</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="Text" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Text</value><value xml:lang="vi">Chữ</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The text to strip.</value><value xml:lang="vi">Chữ cần bỏ dấu.</value></prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="xungho" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">XUNGHO</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">A salutation for mail merge: XUNGHO("Nam";"Nguyễn Văn A") gives "Ông Nguyễn Văn A". An unreadable gender gives "Ông/Bà" instead of a guess.</value>
+            <value xml:lang="vi">Lời xưng hô cho trộn thư: XUNGHO("Nam";"Nguyễn Văn A") cho "Ông Nguyễn Văn A". Giới tính không đọc được thì trả về "Ông/Bà" thay vì đoán.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">XUNGHO</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="Gender" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Gender</value><value xml:lang="vi">Giới tính</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">Nam/Nữ, M/F, Ông/Bà, 1/0.</value><value xml:lang="vi">Nam/Nữ, M/F, Ông/Bà, 1/0.</value></prop>
+            </node>
+            <node oor:name="FullName" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Full name</value><value xml:lang="vi">Họ tên</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">Optional: the name after the title.</value><value xml:lang="vi">Tuỳ chọn: họ tên đặt sau lời xưng hô.</value></prop>
+            </node>
+          </node>
+        </node>
       </node>
     </node>
   </node>

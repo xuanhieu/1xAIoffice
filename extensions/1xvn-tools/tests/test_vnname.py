@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pythonpath"))
-from vn1x.vnname import sort_key, split_name  # noqa: E402
+from vn1x.vnname import salutation, sort_key, split_name  # noqa: E402
 
 
 class SplitTests(unittest.TestCase):
@@ -49,6 +49,26 @@ class SortTests(unittest.TestCase):
 
     def test_empty_name(self):
         self.assertEqual(sort_key(""), "")
+
+
+class SalutationTests(unittest.TestCase):
+    def test_male_and_female_spellings(self):
+        for value in ("Nam", "nam", "M", "male", "Ông", "1"):
+            with self.subTest(value=value):
+                self.assertEqual(salutation(value, "Nguyễn Văn A"), "Ông Nguyễn Văn A")
+        for value in ("Nữ", "nu", "F", "female", "Bà", "0"):
+            with self.subTest(value=value):
+                self.assertEqual(salutation(value, "Trần Thị B"), "Bà Trần Thị B")
+
+    def test_unknown_gender_does_not_guess(self):
+        self.assertEqual(salutation("", "Lê C"), "Ông/Bà Lê C")
+        self.assertEqual(salutation("khác", "Lê C"), "Ông/Bà Lê C")
+
+    def test_without_a_name(self):
+        self.assertEqual(salutation("Nam"), "Ông")
+
+    def test_custom_titles(self):
+        self.assertEqual(salutation("Nam", "A", male="Anh", female="Chị"), "Anh A")
 
 
 if __name__ == "__main__":

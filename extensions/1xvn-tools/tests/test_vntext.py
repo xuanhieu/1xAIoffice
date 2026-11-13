@@ -91,5 +91,59 @@ class TypingTests(unittest.TestCase):
         self.assertFalse(vntext.looks_like_typing("", vntext.VNI))
 
 
+class TidyTests(unittest.TestCase):
+    def test_collapses_spaces_and_trims_lines(self):
+        self.assertEqual(vntext.tidy_spaces("Xin   chào\n   bạn  "), "Xin chào\nbạn")
+
+    def test_punctuation_spacing(self):
+        self.assertEqual(vntext.tidy_spaces("Xin chào , bạn ( ở đây ) ."), "Xin chào, bạn (ở đây).")
+        self.assertEqual(vntext.tidy_spaces("Hà Nội.Việt Nam"), "Hà Nội. Việt Nam")
+
+    def test_keeps_decimal_comma_and_numbers(self):
+        self.assertEqual(vntext.tidy_spaces("1,5 kg và 3.000 đồng"), "1,5 kg và 3.000 đồng")
+
+    def test_replaces_unusual_spaces(self):
+        self.assertEqual(vntext.tidy_spaces("Hà\u00a0Nội\u2009rộng"), "Hà Nội rộng")
+
+
+class NormalizeFullTests(unittest.TestCase):
+    def test_nfc_and_spacing_together(self):
+        combined = unicodedata.normalize("NFD", "Việt  Nam ,đất")
+        self.assertEqual(vntext.normalize_full(combined), "Việt Nam, đất")
+
+    def test_tone_style_left_alone_by_default(self):
+        self.assertEqual(vntext.normalize_full("hòa hoà"), "hòa hoà")
+
+    def test_tone_style_applied_when_asked(self):
+        self.assertEqual(vntext.normalize_full("hòa hoà", modern_tone=True), "hoà hoà")
+        self.assertEqual(vntext.normalize_full("hòa hoà", modern_tone=False), "hòa hòa")
+
+
+class ToneStyleTests(unittest.TestCase):
+    def test_both_directions(self):
+        self.assertEqual(vntext.tone_style("hòa thủy hòe", modern=True), "hoà thuỷ hoè")
+        self.assertEqual(vntext.tone_style("hoà thuỷ hoè", modern=False), "hòa thủy hòe")
+
+    def test_qu_cluster_is_left_alone(self):
+        for text in ("quý", "quỹ", "quả"):
+            with self.subTest(text=text):
+                self.assertEqual(vntext.tone_style(text, modern=True), text)
+                self.assertEqual(vntext.tone_style(text, modern=False), text)
+
+    def test_closed_syllable_is_left_alone(self):
+        self.assertEqual(vntext.tone_style("nguyệt", modern=True), "nguyệt")
+
+    def test_words_without_those_vowels_are_untouched(self):
+        self.assertEqual(vntext.tone_style("Tiếng Việt số 1", modern=True), "Tiếng Việt số 1")
+
+    def test_word_without_tone_is_untouched(self):
+        self.assertEqual(vntext.tone_style("hoa hoe thuy", modern=True), "hoa hoe thuy")
+
+
+class DetectTests(unittest.TestCase):
+    def test_empty_text_is_not_tcvn3(self):
+        self.assertFalse(looks_like_tcvn3(""))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -50,6 +50,10 @@ def main():
         nd30_checks(desktop, prop, run, check)
     elif part == "nd30check":
         nd30_check_checks(desktop, prop, run, check)
+    elif part == "xlsxwarn":
+        xlsx_warning_checks(desktop, prop, run, check)
+    elif part == "csv":
+        csv_checks(desktop, prop, run, check)
     else:
         calc_checks(desktop, prop, run, check)
     try:
@@ -85,6 +89,73 @@ def writer_checks(desktop, prop, run, check):
     run(doc, "MoneyToWords")
     check("Writer đọc số tiền", text.getString(), "Một triệu hai trăm năm mươi nghìn đồng")
 
+    doc.close(True)
+
+
+def csv_checks(desktop, prop, run, check):
+    """Chuỗi tuỳ chọn mở CSV an toàn phải thật sự giữ nguyên dữ liệu trong Calc thật.
+
+    Ở đây nạp thẳng tệp bằng chuỗi tuỳ chọn, không đi qua lệnh trên menu: soffice headless trên macOS dừng khi mở
+    tài liệu thứ hai trong một phiên, mà lệnh đó luôn mở tài liệu mới. Phần nối lệnh được thử bằng tay trên app có
+    giao diện; phần quyết định đúng sai là chuỗi tuỳ chọn, và nó được kiểm thật ở đây.
+    """
+    import os
+    import sys as _sys
+    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pythonpath"))
+    from vn1x import csvsafe
+    path = os.environ["ONEX_TOOLS_CSV_PATH"]
+    rows = ['ho_ten,dien_thoai,cccd,ngay,ghi_chu',
+            'Nguyễn Văn A,0912345678,001234567890,1/2,=1+1',
+            'Trần Thị B,0987654321,079300012345,10/3,"Hà Nội, Việt Nam"']
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(rows) + "\n")
+    # Một phiên trước bị dừng giữa chừng để lại tệp khoá; soffice headless không hỏi được nên sẽ từ chối mở.
+    lock = os.path.join(os.path.dirname(path), "." + "~lock." + os.path.basename(path) + "#")
+    if os.path.exists(lock):
+        os.remove(lock)
+    options = csvsafe.filter_options(separator=csvsafe.guess_separator(rows[0]))
+    doc = desktop.loadComponentFromURL(uno.systemPathToFileUrl(path), "_blank", 0,
+                                       (prop("FilterName", "Text - txt - csv (StarCalc)"),
+                                        prop("FilterOptions", options), prop("Hidden", True)))
+    check("Nạp được CSV bằng chuỗi tuỳ chọn an toàn", doc is not None, True)
+    if doc is None:
+        return
+    sheet = doc.getSheets().getByIndex(0)
+    at = lambda col, row: sheet.getCellByPosition(col, row).getString()  # noqa: E731
+    check("CSV giữ số 0 đầu của số điện thoại", at(1, 1), "0912345678")
+    check("CSV giữ nguyên số căn cước", at(2, 1), "001234567890")
+    check("CSV không đổi 1/2 thành ngày", at(3, 1), "1/2")
+    check("CSV không chạy ô bắt đầu bằng =", at(4, 1), "=1+1")
+    check("CSV giữ dấu phẩy trong ô có dấu bao", at(4, 2), "Hà Nội, Việt Nam")
+    check("CSV đọc đúng chữ tiếng Việt", at(0, 1), "Nguyễn Văn A")
+    doc.close(True)
+
+
+def xlsx_warning_checks(desktop, prop, run, check):
+    """Lưu bảng tính có hàm riêng sang .xlsx thì phải nhắc người dùng. soffice chạy với ONEX_TOOLS_WARN_OUT."""
+    import os
+    import tempfile
+    out = os.environ.get("ONEX_TOOLS_WARN_OUT")
+    if out and os.path.exists(out):
+        os.remove(out)
+    doc = desktop.loadComponentFromURL("private:factory/scalc", "_blank", 0, (prop("Hidden", False),))
+    sheet = doc.getSheets().getByIndex(0)
+    sheet.getCellByPosition(0, 0).setValue(21)
+    sheet.getCellByPosition(1, 0).setFormula("=DOCSO(A1)")
+    doc.calculateAll()
+    folder = tempfile.mkdtemp()
+    for name, filt in (("plain.ods", "calc8"), ("excel.xlsx", "Calc MS Excel 2007 XML")):
+        url = uno.systemPathToFileUrl(os.path.join(folder, name))
+        doc.storeToURL(url, (prop("FilterName", filt), prop("Overwrite", True)))
+    # storeToURL không đổi URL tài liệu nên không bắn sự kiện lưu: dùng storeAsURL cho phép kiểm thật.
+    doc.storeAsURL(uno.systemPathToFileUrl(os.path.join(folder, "thucte.xlsx")),
+                   (prop("FilterName", "Calc MS Excel 2007 XML"), prop("Overwrite", True)))
+    text = open(out, encoding="utf-8").read() if out and os.path.exists(out) else ""
+    check("Lưu .xlsx có hàm riêng thì nhắc", ".xlsx" in text and "DOCSO" in text, True)
+    doc.storeAsURL(uno.systemPathToFileUrl(os.path.join(folder, "thucte.ods")),
+                   (prop("FilterName", "calc8"), prop("Overwrite", True)))
+    after = open(out, encoding="utf-8").read() if out and os.path.exists(out) else ""
+    check("Lưu .ods thì không nhắc thêm", after.count("DOCSO"), text.count("DOCSO"))
     doc.close(True)
 
 

@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- SPDX-License-Identifier: MPL-2.0. First run: put the bundled quick start guides into Recent documents. -->
+<!-- SPDX-License-Identifier: MPL-2.0. First run: put the bundled quick start guides into Recent documents. Every spreadsheet opened gets a save watcher. -->
 <oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="Jobs" oor:package="org.openoffice.Office">
   <node oor:name="Jobs">
     <node oor:name="org.1xvnoffice.tools.GuideSeeder" oor:op="replace">
       <prop oor:name="Service"><value>org.1xvnoffice.tools.GuideSeeder</value></prop>
+    </node>
+    <node oor:name="org.1xvnoffice.tools.XlsxWarner" oor:op="replace">
+      <prop oor:name="Service"><value>org.1xvnoffice.tools.XlsxWarner</value></prop>
     </node>
   </node>
   <node oor:name="Events">
     <node oor:name="onFirstRunInitialization" oor:op="fuse">
       <node oor:name="JobList">
         <node oor:name="org.1xvnoffice.tools.GuideSeeder" oor:op="replace"/>
+      </node>
+    </node>
+    <!-- Mỗi bảng tính vừa mở được gắn bộ theo dõi lưu, để nhắc khi lưu sang định dạng Excel. -->
+    <node oor:name="onDocumentOpened" oor:op="fuse">
+      <node oor:name="JobList">
+        <node oor:name="org.1xvnoffice.tools.XlsxWarner" oor:op="replace"/>
       </node>
     </node>
   </node>

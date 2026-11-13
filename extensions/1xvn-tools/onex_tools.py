@@ -12,6 +12,7 @@ import uno
 import unohelper
 from com.sun.star.frame import XDispatch, XDispatchProvider
 from com.sun.star.lang import XInitialization, XServiceInfo
+from com.sun.star.document import XDocumentEventListener
 from com.sun.star.task import XJob
 
 import datetime
@@ -20,8 +21,9 @@ import json
 from vn1x import docops
 from vn1x import nd30
 from vn1x.numwords import NumberWordsError, money_to_words, number_to_words, parse_number_text
-from vn1x.vnname import sort_key, split_name
-from vn1x.vntext import normalize, remove_diacritics, tcvn3_to_unicode, vni_to_unicode, viqr_to_unicode
+from vn1x.vnname import salutation, sort_key, split_name
+from vn1x.vntext import (normalize_full, remove_diacritics, tcvn3_to_unicode, tone_style,
+                         vni_to_unicode, viqr_to_unicode)
 
 IMPL = "org.1xvnoffice.tools.ProtocolHandler"
 PROTOCOL = "vnd.1x.tools:"
@@ -42,6 +44,13 @@ TEXTS = {
         "check_offer": "\n\nSet the page back to the rules now (paper size, margins, default font)?",
         "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Ctrl+Z undoes it.",
         "check_writer_only": "Open the document in 1xDoc first: this command checks a text document.",
+        "csv_title": "Open a CSV file safely",
+        "csv_done": "Opened {name} as text: leading zeros, codes and dates are kept exactly as written, and cells starting with \"=\" are not run as formulas.",
+        "csv_cancel": "",
+        "xlsx_warning": ("Saved as {ext}. The sheet uses {n} 1xVnOffice formula(s) ({names}).\n\n"
+                         "Excel shows the values they produced but cannot recalculate them: for an Excel user the "
+                         "cells are frozen. Save as .ods to keep them live, or replace them with their values "
+                         "before sending the file."),
     },
     "vi": {
         "title": "1xVnOffice",
@@ -57,6 +66,13 @@ TEXTS = {
         "check_offer": "\n\nSửa phần trang ngay bây giờ (khổ giấy, lề, phông mặc định)?",
         "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Ctrl+Z để hoàn tác.",
         "check_writer_only": "Hãy mở văn bản trong 1xDoc trước: lệnh này kiểm tài liệu văn bản.",
+        "csv_title": "Mở tệp CSV an toàn",
+        "csv_done": "Đã mở {name} dưới dạng chữ: số 0 đầu, mã số và ngày tháng giữ nguyên như trong tệp, ô bắt đầu bằng \"=\" không bị chạy như công thức.",
+        "csv_cancel": "",
+        "xlsx_warning": ("Đã lưu dạng {ext}. Bảng tính đang dùng {n} công thức của 1xVnOffice ({names}).\n\n"
+                         "Excel hiện được giá trị đã tính nhưng không tính lại được: với người dùng Excel, các ô đó "
+                         "đứng yên. Muốn giữ công thức sống thì lưu dạng .ods, hoặc thay công thức bằng giá trị "
+                         "trước khi gửi tệp."),
     },
 }
 
@@ -99,6 +115,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         pass
 
     def dispatch(self, url, args):
+        if url.Path == "OpenCsvSafely":
+            self.t = TEXTS[_ui_lang(self.ctx)]
+            self.cmd_OpenCsvSafely()
+            return
         if url.Path == "Nd30Check":
             self.t = TEXTS[_ui_lang(self.ctx)]
             self.cmd_Nd30Check()
@@ -168,7 +188,16 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         self._text(doc, is_writer, remove_diacritics, "Remove diacritics")
 
     def cmd_NormalizeUnicode(self, doc, is_writer):
-        self._text(doc, is_writer, normalize, "Normalize Unicode")
+        """Dựng sẵn NFC, gộp khoảng trắng và sửa khoảng trắng quanh dấu câu. Kiểu đặt dấu thanh không đổi ở đây."""
+        self._text(doc, is_writer, normalize_full, "Normalize Vietnamese")
+
+    def cmd_ToneStyleOld(self, doc, is_writer):
+        """Đặt dấu thanh kiểu cũ: hòa, thủy, hòe."""
+        self._text(doc, is_writer, lambda t: tone_style(t, modern=False), "Tone style: hòa")
+
+    def cmd_ToneStyleNew(self, doc, is_writer):
+        """Đặt dấu thanh kiểu mới: hoà, thuỷ, hoè."""
+        self._text(doc, is_writer, lambda t: tone_style(t, modern=True), "Tone style: hoà")
 
     def cmd_ConvertVNI(self, doc, is_writer):
         """Chữ gõ kiểu VNI ("Vie65t") thành Unicode. Chỉ đổi chỗ có dấu đứng ngay sau nguyên âm."""
@@ -208,6 +237,38 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                 if not from_selection or new != old:
                     t.CharFontName = TCVN3_REPLACEMENT_FONT
         self.message(self.t["done"].format(n=changed))
+
+    def cmd_OpenCsvSafely(self):
+        """Mở tệp CSV với mọi cột là chữ, bộ ký tự UTF-8 và không chạy công thức."""
+        from vn1x import csvsafe
+        path = os.environ.get("ONEX_TOOLS_CSV_PATH") or self._pick_file()
+        if not path:
+            return
+        with open(path, "r", encoding="utf-8", errors="replace") as handle:
+            first_line = handle.readline()
+        options = csvsafe.filter_options(separator=csvsafe.guess_separator(first_line))
+        desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
+        args = []
+        for name, value in (("FilterName", "Text - txt - csv (StarCalc)"), ("FilterOptions", options)):
+            item = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
+            item.Name, item.Value = name, value
+            args.append(item)
+        desktop.loadComponentFromURL(uno.systemPathToFileUrl(path), "_blank", 0, tuple(args))
+        self.message(self.t["csv_done"].format(name=os.path.basename(path)))
+
+    def _pick_file(self):
+        """Hộp chọn tệp CSV. Trả về đường dẫn hệ thống, hoặc chuỗi rỗng khi người dùng huỷ."""
+        picker = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.ui.dialogs.FilePicker", self.ctx)
+        picker.setTitle(self.t["csv_title"])
+        picker.appendFilter("CSV (*.csv, *.txt)", "*.csv;*.txt")
+        picker.appendFilter("*", "*")
+        try:
+            if picker.execute() != 1:
+                return ""
+            files = picker.getSelectedFiles()
+            return uno.fileUrlToSystemPath(files[0]) if files else ""
+        finally:
+            picker.dispose() if hasattr(picker, "dispose") else None
 
     def cmd_Nd30Check(self):
         """Kiểm thể thức văn bản đang mở theo NĐ30 và mời sửa phần trang."""
@@ -338,6 +399,12 @@ if XVnSheetFunctions is not None:
         def sapten(self, full_name):
             return sort_key(full_name)
 
+        def bodau(self, text):
+            return remove_diacritics(text)
+
+        def xungho(self, gender, full_name):
+            return salutation(gender, _optional_text(full_name, ""))
+
         def doctien(self, amount, currency):
             try:
                 return money_to_words(repr(amount), currency=_optional_text(currency, "đồng"))
@@ -425,8 +492,101 @@ class GuideSeeder(unohelper.Base, XJob):
             window.setVisible(True)
 
 
+WARNER_IMPL = "org.1xvnoffice.tools.XlsxWarner"
+ADDIN_MARK = "ORG.ONEXVN.TOOLS."          # công thức của add-in hiện ra dưới tên đầy đủ này
+RISKY_EXT = (".xlsx", ".xls", ".xlsm", ".csv")
+
+
+def _addin_formulas(doc):
+    """Tên các hàm của 1xVnOffice đang dùng trong bảng tính, không trùng lặp."""
+    from com.sun.star.sheet.CellFlags import FORMULA
+    found = set()
+    sheets = doc.getSheets()
+    for i in range(sheets.getCount()):
+        cells = sheets.getByIndex(i).queryContentCells(FORMULA)
+        for rng in cells.getRangeAddresses():
+            sheet = sheets.getByIndex(rng.Sheet)
+            for row in range(rng.StartRow, rng.EndRow + 1):
+                for col in range(rng.StartColumn, rng.EndColumn + 1):
+                    formula = sheet.getCellByPosition(col, row).getFormula()
+                    at = formula.upper().find(ADDIN_MARK)
+                    while at >= 0:
+                        rest = formula[at + len(ADDIN_MARK):]
+                        name = rest.split("(")[0].split(".")[-1]
+                        if name:
+                            found.add(name.upper())
+                        at = formula.upper().find(ADDIN_MARK, at + 1)
+    return sorted(found)
+
+
+class SaveWatcher(unohelper.Base, XDocumentEventListener):
+    """Sau khi lưu bảng tính sang định dạng Excel, nhắc rằng hàm riêng của 1xVnOffice không tính lại được ở Excel.
+    Mỗi tài liệu chỉ nhắc một lần trong phiên."""
+
+    def __init__(self, ctx, texts):
+        self.ctx, self.t, self.warned = ctx, texts, False
+
+    def documentEventOccured(self, event):
+        try:
+            if self.warned or event.EventName not in ("OnSaveAsDone", "OnSaveDone"):
+                return
+            doc = event.Source
+            url = (doc.getURL() or "").lower()
+            ext = next((e for e in RISKY_EXT if url.endswith(e)), None)
+            if not ext:
+                return
+            names = _addin_formulas(doc)
+            if not names:
+                return
+            self.warned = True
+            _message_box(self.ctx, doc, self.t["title"],
+                         self.t["xlsx_warning"].format(ext=ext, n=len(names), names=", ".join(names)))
+        except Exception:  # noqa: BLE001 - một lời nhắc hỏng không được cản việc lưu
+            pass
+
+    def disposing(self, event):
+        pass
+
+
+class XlsxWarner(unohelper.Base, XJob):
+    """Gắn SaveWatcher vào mỗi bảng tính vừa mở (sự kiện onDocumentOpened trong Jobs.xcu)."""
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+
+    def execute(self, args):
+        try:
+            values = {}
+            for item in args:
+                if item.Name == "Environment":
+                    values = {v.Name: v.Value for v in item.Value}
+            doc = values.get("Model")
+            if doc is not None and doc.supportsService("com.sun.star.sheet.SpreadsheetDocument"):
+                doc.addDocumentEventListener(SaveWatcher(self.ctx, TEXTS[_ui_lang(self.ctx)]))
+        except Exception:  # noqa: BLE001 - không được cản việc mở tài liệu
+            pass
+        return None
+
+
+def _message_box(ctx, doc, title, text):
+    """Hộp thông báo gắn vào cửa sổ của tài liệu."""
+    if os.environ.get("ONEX_TOOLS_SILENT") == "1":
+        out = os.environ.get("ONEX_TOOLS_WARN_OUT")
+        if out:
+            with open(out, "a", encoding="utf-8") as f:
+                f.write(text.replace("\n", " ") + "\n")
+        return
+    from com.sun.star.awt.MessageBoxType import INFOBOX
+    window = doc.getCurrentController().getFrame().getContainerWindow()
+    toolkit = ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", ctx)
+    box = toolkit.createMessageBox(window, INFOBOX, 1, title, text)
+    box.execute()
+    box.dispose()
+
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationHelper.addImplementation(Handler, IMPL, ("com.sun.star.frame.ProtocolHandler",))
 g_ImplementationHelper.addImplementation(GuideSeeder, GUIDES_IMPL, ("com.sun.star.task.Job",))
+g_ImplementationHelper.addImplementation(XlsxWarner, WARNER_IMPL, ("com.sun.star.task.Job",))
 if XVnSheetFunctions is not None:
     g_ImplementationHelper.addImplementation(SheetFunctions, SHEET_IMPL, ("com.sun.star.sheet.AddIn",))

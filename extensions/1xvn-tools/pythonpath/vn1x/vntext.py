@@ -128,3 +128,71 @@ def looks_like_typing(text, rules, threshold=0.02):
     hits = sum(1 for i, c in enumerate(text)
                if c in signs and i and (text[i - 1] in _VOWELS or text[i - 1] in _MODIFIED))
     return hits / len(letters) >= threshold
+
+
+# --- Chuẩn hoá khoảng trắng, dấu câu và kiểu đặt dấu thanh ---
+_CLOSERS = ",.;:!?)]}"      # dấu câu dính vào chữ đứng trước
+_OPENERS = "([{"            # dấu mở dính vào chữ đứng sau
+_SPACES = "\u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"
+# Nguyên âm đôi mà hai kiểu đặt dấu khác nhau: kiểu cũ đặt ở nguyên âm đầu (hòa), kiểu mới ở nguyên âm sau (hoà).
+_PAIRS = (("o", "a"), ("o", "e"), ("u", "y"))
+_TONE_CHARS = "\u0300\u0301\u0303\u0309\u0323"
+
+
+def tidy_spaces(text):
+    """Gộp khoảng trắng lặp, bỏ khoảng trắng trước dấu câu và sau dấu mở ngoặc, thêm một khoảng trắng sau dấu câu
+    khi liền sau là chữ. Không đụng tới số thập phân (1,5) vì chỉ thêm khoảng trắng khi sau dấu là chữ cái."""
+    import re
+    out = text
+    for ch in _SPACES:
+        out = out.replace(ch, " ")
+    out = re.sub(r"[ \t]+", " ", out)
+    out = re.sub(r"\s+([" + re.escape(_CLOSERS) + r"])", r"\1", out)
+    out = re.sub(r"([" + re.escape(_OPENERS) + r"])\s+", r"\1", out)
+    out = re.sub(r"([" + re.escape(_CLOSERS) + r"])(?=[^\W\d_])", r"\1 ", out, flags=re.UNICODE)
+    return "\n".join(line.strip() for line in out.split("\n"))
+
+
+def _move_tone(word, to_second):
+    """Chuyển dấu thanh giữa hai nguyên âm của oa, oe, uy trong một tiếng."""
+    chars = list(unicodedata.normalize("NFD", word))
+    bases = [c for c in chars if c not in _TONE_CHARS]
+    tones = [c for c in chars if c in _TONE_CHARS]
+    if len(tones) != 1:
+        return word
+    plain = "".join(bases)
+    low = plain.casefold()
+    for first, second in _PAIRS:
+        at = low.find(first + second)
+        if at < 0:
+            continue
+        if first == "u" and at > 0 and low[at - 1] == "q":
+            continue                      # "qu" là phụ âm ghép (quý, quỹ): cả hai kiểu đặt dấu như nhau
+        if second == "y" and at + 2 < len(low) and low[at + 2].isalpha():
+            continue                      # "uy" có phụ âm cuối (nguyệt) thì cả hai kiểu đặt như nhau
+        want = at + 1 if to_second else at
+        # đặt lại dấu ngay sau nguyên âm đã chọn
+        rebuilt = []
+        for index, ch in enumerate(bases):
+            rebuilt.append(ch)
+            if index == want:
+                rebuilt.append(tones[0])
+        return unicodedata.normalize("NFC", "".join(rebuilt))
+    return word
+
+
+def tone_style(text, modern=False):
+    """Đổi kiểu đặt dấu thanh của các tiếng có oa, oe, uy.
+
+    modern=False (mặc định): kiểu cũ, dấu ở nguyên âm đầu — hòa, hòe, thủy. Đây là kiểu sách giáo khoa và phần lớn
+    văn bản hành chính dùng. modern=True: kiểu mới — hoà, hoè, thuỷ. Chữ không thuộc ba nguyên âm đôi này giữ nguyên.
+    """
+    import re
+    return re.sub(r"[^\W\d_]+", lambda m: _move_tone(m.group(0), modern), text, flags=re.UNICODE)
+
+
+def normalize_full(text, modern_tone=None):
+    """Chuẩn hoá tiếng Việt: dựng sẵn NFC, gộp khoảng trắng, sửa khoảng trắng quanh dấu câu. Kiểu đặt dấu thanh chỉ
+    đổi khi được yêu cầu rõ (modern_tone=True hoặc False), vì hai kiểu đều đang được dùng."""
+    out = tidy_spaces(normalize(text))
+    return out if modern_tone is None else tone_style(out, modern_tone)
