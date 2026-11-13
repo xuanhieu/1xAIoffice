@@ -524,6 +524,11 @@ def mcp_server_checks(desktop, prop, run, check):
     finally:
         friend.close()
     doc.close(True)
+    # Cửa MCP để lại socket trong /tmp; dọn luôn để không tích lại sau mỗi lần kiểm.
+    try:
+        os.remove(f"/tmp/OSL_PIPE_{os.getuid()}_{pipe}")
+    except OSError:
+        pass
 
 
 def csv_checks(desktop, prop, run, check):
