@@ -34,6 +34,12 @@ def _border(width_mm100=18):
     return line
 
 
+def _vi_locale():
+    loc = uno.createUnoStruct("com.sun.star.lang.Locale")
+    loc.Language, loc.Country = "vi", "VN"
+    return loc
+
+
 def _no_border():
     return uno.createUnoStruct("com.sun.star.table.BorderLine2")
 
@@ -61,6 +67,7 @@ class Writer:
         spacing.Mode, spacing.Height = 0, line_percent  # PROP
         cur.ParaLineSpacing = spacing
         cur.CharFontName = self.font
+        cur.CharLocale = _vi_locale()  # kiểm chính tả tiếng Việt, không theo ngôn ngữ giao diện
         cur.CharHeight = block["size"]
         cur.CharWeight = 150.0 if block.get("bold") else 100.0
         cur.CharPosture = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC" if block.get("italic") else "NONE")
@@ -114,6 +121,7 @@ def _setup_pages(doc, spec):
     default = para_styles.getByName("Standard")
     default.CharFontName = font
     default.CharHeight = spec["body_size"]
+    default.CharLocale = _vi_locale()
     pages = styles.getByName("PageStyles")
     for name in ("Standard", "First Page"):
         ps = pages.getByName(name)

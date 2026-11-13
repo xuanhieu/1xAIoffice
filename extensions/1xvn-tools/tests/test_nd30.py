@@ -78,5 +78,38 @@ class BuildTests(unittest.TestCase):
             build(dict(BASE, authority="XX."))
 
 
+class DialogValidateTests(unittest.TestCase):
+    RAW = {"type": "to_trinh", "org": "Sở Khoa học và Công nghệ", "org_abbr": "SKHCN", "number": "5",
+           "place": "Đà Nẵng", "date": "05/01/2026", "summary": "Về việc A", "authority": "",
+           "signer_name": "Nguyễn Văn A", "body": "Đoạn một.\n\nĐoạn hai.", "recipients": "Như trên\n"}
+
+    def test_ok(self):
+        from vn1x.nd30_dialog import validate
+        fields, problem = validate(self.RAW, "vi")
+        self.assertIsNone(problem)
+        self.assertEqual(fields["number"], 5)
+        self.assertEqual(fields["date"], datetime.date(2026, 1, 5))
+        self.assertEqual(fields["body"], ["Đoạn một.", "Đoạn hai."])
+        self.assertEqual(fields["recipients"], ["Như trên"])
+
+    def test_problems_point_at_field(self):
+        from vn1x.nd30_dialog import validate
+        cases = {"summary": " ", "signer_name": "", "org_abbr": "", "number": "abc", "date": "31/02/2026"}
+        for key, value in cases.items():
+            with self.subTest(key=key):
+                fields, problem = validate(dict(self.RAW, **{key: value}), "vi")
+                self.assertIsNone(fields)
+                self.assertEqual(problem[0], key)
+        _, problem = validate(dict(self.RAW, summary=""), "vi")
+        self.assertEqual(problem[1], "Vui lòng nhập: Trích yếu")
+        _, problem = validate(dict(self.RAW, number="0"), "en")
+        self.assertEqual(problem[0], "number")
+
+    def test_empty_date_is_today(self):
+        from vn1x.nd30_dialog import validate
+        fields, _ = validate(dict(self.RAW, date=""), "vi", today=datetime.date(2026, 11, 13))
+        self.assertEqual(fields["date"], datetime.date(2026, 11, 13))
+
+
 if __name__ == "__main__":
     unittest.main()

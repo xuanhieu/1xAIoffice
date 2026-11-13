@@ -134,6 +134,8 @@ def nd30_checks(desktop, prop, run, check):
     check("NĐ30 họ tên", signer.rstrip().endswith("Nguyễn Văn A"), True)
     receivers = sign.getCellByName("A1").getText().getString().replace("\r\n", "\n").split("\n")
     check("NĐ30 nơi nhận", (receivers[0], receivers[-1]), ("Nơi nhận:", "- Lưu: VT, VP, 02b."))
+    loc = sign.getCellByName("B1").getText().createTextCursor().CharLocale
+    check("NĐ30 ngôn ngữ chữ tiếng Việt", (loc.Language, loc.Country), ("vi", "VN"))
     out = __import__("os").environ.get("ONEX_TOOLS_ND30_PNG")
     if out:
         doc.storeToURL(uno.systemPathToFileUrl(out), (prop("FilterName", "writer_png_Export"),))
