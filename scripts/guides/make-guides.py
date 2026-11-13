@@ -306,6 +306,11 @@ def make_doc(office, lang, out):
             para("•\t" + item)
             cur.ParaLeftMargin, cur.ParaFirstLineIndent = 700, -500
         cur.ParaLeftMargin = cur.ParaFirstLineIndent = 0
+    d = ABOUT["donate"]
+    para(about["support_title"], "Heading 2")
+    para(about["support"])
+    para(f'{d["bank"]} · {d["account"]} · {d["holder"]}')
+    para(f'{about["support_link"]}: {d["url_" + lang]}')
     para(about["footer"])
     para(t["shortcuts_title"], "Heading 1")
     rows = [t["shortcuts_head"]] + t["shortcuts"]

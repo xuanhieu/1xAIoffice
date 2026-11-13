@@ -3178,3 +3178,12 @@ msgctxt ""
 "value.text"
 msgid "Table Cell Background Color"
 msgstr "Màu nền ô"
+
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:Donation\n"
+"Label\n"
+"value.text"
+msgid "Donate to LibreOffice"
+msgstr "Ủng hộ tác giả"

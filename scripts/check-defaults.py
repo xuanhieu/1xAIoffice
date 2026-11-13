@@ -33,6 +33,7 @@ EXPECTED = [
     ("/org.openoffice.Office.Common/Menus", "ReleaseNotesURL", "https://github.com/xuanhieu/1xvnoffice/releases"),
     ("/org.openoffice.Office.Common/Menus", "SendFeedbackURL", "https://github.com/xuanhieu/1xvnoffice/issues"),
     ("/org.openoffice.Office.Common/Help/StartCenter", "InfoURL", "https://1xag.com"),
+    ("/org.openoffice.Office.Common/Menus", "DonationURL", "https://1xag.com/?donate"),
 ]
 
 
@@ -48,6 +49,8 @@ def connect(pipe):
 
 
 CUT_LABEL = {"en": "~Cut", "vi": "~Cắt"}
+# Lệnh Ủng hộ phải mang tên tác giả, không phải tên dự án nền (config/1x-identity.xcd).
+DONATION_LABEL = {"en": "Support the author", "vi": "Ủng hộ tác giả"}
 
 
 def main():
@@ -70,6 +73,12 @@ def main():
     ok = label == want
     failures += not ok
     print(f"{'OK  ' if ok else 'SAI '} nhãn ({lang}) của .uno:Cut = {label!r}" + ("" if ok else f" (mong đợi {want!r})"))
+    donation = dict((p.Name, p.Value) for p in
+                    commands.getByName("com.sun.star.text.TextDocument").getByName(".uno:Donation"))["Label"]
+    want = DONATION_LABEL[lang]
+    ok = donation == want
+    failures += not ok
+    print(f"{'OK  ' if ok else 'SAI '} nhãn ({lang}) của .uno:Donation = {donation!r}" + ("" if ok else f" (mong đợi {want!r})"))
     try:
         ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", ctx).terminate()
     except Exception:  # noqa: BLE001 - the bridge drops when the office exits

@@ -36,6 +36,13 @@ Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 
 - Riêng tư mặc định: không gửi gì ra ngoài trừ khi bạn bật.
 - Mở: mã nguồn công khai theo giấy phép MPL-2.0.
 
+**Ủng hộ tác giả**
+
+1xVnOffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.
+
+> **MB Bank** · `9112233449` · PHAM XUAN HIEU  
+> 50.000đ · 100.000đ · 200.000đ · 500.000đ · [Trang ủng hộ](https://1xag.com/?donate)
+
 ---
 
 ## About 1xVnOffice
@@ -70,13 +77,20 @@ The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSli
 - Private by default: nothing is sent anywhere unless you turn it on.
 - Open: the code is public under the MPL-2.0 license.
 
+**Support the author**
+
+1xVnOffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.
+
+> **MB Bank** · `9112233449` · PHAM XUAN HIEU  
+> 50.000đ · 100.000đ · 200.000đ · 500.000đ · [Donation page](https://1xag.com/en/?donate)
+
 ---
 
 ## Cấu trúc repo
 
 | Thư mục | Nội dung |
 |---|---|
-| `branding/` | Nhận diện: màu, logo, nội dung giới thiệu (một nguồn duy nhất) |
+| `branding/` | Nhận diện: màu, logo, nội dung giới thiệu (nguồn của hướng dẫn trong app) |
 | `config/` | Cấu hình mặc định, theme, địa chỉ web |
 | `build-config/` | Tuỳ chọn build cho từng nền tảng, mỗi dòng có lý do |
 | `patches/` | Bản vá nguồn (càng ít càng tốt), theo thứ tự trong `series` |
