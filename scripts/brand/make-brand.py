@@ -217,7 +217,7 @@ def fluent_icons(fluent_dir):
 
 
 # Icon cho lệnh của extension 1xvn-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
-ADDON_ICONS = {"AiAsk": "sparkle", "Nd30Document": "document_ribbon", "Nd30Check": "document_checkmark", "NumberToWords": "number_symbol_square",
+ADDON_ICONS = {"AiAsk": "sparkle", "AiRewrite": "text_edit_style", "Nd30Document": "document_ribbon", "Nd30Check": "document_checkmark", "NumberToWords": "number_symbol_square",
                "MoneyToWords": "money", "ConvertTCVN3": "arrow_swap", "NormalizeUnicode": "text_grammar_wand",
                "RemoveDiacritics": "text_clear_formatting"}
 

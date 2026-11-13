@@ -220,7 +220,7 @@ step_extensions() {
   done
 }
 
-run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn|csv|ai
+run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn|csv|ai|airewrite
   local app="$1" part="$2" profile pipe="onex_tools_$$_$2" rc=0
   profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
   rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
@@ -229,6 +229,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn
   ONEX_TOOLS_SILENT=1 ONEX_TOOLS_CHECK_OUT="$LOG_DIR/nd30-check.json" ONEX_TOOLS_CHECK_FIX=1 \
     ONEX_TOOLS_WARN_OUT="$LOG_DIR/xlsx-warning.txt" ONEX_TOOLS_CSV_PATH="$LOG_DIR/danhsach.csv" \
     ONEX_AI_QUESTION="Đây là văn bản gì?" ONEX_AI_CONFIG_PATH="$LOG_DIR/ai/providers.json" \
+    ONEX_AI_REWRITE_HOW="ngắn gọn hơn" ONEX_AI_AUTO_APPLY=1 \
     ONEX_TOOLS_ND30_FIELDS="$nd30_fields" \
     "$app/Contents/MacOS/soffice" --headless --norestore -env:UserInstallation="file://$profile" \
     "--accept=pipe,name=$pipe;urp;" >/dev/null 2>&1 &
@@ -237,6 +238,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn
     ONEX_TOOLS_WARN_OUT="$LOG_DIR/xlsx-warning.txt" ONEX_TOOLS_ND30_PNG="$LOG_DIR/nd30-sample.png" \
     ONEX_TOOLS_CSV_PATH="$LOG_DIR/danhsach.csv" \
     ONEX_AI_QUESTION="Đây là văn bản gì?" ONEX_AI_CONFIG_PATH="$LOG_DIR/ai/providers.json" \
+    ONEX_AI_REWRITE_HOW="ngắn gọn hơn" ONEX_AI_AUTO_APPLY=1 \
     "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xvn-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
   sleep 2; kill -9 "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
@@ -257,6 +259,7 @@ step_tools() {
   run_tools_check "$app" xlsxwarn || rc=1
   run_tools_check "$app" csv || rc=1
   run_tools_check "$app" ai || rc=1
+  run_tools_check "$app" airewrite || rc=1
   [ "$rc" = 0 ] || die "Lệnh tiếng Việt chạy sai trên app."
   info "Lệnh tiếng Việt chạy đúng trên app."
 }

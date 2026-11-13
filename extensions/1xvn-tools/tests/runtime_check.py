@@ -56,6 +56,8 @@ def main():
         csv_checks(desktop, prop, run, check)
     elif part == "ai":
         ai_checks(desktop, prop, run, check)
+    elif part == "airewrite":
+        ai_rewrite_checks(desktop, prop, run, check)
     else:
         calc_checks(desktop, prop, run, check)
     try:
@@ -92,6 +94,82 @@ def writer_checks(desktop, prop, run, check):
     check("Writer đọc số tiền", text.getString(), "Một triệu hai trăm năm mươi nghìn đồng")
 
     doc.close(True)
+
+
+def ai_rewrite_checks(desktop, prop, run, check):
+    """Mốc M2: AI viết lại một đoạn, có xem trước, và Ctrl+Z MỘT lần trả lại đúng như cũ.
+
+    Máy chủ AI giả chạy ngay trên máy này nên không gọi ra Internet và không cần khoá thật.
+    """
+    import json as _json
+    import os
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    before = "Chúng tôi kính đề nghị quý cơ quan xem xét và cho ý kiến về nội dung nêu trên."
+    after = "Kính đề nghị quý cơ quan xem xét, cho ý kiến về nội dung trên."
+    other = "Đoạn thứ hai giữ nguyên."
+    seen = []
+
+    class Fake(BaseHTTPRequestHandler):
+        def do_POST(self):
+            seen.append(_json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or "{}"))
+            payload = _json.dumps({"choices": [{"message": {"content": after}}],
+                                   "usage": {"prompt_tokens": 30, "completion_tokens": 20}}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Fake)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        config_path = os.environ["ONEX_AI_CONFIG_PATH"]
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+        with open(config_path, "w", encoding="utf-8") as handle:
+            _json.dump({"providers": [{"id": "gia", "type": "openai",
+                                       "base_url": f"http://127.0.0.1:{server.server_port}/v1",
+                                       "models": ["mo-hinh-gia"]}],
+                        "roles": {"soan_thao": "gia/mo-hinh-gia"}}, handle, ensure_ascii=False)
+        out = os.environ.get("ONEX_TOOLS_WARN_OUT")
+        if out and os.path.exists(out):
+            os.remove(out)
+        doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+        text = doc.getText()
+        text.setString(before)
+        cursor = text.createTextCursor()
+        cursor.gotoEnd(False)
+        text.insertControlCharacter(cursor, 0, False)   # đoạn thứ hai, để chắc chắn chỉ đoạn 1 bị sửa
+        text.insertString(cursor, other, False)
+        doc.getCurrentController().getViewCursor().gotoStart(False)
+        run(doc, "AiRewrite")
+
+        def paragraphs():
+            out_list, it = [], doc.getText().createEnumeration()
+            while it.hasMoreElements():
+                element = it.nextElement()
+                if element.supportsService("com.sun.star.text.Paragraph"):
+                    out_list.append(element.getString())
+            return out_list
+
+        check("Viết lại gọi mô hình một lần", len(seen), 1)
+        if seen:
+            sent = _json.dumps(seen[0], ensure_ascii=False)
+            check("Viết lại gửi đúng đoạn cần sửa", before in sent, True)
+        shown = open(out, encoding="utf-8").read() if out and os.path.exists(out) else ""
+        check("Viết lại hiện bản xem trước trước khi áp", "Trước:" in shown and "Sau:" in shown, True)
+        check("Viết lại đã sửa đoạn đầu", paragraphs()[0], after)
+        check("Viết lại không đụng đoạn sau", paragraphs()[1], other)
+        check("Viết lại gom thành một bước hoàn tác", doc.UndoManager.isUndoPossible(), True)
+        doc.UndoManager.undo()
+        check("Ctrl+Z một lần trả lại đúng như cũ", paragraphs()[:2], [before, other])
+        doc.close(True)
+    finally:
+        server.shutdown()
+        server.server_close()
 
 
 def ai_checks(desktop, prop, run, check):

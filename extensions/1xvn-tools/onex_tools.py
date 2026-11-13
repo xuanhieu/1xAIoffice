@@ -46,6 +46,14 @@ TEXTS = {
         "check_offer": "\n\nSet the page back to the rules now (paper size, margins, default font)?",
         "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Ctrl+Z undoes it.",
         "check_writer_only": "Open the document in 1xDoc first: this command checks a text document.",
+        "rewrite_title": "Rewrite with AI",
+        "rewrite_prompt": "How should it be rewritten? Leave empty for: clearer, keeping the meaning and the terms.",
+        "rewrite_default": "clearer and easier to read, keeping the meaning, the terms and the tone",
+        "rewrite_none": "Put the cursor in a paragraph, or select the text to rewrite.",
+        "rewrite_preview": "{preview}\n\nApply this change? Ctrl+Z undoes it in one step.",
+        "rewrite_stale": "The text changed while the AI was working, so nothing was applied. Run the command again.",
+        "rewrite_nochange": "The AI returned the same text; nothing to apply.",
+        "rewrite_done": "Applied. Ctrl+Z undoes it in one step.",
         "ai_question": "Ask about this document",
         "ai_prompt": "What do you want to know? The answer only reads the document; it changes nothing.",
         "ai_answer": "{text}\n\n— {provider}/{model}, sent {note}, {tokens} tokens.",
@@ -75,6 +83,14 @@ TEXTS = {
         "check_offer": "\n\nSửa phần trang ngay bây giờ (khổ giấy, lề, phông mặc định)?",
         "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Ctrl+Z để hoàn tác.",
         "check_writer_only": "Hãy mở văn bản trong 1xDoc trước: lệnh này kiểm tài liệu văn bản.",
+        "rewrite_title": "Viết lại bằng AI",
+        "rewrite_prompt": "Viết lại theo hướng nào? Để trống thì: rõ ràng hơn, giữ nguyên ý và thuật ngữ.",
+        "rewrite_default": "rõ ràng và dễ đọc hơn, giữ nguyên ý, thuật ngữ và giọng văn",
+        "rewrite_none": "Hãy đặt con trỏ vào một đoạn, hoặc chọn phần chữ cần viết lại.",
+        "rewrite_preview": "{preview}\n\nÁp dụng thay đổi này? Bấm Ctrl+Z một lần là hoàn tác.",
+        "rewrite_stale": "Chữ đã bị sửa trong lúc AI đang chạy nên chưa áp gì cả. Hãy chạy lại lệnh.",
+        "rewrite_nochange": "AI trả về đúng chữ cũ, không có gì để áp.",
+        "rewrite_done": "Đã áp dụng. Bấm Ctrl+Z một lần là hoàn tác.",
         "ai_question": "Hỏi về tài liệu này",
         "ai_prompt": "Bạn muốn biết điều gì? Câu trả lời chỉ đọc tài liệu, không sửa gì cả.",
         "ai_answer": "{text}\n\n— {provider}/{model}, đã gửi {note}, {tokens} token.",
@@ -254,21 +270,155 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     t.CharFontName = TCVN3_REPLACEMENT_FONT
         self.message(self.t["done"].format(n=changed))
 
-    def cmd_AiAsk(self, doc, is_writer):
-        """Hỏi mô hình AI về tài liệu đang mở. Chỉ đọc: không sửa gì trong tài liệu."""
-        from vn1x import aiconfig, aicontext
+    def cmd_AiRewrite(self, doc, is_writer):
+        """AI viết lại đoạn đang chọn. Không sửa thẳng: dựng ChangeSet, cho xem trước, rồi áp trong một bước hoàn tác."""
+        from vn1x import aicontext, changeset
+        if not is_writer:
+            self.message(self.t["unsupported"])
+            return
+        config = self._ai_ready()
+        if config is None:
+            return
+        target = self._writer_target(doc)
+        if target is None:
+            self.message(self.t["rewrite_none"])
+            return
+        anchor, original = target
+        how = os.environ.get("ONEX_AI_REWRITE_HOW")
+        if how is None:
+            how = self._ask_text(self.t["rewrite_title"], self.t["rewrite_prompt"])
+            if how is None:
+                return
+        how = how.strip() or self.t["rewrite_default"]
+        messages = [
+            {"role": "system", "content": "Bạn viết lại văn bản tiếng Việt. Chỉ trả về phần chữ đã viết lại, "
+                                          "không thêm lời dẫn, không thêm dấu nháy, không giải thích."},
+            {"role": "user", "content": f"Viết lại đoạn sau cho {how}:\n\n{original}"},
+        ]
+        result = self._call_model(config, messages)
+        if result is None:
+            return
+        changes = changeset.build([(anchor, original, result.strip())])
+        if not changes:
+            self.message(self.t["rewrite_nochange"])
+            return
+        if not self._confirm_changes(changes):
+            return
+        if changeset.stale(changes, {anchor: self._anchor_text(doc, anchor)}):
+            self.message(self.t["rewrite_stale"])
+            return
+        self._apply_changes(doc, changes, f"AI: viết lại ({aicontext.trim(how, 40)[0]})")
+        self.message(self.t["rewrite_done"])
+
+    def _confirm_changes(self, changes):
+        """Hộp xem trước. Khi chạy tự động thì ONEX_AI_AUTO_APPLY=1 đóng vai người dùng bấm Áp dụng."""
+        from vn1x import changeset
+        text = self.t["rewrite_preview"].format(preview=changeset.preview(changes))
+        if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
+            self.message(text)
+            return os.environ.get("ONEX_AI_AUTO_APPLY") == "1"
+        return self.ask(text)
+
+    def _writer_target(self, doc):
+        """(mốc, chữ gốc) của chỗ sẽ sửa: vùng đang chọn, nếu không thì đoạn chứa con trỏ.
+
+        Mốc là chỉ số đoạn trong thân tài liệu, kèm chữ gốc để phát hiện người dùng đã sửa chỗ đó."""
+        try:
+            selection = doc.getCurrentSelection()
+            if selection is not None and selection.getCount():
+                piece = selection.getByIndex(0)
+                if piece.getString().strip():
+                    index = self._paragraph_index(doc, piece.getStart())
+                    if index is not None:
+                        return f"para:{index}", self._paragraph_at(doc, index).getString()
+        except Exception:  # noqa: BLE001 - không có vùng chọn thì rơi xuống đoạn chứa con trỏ
+            pass
+        try:
+            cursor = doc.getCurrentController().getViewCursor()
+            index = self._paragraph_index(doc, cursor.getStart())
+        except Exception:  # noqa: BLE001
+            index = None
+        if index is None:
+            return None
+        paragraph = self._paragraph_at(doc, index)
+        return (f"para:{index}", paragraph.getString()) if paragraph.getString().strip() else None
+
+    def _paragraphs(self, doc):
+        out = []
+        it = doc.getText().createEnumeration()
+        while it.hasMoreElements():
+            element = it.nextElement()
+            if element.supportsService("com.sun.star.text.Paragraph"):
+                out.append(element)
+        return out
+
+    def _paragraph_at(self, doc, index):
+        return self._paragraphs(doc)[index]
+
+    def _paragraph_index(self, doc, position):
+        """Chỉ số đoạn chứa `position` (một text range)."""
+        text = doc.getText()
+        for index, paragraph in enumerate(self._paragraphs(doc)):
+            cursor = text.createTextCursorByRange(paragraph)
+            if text.compareRegionStarts(cursor, position) >= 0 and text.compareRegionEnds(cursor, position) <= 0:
+                return index
+        return None
+
+    def _anchor_text(self, doc, anchor):
+        try:
+            return self._paragraph_at(doc, int(anchor.split(":")[1])).getString()
+        except (IndexError, ValueError):
+            return ""
+
+    def _apply_changes(self, doc, changes, title):
+        """Áp mọi thay đổi trong MỘT bước hoàn tác: Ctrl+Z một lần trả lại như cũ."""
+        doc.UndoManager.enterUndoContext(title)
+        try:
+            for change in changes:
+                self._paragraph_at(doc, int(change.anchor.split(":")[1])).setString(change.new)
+        finally:
+            doc.UndoManager.leaveUndoContext()
+
+    def _ai_ready(self):
+        """Cấu hình AI dùng được, hoặc None (đã báo lỗi cho người dùng)."""
+        from vn1x import aiconfig
         path = self._ai_config_path()
         try:
             config = aiconfig.load(path)
         except aiconfig.ConfigError as exc:
             self.message(self.t["ai_bad_config"].format(list=str(exc), path=path))
-            return
+            return None
         if not config.get("providers"):
             self.message(self.t["ai_no_config"].format(path=path, example=AI_EXAMPLE))
-            return
+            return None
         found = aiconfig.problems(config)
         if found:
             self.message(self.t["ai_bad_config"].format(list="\n".join(f"- {p}" for p in found), path=path))
+            return None
+        return config
+
+    def _call_model(self, config, messages, role="soan_thao"):
+        """Chữ mô hình trả về, hoặc None (đã báo lỗi)."""
+        from vn1x import aiconfig
+        try:
+            provider, model = aiconfig.resolve(config, role)
+        except aiconfig.ConfigError as exc:
+            self.message(self.t["ai_bad_config"].format(list=str(exc), path=self._ai_config_path()))
+            return None
+        limit = (config.get("limits") or {}).get("max_output_tokens", 2000)
+        result = self._agent_host({"action": "ask", "provider": provider, "model": model,
+                                   "messages": messages, "max_tokens": limit})
+        if not result.get("ok"):
+            self.message(self.t["ai_failed"].format(error=result.get("error", "?")))
+            return None
+        return result.get("text", "")
+
+    def cmd_AiAsk(self, doc, is_writer):
+        """Hỏi mô hình AI về tài liệu đang mở. Chỉ đọc: không sửa gì trong tài liệu."""
+        from vn1x import aiconfig, aicontext
+        path = self._ai_config_path()
+        config = self._ai_ready()
+        if config is None:
             return
         question = os.environ.get("ONEX_AI_QUESTION") or self._ask_text(self.t["ai_question"],
                                                                         self.t["ai_prompt"])
@@ -379,7 +529,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         dialog.createPeer(smgr.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx),
                           self.frame.getContainerWindow())
         try:
-            return dialog.getControl("q").getText().strip() if dialog.execute() == 1 else ""
+            return dialog.getControl("q").getText().strip() if dialog.execute() == 1 else None
         finally:
             dialog.dispose()
 

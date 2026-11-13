@@ -31,6 +31,12 @@ Mỗi lệnh là một bước hoàn tác. Chữ đã là Unicode không bao gi�
 
 Chưa làm (NĐ30): kiểm thể thức cho văn bản có sẵn, bố cục riêng của quyết định (căn cứ, điều khoản), nhớ thông tin cơ quan giữa các lần dùng, đường kẻ dài đúng từng dòng (hiện ước lượng theo bề rộng chữ). Chưa làm (khác): cảnh báo khi lưu `.xlsx` có ô dùng `DOCSO`/`DOCTIEN` (kèm lựa chọn đổi thành giá trị), chuyển mã VNI, icon riêng cho các nút.
 
+**Viết lại bằng AI...** (menu Tiếng Việt, và nút trên thẻ Trang đầu): AI viết lại đoạn đang chọn, hoặc đoạn chứa con trỏ. Bạn nhập hướng viết lại, để trống thì mặc định là "rõ ràng và dễ đọc hơn, giữ nguyên ý, thuật ngữ và giọng văn".
+
+AI **không sửa thẳng** vào tài liệu. Lệnh dựng một tập thay đổi, hiện bản xem trước chữ trước và chữ sau, rồi chỉ áp khi bạn đồng ý. Khi áp, mọi thay đổi gom trong một bước hoàn tác: **bấm Ctrl+Z một lần là trả lại đúng như cũ**.
+
+Mỗi chỗ sửa nhớ chữ gốc của nó. Nếu bạn sửa đúng chỗ đó trong lúc AI đang chạy, tập thay đổi bị coi là đã cũ và lệnh từ chối áp, thay vì ghi đè mất phần bạn vừa gõ.
+
 **Hỏi AI về tài liệu này...** (menu Tiếng Việt, và nút trên thẻ Trang đầu): hỏi một câu về tài liệu đang mở. Lệnh **chỉ đọc**, không sửa gì trong tài liệu. Gửi vùng đang chọn nếu có, nếu không thì cả tài liệu, cắt ở ranh giới đoạn khi vượt ngân sách, và nói rõ đã gửi bao nhiêu ký tự cùng số token đã dùng.
 
 Khoá API là **của chính bạn** (BYOK) và nằm trong kho bí mật của hệ điều hành, không bao giờ ghi vào tệp cấu hình. Khai báo nhà cung cấp trong `providers.json` ở hồ sơ người dùng:
