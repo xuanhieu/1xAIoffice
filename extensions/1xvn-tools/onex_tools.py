@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
-"""ProtocolHandler "vnd.1x.tools:" của 1xVnOffice: các lệnh tiếng Việt cho Writer và Calc.
+"""ProtocolHandler "vnd.1x.tools:" của 1xVnOffice: các lệnh tiếng Việt cho Writer và Calc,
+và add-in hàm bảng tính DOCSO, DOCTIEN (interface org.onexvn.tools.XVnSheetFunctions, types/onexvn-tools.rdb).
 
 Lệnh: NumberToWords, MoneyToWords, RemoveDiacritics, NormalizeUnicode, ConvertTCVN3.
 Logic chữ nằm trong pythonpath/vn1x (có test riêng, không cần UNO); file này chỉ nối lệnh với tài liệu.
@@ -183,5 +184,62 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         box.execute()
 
 
+SHEET_IMPL = "org.onexvn.tools.SheetFunctions"
+
+
+def _optional_text(value, default):
+    """Tham số tuỳ chọn của hàm Calc đến dưới dạng any: rỗng (None) khi bị bỏ qua."""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return default
+    if isinstance(value, float):
+        raise ValueError("cần chữ")
+    return str(value).strip()
+
+
+def _illegal(message):
+    from com.sun.star.lang import IllegalArgumentException
+    return IllegalArgumentException(message, None, 0)
+
+
+try:
+    from org.onexvn.tools import XVnSheetFunctions
+except ImportError:  # type library not registered (e.g. imported outside the office)
+    XVnSheetFunctions = None
+
+if XVnSheetFunctions is not None:
+    class SheetFunctions(unohelper.Base, XVnSheetFunctions, XServiceInfo):
+        """=DOCSO(số; ["lẻ"|"linh"]) và =DOCTIEN(số tiền; [đơn vị, mặc định "đồng"]). Giá trị không đọc được
+        (quá 18 chữ số…) báo lỗi trong ô thay vì trả về chữ sai."""
+
+        def __init__(self, ctx, *args):
+            self.ctx = ctx
+
+        def docso(self, number, zero):
+            try:
+                le = _optional_text(zero, "lẻ")
+                if le not in ("lẻ", "linh"):
+                    raise ValueError(le)
+                return number_to_words(repr(number), le=le, capitalize=True)
+            except (NumberWordsError, ValueError) as exc:
+                raise _illegal(str(exc))
+
+        def doctien(self, amount, currency):
+            try:
+                return money_to_words(repr(amount), currency=_optional_text(currency, "đồng"))
+            except (NumberWordsError, ValueError) as exc:
+                raise _illegal(str(exc))
+
+        def getImplementationName(self):
+            return SHEET_IMPL
+
+        def supportsService(self, name):
+            return name in ("com.sun.star.sheet.AddIn",)
+
+        def getSupportedServiceNames(self):
+            return ("com.sun.star.sheet.AddIn",)
+
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationHelper.addImplementation(Handler, IMPL, ("com.sun.star.frame.ProtocolHandler",))
+if XVnSheetFunctions is not None:
+    g_ImplementationHelper.addImplementation(SheetFunctions, SHEET_IMPL, ("com.sun.star.sheet.AddIn",))

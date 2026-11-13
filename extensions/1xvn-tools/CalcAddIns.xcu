@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: MPL-2.0. Names, help and category of the DOCSO / DOCTIEN sheet functions. -->
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="CalcAddIns" oor:package="org.openoffice.Office">
+  <node oor:name="AddInInfo">
+    <node oor:name="org.onexvn.tools.SheetFunctions" oor:op="replace">
+      <node oor:name="AddInFunctions">
+        <node oor:name="docso" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">DOCSO</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">Spells out a number in Vietnamese words, e.g. 1205 -> Một nghìn hai trăm lẻ năm.</value>
+            <value xml:lang="vi">Đọc số thành chữ tiếng Việt, vd 1205 -> Một nghìn hai trăm lẻ năm.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">DOCSO</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="Number" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Number</value><value xml:lang="vi">Số</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The number to spell out (up to 18 integer digits).</value><value xml:lang="vi">Số cần đọc (tối đa 18 chữ số phần nguyên).</value></prop>
+            </node>
+            <node oor:name="Zero" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Zero</value><value xml:lang="vi">Lẻ</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">Optional: "lẻ" (default) or "linh", as in 105 = một trăm lẻ năm / linh năm.</value><value xml:lang="vi">Tuỳ chọn: "lẻ" (mặc định) hoặc "linh", vd 105 = một trăm lẻ năm / linh năm.</value></prop>
+            </node>
+          </node>
+        </node>
+        <node oor:name="doctien" oor:op="replace">
+          <prop oor:name="DisplayName"><value xml:lang="en-US">DOCTIEN</value></prop>
+          <prop oor:name="Description">
+            <value xml:lang="en-US">Spells out an amount of money in Vietnamese words, rounded to whole units, e.g. 1250000 -> Một triệu hai trăm năm mươi nghìn đồng.</value>
+            <value xml:lang="vi">Đọc số tiền thành chữ, làm tròn tới đơn vị, vd 1250000 -> Một triệu hai trăm năm mươi nghìn đồng.</value>
+          </prop>
+          <prop oor:name="Category"><value>Text</value></prop>
+          <prop oor:name="CompatibilityName"><value xml:lang="en-US">DOCTIEN</value></prop>
+          <node oor:name="Parameters">
+            <node oor:name="Amount" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Amount</value><value xml:lang="vi">Số tiền</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">The amount to spell out.</value><value xml:lang="vi">Số tiền cần đọc.</value></prop>
+            </node>
+            <node oor:name="Currency" oor:op="replace">
+              <prop oor:name="DisplayName"><value xml:lang="en-US">Currency</value><value xml:lang="vi">Đơn vị</value></prop>
+              <prop oor:name="Description"><value xml:lang="en-US">Optional currency word, default "đồng".</value><value xml:lang="vi">Tuỳ chọn: đơn vị tiền, mặc định "đồng".</value></prop>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

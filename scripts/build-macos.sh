@@ -167,6 +167,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc
   local pid=$!
   "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xvn-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
   sleep 2; kill -9 "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
   # A crashed office leaves its pipe socket behind and blocks the next session with the same name.
   rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
   rm -rf "$profile"

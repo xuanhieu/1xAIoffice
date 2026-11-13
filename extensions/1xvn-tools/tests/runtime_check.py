@@ -101,6 +101,19 @@ def calc_checks(desktop, prop, run, check):
     calc.getCurrentController().select(sheet.getCellRangeByName("C1"))
     run(calc, "RemoveDiacritics")
     check("Calc bỏ dấu", sheet.getCellByPosition(2, 0).getString(), "Nguyen Thi Anh")
+    # Sheet functions from the add-in.
+    for ref, formula, want in [("D1", "=DOCSO(21)", "Hai mươi mốt"),
+                               ("D2", '=DOCSO(105;"linh")', "Một trăm linh năm"),
+                               ("D3", "=DOCSO(3.25)", "Ba phẩy hai mươi lăm"),
+                               ("D4", "=DOCTIEN(1250000)", "Một triệu hai trăm năm mươi nghìn đồng"),
+                               ("D5", '=DOCTIEN(100;"USD")', "Một trăm USD"),
+                               ("D6", "=DOCTIEN(A1*1000)", "Hai mươi mốt nghìn đồng")]:
+        cell = sheet.getCellRangeByName(ref)
+        cell.setFormula(formula)
+        check(f"Calc {formula}", cell.getString(), want)
+    bad = sheet.getCellRangeByName("D7")
+    bad.setFormula("=DOCSO(10^20)")
+    check("Calc =DOCSO(10^20) báo lỗi", bad.getError() != 0, True)
     calc.close(True)
 
 
