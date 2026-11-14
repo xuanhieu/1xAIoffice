@@ -27,9 +27,17 @@ class Issue:
         return (self.key, self.message, self.fix, self.where) == (other.key, other.message, other.fix, other.where)
 
 
+# Writer giữ khổ trang và lề bằng twip (1/1440 inch), nên một tài liệu đặt đúng 15 mm đọc ra có thể là 14,99 mm.
+# Không chừa dung sai thì bộ kiểm báo sai ngay cả văn bản do chính app này dựng ra — đã xảy ra thật, bước kiểm
+# "văn bản app dựng ra tự vượt qua bộ kiểm thể thức" bắt được. 0,05 mm rộng hơn sai số quy đổi (khoảng 0,018 mm)
+# nhưng vẫn hẹp hơn mọi mức Nghị định 30 quy định (các mốc cách nhau 5 mm).
+ROUNDING_MM = 0.05
+
+
 def _in_range(value, name):
     low, high = R[name]
-    return low - 1e-9 <= value <= high + 1e-9
+    slack = ROUNDING_MM if name.endswith("_mm") else 1e-9
+    return low - slack <= value <= high + slack
 
 
 def _mm(value):

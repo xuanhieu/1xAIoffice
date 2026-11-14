@@ -572,8 +572,10 @@ def csv_checks(desktop, prop, run, check):
     giao diện; phần quyết định đúng sai là chuỗi tuỳ chọn, và nó được kiểm thật ở đây.
     """
     import os
+    import os as _os
     import sys as _sys
-    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pythonpath"))
+    _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                                      "pythonpath"))
     from vn1x import csvsafe
     path = os.environ["ONEX_TOOLS_CSV_PATH"]
     rows = ['ho_ten,dien_thoai,cccd,ngay,ghi_chu',
@@ -710,6 +712,17 @@ def nd30_checks(desktop, prop, run, check):
     check("NĐ30 nơi nhận", (receivers[0], receivers[-1]), ("Nơi nhận:", "- Lưu: VT, VP, 02b."))
     loc = sign.getCellByName("B1").getText().createTextCursor().CharLocale
     check("NĐ30 ngôn ngữ chữ tiếng Việt", (loc.Language, loc.Country), ("vi", "VN"))
+
+    # Phép thử đáng giá nhất: văn bản do chính app dựng ra phải VƯỢT QUA bộ kiểm thể thức của chính app.
+    # Hai nửa này viết độc lập nhau (nd30_writer dựng, nd30_check soi), nên chúng bất đồng là có thật một bên sai.
+    import os as _os
+    import sys as _sys
+    _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                                      "pythonpath"))
+    from vn1x import nd30_check, nd30_check_writer
+    issues = nd30_check.check(nd30_check_writer.describe(doc))
+    check("NĐ30 văn bản app dựng ra tự vượt qua bộ kiểm thể thức",
+          [i.key for i in issues], [])
     out = __import__("os").environ.get("ONEX_TOOLS_ND30_PNG")
     if out:
         doc.storeToURL(uno.systemPathToFileUrl(out), (prop("FilterName", "writer_png_Export"),))

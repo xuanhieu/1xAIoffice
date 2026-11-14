@@ -143,3 +143,37 @@ class NumberFormatTests(unittest.TestCase):
         message = next(i.message for i in issues if i.key == "page_size")
         self.assertIn("216", message)
         self.assertIn("210", message)      # khổ A4 mà NĐ30 yêu cầu
+
+
+class RoundingTests(unittest.TestCase):
+    """Writer giữ lề bằng twip, nên 15 mm đọc ra có thể là 14,99 mm."""
+
+    def page(self, **extra):
+        base = {"width_mm": 210, "height_mm": 297, "margin_top_mm": 20, "margin_bottom_mm": 20,
+                "margin_left_mm": 30, "margin_right_mm": 15, "font": "Times New Roman"}
+        return dict(base, **extra)
+
+    def keys(self, page):
+        return {issue.key for issue in nd30_check.check_page(page)}
+
+    def test_a_margin_a_hair_under_the_limit_is_not_an_error(self):
+        """Chính văn bản app dựng ra từng bị báo sai lề phải vì chuyện này."""
+        self.assertEqual(self.keys(self.page(margin_right_mm=14.99)), set())
+        self.assertEqual(self.keys(self.page(margin_left_mm=29.99)), set())
+
+    def test_a_page_size_a_hair_off_is_not_an_error(self):
+        self.assertEqual(self.keys(self.page(width_mm=209.99, height_mm=296.99)), set())
+
+    def test_a_margin_that_is_really_wrong_is_still_caught(self):
+        self.assertIn("margin_right_mm", self.keys(self.page(margin_right_mm=10)))
+        self.assertIn("margin_left_mm", self.keys(self.page(margin_left_mm=25)))
+
+    def test_the_slack_is_far_smaller_than_the_steps_the_decree_uses(self):
+        """Các mốc của NĐ30 cách nhau 5 mm; dung sai 0,05 mm không thể nuốt mất một mức nào."""
+        self.assertLess(nd30_check.ROUNDING_MM, 0.5)
+
+    def test_font_sizes_keep_the_exact_comparison(self):
+        """Dung sai chỉ dành cho số đo milimét; cỡ chữ 12,9 pt vẫn là sai."""
+        issues = nd30_check.check_body([{"text": "a", "size": 12.9, "font": "Times New Roman",
+                                         "adjust": 2, "indent_mm": 12.7}])
+        self.assertIn("body_size", {i.key for i in issues})

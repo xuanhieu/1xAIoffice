@@ -26,6 +26,16 @@ khoá thật, không cần mạng, và không chạm vào nhóm việc phải xi
   khổ A4 rộng 210 mm hiện thành "21 mm". Người dùng đọc lời nhắn đó sẽ không hiểu gì. Đã sửa và có test riêng
   cho từng con số tròn.
 
+| 9 | Dung sai khi đo lề và khổ giấy | **0,05 mm** | Writer giữ số đo bằng twip nên 15 mm đọc ra có thể là 14,99 mm. Không chừa dung sai thì bộ kiểm báo sai cả văn bản do chính app dựng. 0,05 mm rộng hơn sai số quy đổi (~0,018 mm) nhưng hẹp hơn nhiều so với bước 5 mm giữa các mốc của Nghị định | `nd30_check.ROUNDING_MM` |
+
+## Lỗi có sẵn đã sửa trong đêm (tiếp)
+
+- **Bộ kiểm báo sai chính văn bản app dựng ra.** Thêm bước kiểm "văn bản app dựng ra tự vượt qua bộ kiểm thể
+  thức" thì nó đỏ ngay ở `margin_right_mm`: bộ dựng đặt lề phải đúng 15 mm, Writer lưu bằng twip và trả về
+  14,99 mm, bộ kiểm so cứng nên kết luận sai. Người dùng đặt lề đúng 15 mm trong Writer cũng dính y hệt.
+  Đây là phép thử đáng giá nhất đêm nay: hai nửa (bộ dựng và bộ kiểm) viết độc lập nhau, nên bất đồng giữa
+  chúng là có thật một bên sai.
+
 ## Việc đang chờ chủ dự án
 
 Không có việc nào trong đêm chạm tới nhóm phải xin phép (gửi tin, đăng công khai, chi tiền, xoá vĩnh viễn, nhập
