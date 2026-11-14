@@ -78,6 +78,30 @@ def body_template(type_key):
     return list(found["than"]) if found else ["[Nội dung văn bản]"]
 
 
+def _level_signature_columns(columns):
+    """Chừa thêm dòng trống ở cột ít chữ hơn, để hai họ tên nằm ngang nhau.
+
+    Cột người ký chính thường có thêm dòng chức vụ, nên nếu không cân thì tên bên này tụt xuống dưới tên bên kia
+    một dòng — nhìn là thấy lệch.
+    """
+    headings = [sum(1 for b in col if b.get("text") and not b.get("blank_lines")) - 1 for col in columns]
+    most = max(headings)
+    for column, count in zip(columns, headings):
+        for block in column:
+            if block.get("blank_lines"):
+                block["blank_lines"] += most - count
+                break
+
+
+def signature_columns(type_key):
+    """Cách bày khối chữ ký của loại này, hoặc None khi chỉ cần một khối như thường.
+
+    Biên bản có hai cột là do Nghị định 30 quy định (Mẫu 1.9: THƯ KÝ bên trái, CHỦ TỌA bên phải). Bốn loại hai
+    bên (hợp đồng, bản ghi nhớ, bản thỏa thuận, giấy uỷ quyền) là thông lệ: văn bản hai bên thì mỗi bên một cột.
+    """
+    return TEMPLATES.get("chu_ky_hai_cot", {}).get(type_key)
+
+
 def template_warning(type_key):
     """Lời nhắc cần hiện MỘT LẦN cho loại văn bản có hiệu lực pháp lý giữa các bên; rỗng nghĩa là không cần.
 
@@ -147,12 +171,24 @@ def build(fields):
     sign.append({"text": "", "size": s["chuc_vu"], "blank_lines": 3})
     sign.append({"text": f["signer_name"].strip(), "size": s["ho_ten"], "bold": True})
 
+    columns = signature_columns(f.get("type", ""))
+    sign_columns = None
+    if columns:
+        heading = lambda text: {"text": text, "size": s["chuc_vu"], "bold": True}
+        other = [heading(columns["phai" if columns["chinh"] == "trai" else "trai"]),
+                 {"text": "", "size": s["chuc_vu"], "blank_lines": 3},
+                 {"text": f.get("cosigner_name", "").strip() or "…………", "size": s["ho_ten"], "bold": True}]
+        mine = [heading(columns[columns["chinh"]])] + sign
+        sign_columns = [mine, other] if columns["chinh"] == "trai" else [other, mine]
+        _level_signature_columns(sign_columns)
+
     receivers = [{"text": "Nơi nhận:", "size": s["noi_nhan_tieu_de"], "bold": True, "italic": True}]
     receivers += [{"text": line, "size": s["noi_nhan"]}
                   for line in recipients_lines(f.get("recipients", []), f.get("archive_unit", ""),
                                                f.get("archive_copies"))]
 
-    return {"left": left, "right": right, "title": title, "body": body, "sign": sign, "receivers": receivers,
+    return {"left": left, "right": right, "title": title, "body": body, "sign": sign,
+            "sign_columns": sign_columns, "receivers": receivers,
             "page": DATA["page"], "font": DATA["font"], "body_format": DATA["body"],
             "body_size": s["noi_dung"], "page_number_size": s["so_trang"],
             "header_columns_percent": DATA["header_columns_percent"]}

@@ -358,5 +358,37 @@
       ]
     }
   },
-  "canh_bao": "Bốn loại hợp đồng, bản ghi nhớ, bản thỏa thuận và giấy uỷ quyền có hiệu lực pháp lý giữa các bên. Khung ở đây CHỈ là nhãn mục để điền, không chứa điều khoản nào và không thay cho ý kiến pháp lý. Ngoài ra bộ dựng chỉ tạo MỘT khối chữ ký, nên văn bản hai bên cần tự thêm khối ký của bên còn lại."
+  "canh_bao": "Bốn loại hợp đồng, bản ghi nhớ, bản thỏa thuận và giấy uỷ quyền có hiệu lực pháp lý giữa các bên. Khung ở đây CHỈ là nhãn mục để điền, không chứa điều khoản nào và không thay cho ý kiến pháp lý.",
+  "chu_ky_hai_cot": {
+    "bien_ban": {
+      "trai": "THƯ KÝ",
+      "phai": "CHỦ TỌA",
+      "chinh": "phai",
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.9"
+    },
+    "hop_dong": {
+      "trai": "ĐẠI DIỆN BÊN A",
+      "phai": "ĐẠI DIỆN BÊN B",
+      "chinh": "trai",
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30"
+    },
+    "ban_ghi_nho": {
+      "trai": "ĐẠI DIỆN BÊN A",
+      "phai": "ĐẠI DIỆN BÊN B",
+      "chinh": "trai",
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30"
+    },
+    "ban_thoa_thuan": {
+      "trai": "ĐẠI DIỆN BÊN A",
+      "phai": "ĐẠI DIỆN BÊN B",
+      "chinh": "trai",
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30"
+    },
+    "giay_uy_quyen": {
+      "trai": "BÊN UỶ QUYỀN",
+      "phai": "BÊN ĐƯỢC UỶ QUYỀN",
+      "chinh": "trai",
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30"
+    }
+  }
 }

@@ -175,8 +175,18 @@ def fill(doc, spec):
         end = text.createTextCursor()
         end.gotoEnd(False)
         text.insertControlCharacter(end, 0, False)
-        sign = w.table(end, [45, 55])
-        w.blocks(sign.getCellByName("A1").getText(), spec["receivers"], text_width * 45 // 100, adjust=LEFT)
-        w.blocks(sign.getCellByName("B1").getText(), spec["sign"], text_width * 55 // 100)
+        if spec.get("sign_columns"):
+            # Văn bản hai bên (và biên bản theo Mẫu 1.9): hai cột chữ ký bằng nhau, "Nơi nhận" xuống dưới.
+            left_col, right_col = spec["sign_columns"]
+            signs = w.table(end, [50, 50])
+            w.blocks(signs.getCellByName("A1").getText(), left_col, text_width // 2)
+            w.blocks(signs.getCellByName("B1").getText(), right_col, text_width // 2)
+            after = text.createTextCursor()
+            after.gotoEnd(False)
+            w.blocks(text, spec["receivers"], text_width, adjust=LEFT, first=True)
+        else:
+            sign = w.table(end, [45, 55])
+            w.blocks(sign.getCellByName("A1").getText(), spec["receivers"], text_width * 45 // 100, adjust=LEFT)
+            w.blocks(sign.getCellByName("B1").getText(), spec["sign"], text_width * 55 // 100)
     finally:
         doc.UndoManager.leaveUndoContext()

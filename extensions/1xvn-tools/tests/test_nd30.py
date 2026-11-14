@@ -235,7 +235,6 @@ class BodyTemplateTests(unittest.TestCase):
             with self.subTest(key):
                 warning = nd30.template_warning(key)
                 self.assertIn("không thay cho ý kiến pháp lý", warning)
-                self.assertIn("MỘT khối chữ ký", warning)
 
     def test_no_other_type_warns(self):
         for key in nd30.DATA["doc_types"]:
@@ -273,3 +272,57 @@ class BodyTemplateTests(unittest.TestCase):
         text = " ".join(blocks["body"])
         self.assertEqual(text, "Chỉ một dòng của tôi.")
         self.assertNotIn("Thời gian bắt đầu", text)
+
+
+class SignatureColumnTests(unittest.TestCase):
+    """Văn bản hai bên, và biên bản theo Mẫu 1.9, phải có hai cột chữ ký."""
+
+    TWO_COLUMN = ("bien_ban", "hop_dong", "ban_ghi_nho", "ban_thoa_thuan", "giay_uy_quyen")
+
+    def test_minutes_follow_the_decree_layout(self):
+        """Mẫu 1.9: THƯ KÝ bên trái, CHỦ TỌA bên phải, và người ký đã nhập là chủ tọa."""
+        blocks = build(dict(BASE, type="bien_ban", cosigner_name="Trần Thị B"))
+        left, right = blocks["sign_columns"]
+        self.assertEqual(left[0]["text"], "THƯ KÝ")
+        self.assertEqual(right[0]["text"], "CHỦ TỌA")
+        self.assertEqual(left[-1]["text"], "Trần Thị B")
+        self.assertEqual(right[-1]["text"], BASE["signer_name"])
+
+    def test_the_decree_is_named_as_the_source_for_minutes(self):
+        self.assertIn("Mẫu 1.9", nd30.signature_columns("bien_ban")["nguon"])
+
+    def test_two_party_documents_put_our_signer_on_the_left(self):
+        for key in ("hop_dong", "ban_ghi_nho", "ban_thoa_thuan"):
+            with self.subTest(key):
+                left, right = build(dict(BASE, type=key))["sign_columns"]
+                self.assertEqual(left[0]["text"], "ĐẠI DIỆN BÊN A")
+                self.assertEqual(right[0]["text"], "ĐẠI DIỆN BÊN B")
+                self.assertEqual(left[-1]["text"], BASE["signer_name"])
+
+    def test_the_authorisation_names_both_sides(self):
+        left, right = build(dict(BASE, type="giay_uy_quyen"))["sign_columns"]
+        self.assertEqual(left[0]["text"], "BÊN UỶ QUYỀN")
+        self.assertEqual(right[0]["text"], "BÊN ĐƯỢC UỶ QUYỀN")
+
+    def test_a_missing_co_signer_leaves_a_blank_to_fill_in(self):
+        left, right = build(dict(BASE, type="hop_dong"))["sign_columns"]
+        self.assertIn("…", right[-1]["text"])
+
+    def test_the_two_names_sit_on_the_same_line(self):
+        """Cột người ký chính có thêm dòng chức vụ, nên cột kia phải chừa thêm một dòng trống."""
+        for key in self.TWO_COLUMN:
+            with self.subTest(key):
+                columns = build(dict(BASE, type=key, cosigner_name="Trần Thị B"))["sign_columns"]
+                heights = [sum(1 for b in col if b.get("text")) + max(b.get("blank_lines", 0) for b in col)
+                           for col in columns]
+                self.assertEqual(heights[0], heights[1])
+
+    def test_every_other_type_keeps_the_single_signature_block(self):
+        for key in nd30.DATA["doc_types"]:
+            if key in self.TWO_COLUMN:
+                continue
+            with self.subTest(key):
+                self.assertIsNone(build(dict(BASE, type=key))["sign_columns"])
+
+    def test_the_warning_no_longer_claims_a_single_signature_block(self):
+        self.assertNotIn("MỘT khối chữ ký", nd30.template_warning("hop_dong"))

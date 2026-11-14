@@ -25,6 +25,7 @@ FIELDS = [  # (khoá, nhãn en, nhãn vi, kiểu, số dòng)
     ("authority_title", "Head's title", "Chức danh thủ trưởng", "text", 1),
     ("signer_title", "Signer's title", "Chức vụ người ký", "text", 1),
     ("signer_name", "Signer's name *", "Họ tên người ký *", "text", 1),
+    ("cosigner_name", "Co-signer (minutes, two-party documents)", "Người ký thứ hai (biên bản, văn bản hai bên)", "text", 1),
     ("recipients", "Recipients (one per line)", "Nơi nhận (mỗi dòng một nơi)", "multi", 3),
     ("archive_unit", "Archive unit", "Đơn vị lưu", "text", 1),
 ]

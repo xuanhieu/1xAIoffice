@@ -331,6 +331,25 @@ lo ngại đó:
   với các điều khoản sau:").
 - **Căn cứ để trống.** Test cấm mọi chữ "Luật", "Bộ luật", "Nghị định số", "Thông tư" xuất hiện trong khung:
   app không chọn hộ người dùng căn cứ pháp lý nào.
-- **Lời nhắc hiện một lần trên hộp thoại, không chèn vào văn bản.** Nhắc rằng khung chỉ là nhãn mục, không thay
-  cho ý kiến pháp lý, và rằng bộ dựng chỉ tạo **một** khối chữ ký nên văn bản hai bên phải tự thêm khối ký của
-  bên còn lại. Có test khẳng định lời nhắc không lọt vào thân văn bản.
+- **Lời nhắc hiện một lần trên hộp thoại, không chèn vào văn bản.** Nhắc rằng khung chỉ là nhãn mục và không
+  thay cho ý kiến pháp lý. Có test khẳng định lời nhắc không lọt vào thân văn bản.
+
+## Hai cột chữ ký (15/11/2026)
+
+Trước đây bộ dựng chỉ làm **một** khối chữ ký, nên văn bản hai bên phải tự thêm cột thứ hai bằng tay. Nay năm
+loại có hai cột:
+
+| Loại | Cột trái | Cột phải | Người ký đã nhập nằm ở | Nguồn |
+|---|---|---|---|---|
+| Biên bản | THƯ KÝ | CHỦ TỌA | phải | **Nghị định 30, Mẫu 1.9** |
+| Hợp đồng, bản ghi nhớ, bản thỏa thuận | ĐẠI DIỆN BÊN A | ĐẠI DIỆN BÊN B | trái | thông lệ |
+| Giấy uỷ quyền | BÊN UỶ QUYỀN | BÊN ĐƯỢC UỶ QUYỀN | trái | thông lệ |
+
+Biên bản là trường hợp có cơ sở pháp lý rõ: Mẫu 1.9 của chính Nghị định 30 xếp THƯ KÝ bên trái và CHỦ TỌA bên
+phải — tức bản cũ dựng **sai** thể thức biên bản, chứ không chỉ thiếu tiện lợi.
+
+Hộp thoại có thêm ô "Người ký thứ hai"; bỏ trống thì cột kia để chỗ trống cho điền tay. Khi hai cột, "Nơi nhận"
+xuống dưới bảng chữ ký thay vì nằm bên trái như văn bản một người ký.
+
+**Cân dòng:** cột người ký chính thường có thêm dòng chức vụ, nên `_level_signature_columns` chừa thêm dòng
+trống ở cột kia để hai họ tên nằm ngang nhau — không cân thì nhìn là thấy lệch ngay.
