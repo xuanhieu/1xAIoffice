@@ -1,5 +1,5 @@
 {
-  "source": "Nghị định 30/2020/NĐ-CP, Phụ lục I Phần I; trích tại docs/legal/sources/nd-30-2020-phu-luc-i-trich-2026-11-13.txt",
+  "source": "Nghị định 30/2020/NĐ-CP: khổ giấy, lề và phông theo Phụ lục I Phần I; bảng chữ viết tắt tên loại theo Phụ lục III Mục I. Trích tại docs/legal/sources/nd-30-2020-trich-2026-11-15.txt",
   "page": {
     "width_mm": 210,
     "height_mm": 297,
@@ -133,14 +133,34 @@
       "abbr": "",
       "title": false
     },
-    "to_trinh": {
-      "name": "Tờ trình",
-      "abbr": "TTr",
+    "nghi_quyet": {
+      "name": "Nghị quyết (cá biệt)",
+      "abbr": "NQ",
       "title": true
     },
-    "bao_cao": {
-      "name": "Báo cáo",
-      "abbr": "BC",
+    "quyet_dinh": {
+      "name": "Quyết định",
+      "abbr": "QĐ",
+      "title": true
+    },
+    "chi_thi": {
+      "name": "Chỉ thị",
+      "abbr": "CT",
+      "title": true
+    },
+    "quy_che": {
+      "name": "Quy chế",
+      "abbr": "QC",
+      "title": true
+    },
+    "quy_dinh": {
+      "name": "Quy định",
+      "abbr": "QyĐ",
+      "title": true
+    },
+    "thong_cao": {
+      "name": "Thông cáo",
+      "abbr": "TC",
       "title": true
     },
     "thong_bao": {
@@ -148,9 +168,74 @@
       "abbr": "TB",
       "title": true
     },
+    "huong_dan": {
+      "name": "Hướng dẫn",
+      "abbr": "HD",
+      "title": true
+    },
+    "chuong_trinh": {
+      "name": "Chương trình",
+      "abbr": "CTr",
+      "title": true
+    },
     "ke_hoach": {
       "name": "Kế hoạch",
       "abbr": "KH",
+      "title": true
+    },
+    "phuong_an": {
+      "name": "Phương án",
+      "abbr": "PA",
+      "title": true
+    },
+    "de_an": {
+      "name": "Đề án",
+      "abbr": "ĐA",
+      "title": true
+    },
+    "du_an": {
+      "name": "Dự án",
+      "abbr": "DA",
+      "title": true
+    },
+    "bao_cao": {
+      "name": "Báo cáo",
+      "abbr": "BC",
+      "title": true
+    },
+    "bien_ban": {
+      "name": "Biên bản",
+      "abbr": "BB",
+      "title": true
+    },
+    "to_trinh": {
+      "name": "Tờ trình",
+      "abbr": "TTr",
+      "title": true
+    },
+    "hop_dong": {
+      "name": "Hợp đồng",
+      "abbr": "HĐ",
+      "title": true
+    },
+    "cong_dien": {
+      "name": "Công điện",
+      "abbr": "CĐ",
+      "title": true
+    },
+    "ban_ghi_nho": {
+      "name": "Bản ghi nhớ",
+      "abbr": "BGN",
+      "title": true
+    },
+    "ban_thoa_thuan": {
+      "name": "Bản thỏa thuận",
+      "abbr": "BTT",
+      "title": true
+    },
+    "giay_uy_quyen": {
+      "name": "Giấy ủy quyền",
+      "abbr": "GUQ",
       "title": true
     },
     "giay_moi": {
@@ -158,9 +243,29 @@
       "abbr": "GM",
       "title": true
     },
-    "quyet_dinh": {
-      "name": "Quyết định",
-      "abbr": "QĐ",
+    "giay_gioi_thieu": {
+      "name": "Giấy giới thiệu",
+      "abbr": "GGT",
+      "title": true
+    },
+    "giay_nghi_phep": {
+      "name": "Giấy nghỉ phép",
+      "abbr": "GNP",
+      "title": true
+    },
+    "phieu_gui": {
+      "name": "Phiếu gửi",
+      "abbr": "PG",
+      "title": true
+    },
+    "phieu_chuyen": {
+      "name": "Phiếu chuyển",
+      "abbr": "PC",
+      "title": true
+    },
+    "phieu_bao": {
+      "name": "Phiếu báo",
+      "abbr": "PB",
       "title": true
     }
   },

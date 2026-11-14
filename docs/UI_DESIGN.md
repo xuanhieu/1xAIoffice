@@ -277,3 +277,23 @@ mở ra xem thì đóng lại không nên bị hỏi có lưu không.
 Kiểm: `scripts/build-macos.sh defaults` đọc thẳng cấu hình từ app đang chạy; phần đoán tiêu đề có bảy test
 trong `tests/test_csvsafe.py`. Phần UNO của việc dọn CSV (giãn cột, tô đậm, ghim) kiểm bằng mắt trên app có
 giao diện, vì soffice headless trên macOS không mở được tài liệu thứ hai trong một phiên.
+
+## Đủ 28 loại văn bản hành chính (15/11/2026)
+
+Bộ soạn NĐ30 trước đây làm được 7 loại. Nay đủ **28**: công văn, cùng 27 loại trong Bảng chữ viết tắt tại
+**Phụ lục III Mục I** của Nghị định 30/2020/NĐ-CP. Công văn là ngoại lệ duy nhất không có trong bảng, vì ký
+hiệu của công văn chỉ gồm chữ viết tắt tên cơ quan.
+
+**Một đính chính:** dữ liệu cũ ghi nguồn của bảng viết tắt là "Phụ lục I Phần I". Sai — Phụ lục I là thể thức
+và kỹ thuật trình bày (khổ giấy, lề, phông), còn bảng chữ viết tắt nằm ở **Phụ lục III**. Nay ghi đúng cả hai.
+
+**Và một lỗ hổng đã bịt:** dữ liệu dẫn nguồn tới `docs/legal/sources/nd-30-2020-phu-luc-i-trich-2026-11-13.txt`
+nhưng tệp đó **chưa từng được commit** — tức bảy chữ viết tắt cũ không kiểm chứng được từ trong kho. Nay có
+`docs/legal/sources/nd-30-2020-trich-2026-11-15.txt`, trích từ bản PDF phụ lục của VCCI và đối chiếu với bản
+toàn văn trên trang Đại học Cần Thơ; hai bản khớp nhau. Bảy chữ viết tắt cũ đều đúng.
+
+Chữ viết tắt dễ sai mà nhìn mắt thường không thấy (`QyĐ` cho Quy định chứ không phải `QĐ`; `GUQ` chứ không
+phải `GƯQ`; `TTr` chứ không phải `TT`), nên `tests/test_nd30.py` chép nguyên bảng Phụ lục III và bắt dữ liệu
+khớp từng chữ, cộng thêm phép thử dựng được văn bản cho cả 28 loại.
+
+Hộp thoại và bộ dựng đều đọc thẳng từ `data/nd30.json`, nên thêm loại chỉ là thêm dữ liệu, không sửa mã.

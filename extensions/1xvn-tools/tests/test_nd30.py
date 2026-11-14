@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pythonpath"))
+from vn1x import nd30  # noqa: E402
 from vn1x.nd30 import (  # noqa: E402
     Nd30Error, build, format_date_line, format_number, format_symbol, recipients_lines)
 
@@ -113,3 +114,57 @@ class DialogValidateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AbbreviationTableTests(unittest.TestCase):
+    """Bảng chữ viết tắt phải khớp từng chữ với Phụ lục III Mục I của Nghị định 30/2020/NĐ-CP.
+
+    Chép lại ở đây nguyên văn (xem docs/legal/sources/nd-30-2020-trich-2026-11-15.txt). Sai một chữ viết tắt là
+    ra văn bản sai thể thức, mà nhìn bằng mắt thì không thấy — nên để máy giữ.
+    """
+
+    PHU_LUC_III = [
+        ("Nghị quyết (cá biệt)", "NQ"), ("Quyết định", "QĐ"), ("Chỉ thị", "CT"), ("Quy chế", "QC"),
+        ("Quy định", "QyĐ"), ("Thông cáo", "TC"), ("Thông báo", "TB"), ("Hướng dẫn", "HD"),
+        ("Chương trình", "CTr"), ("Kế hoạch", "KH"), ("Phương án", "PA"), ("Đề án", "ĐA"),
+        ("Dự án", "DA"), ("Báo cáo", "BC"), ("Biên bản", "BB"), ("Tờ trình", "TTr"),
+        ("Hợp đồng", "HĐ"), ("Công điện", "CĐ"), ("Bản ghi nhớ", "BGN"), ("Bản thỏa thuận", "BTT"),
+        ("Giấy ủy quyền", "GUQ"), ("Giấy mời", "GM"), ("Giấy giới thiệu", "GGT"),
+        ("Giấy nghỉ phép", "GNP"), ("Phiếu gửi", "PG"), ("Phiếu chuyển", "PC"), ("Phiếu báo", "PB"),
+    ]
+
+    def test_every_type_in_the_decree_is_offered(self):
+        have = {(v["name"], v["abbr"]) for v in nd30.DATA["doc_types"].values()}
+        for name, abbr in self.PHU_LUC_III:
+            with self.subTest(name):
+                self.assertIn((name, abbr), have)
+
+    def test_nothing_is_offered_that_the_decree_does_not_list(self):
+        """Công văn là ngoại lệ duy nhất: ký hiệu chỉ gồm chữ viết tắt tên cơ quan, nên không có trong bảng."""
+        allowed = {name for name, _ in self.PHU_LUC_III} | {"Công văn"}
+        for key, value in nd30.DATA["doc_types"].items():
+            with self.subTest(key):
+                self.assertIn(value["name"], allowed)
+
+    def test_only_cong_van_has_no_type_name_in_the_document(self):
+        for key, value in nd30.DATA["doc_types"].items():
+            with self.subTest(key):
+                self.assertEqual(value["title"], key != "cong_van")
+
+    def test_abbreviations_are_unique(self):
+        abbrs = [v["abbr"] for v in nd30.DATA["doc_types"].values() if v["abbr"]]
+        self.assertEqual(len(abbrs), len(set(abbrs)))
+
+    def test_the_symbol_of_a_new_type_reads_the_way_the_decree_writes_it(self):
+        self.assertEqual(nd30.format_symbol("quy_dinh", "SKHCN"), "QyĐ-SKHCN")
+        self.assertEqual(nd30.format_symbol("giay_uy_quyen", "UBND"), "GUQ-UBND")
+        self.assertEqual(nd30.format_symbol("cong_van", "SKHCN"), "SKHCN")
+
+    def test_a_document_of_every_type_can_be_built(self):
+        for key in nd30.DATA["doc_types"]:
+            with self.subTest(key):
+                blocks = nd30.build({"type": key, "org": "Sở Khoa học và Công nghệ", "org_abbr": "SKHCN",
+                                     "number": 7, "place": "Đà Nẵng", "date": datetime.date(2026, 11, 15),
+                                     "summary": "việc thử dựng văn bản", "body": ["Một đoạn."],
+                                     "signer_title": "Giám đốc", "signer_name": "Nguyễn Văn A"})
+                self.assertTrue(blocks)

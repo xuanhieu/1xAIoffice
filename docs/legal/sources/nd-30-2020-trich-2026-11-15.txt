@@ -1,0 +1,70 @@
+Nghị định 30/2020/NĐ-CP ngày 05/3/2020 của Chính phủ về công tác văn thư
+Trích hai phần mà 1xVnOffice dựa vào, để dữ liệu trong extensions/1xvn-tools/data/nd30.json kiểm chứng được.
+
+Lấy ngày 15/11/2026 từ bản PDF phụ lục do VCCI đăng tải:
+  https://vanban.vcci.com.vn/hm_content/uploads/van-ban/ND_30-2020-ND-CP_Phu_luc.pdf
+Đối chiếu với bản toàn văn trên trang Trường Đại học Cần Thơ:
+  https://m.ctu.edu.vn/images/upload/vbdh/vbctu/Nghi_dinh_30_cua_Thu_tuong_Chinh_phu.pdf
+Hai bản khớp nhau ở cả bảng chữ viết tắt lẫn phần khổ giấy, lề và phông chữ.
+Đây là bản chuyển từ PDF sang chữ, giữ nguyên lỗi chính tả do nhận dạng ở bản CTU; bản VCCI sạch hơn nên
+dữ liệu của app lấy theo bản VCCI.
+
+========================================================================
+PHỤ LỤC I, PHẦN I — THỂ THỨC VÀ KỸ THUẬT TRÌNH BÀY VĂN BẢN HÀNH CHÍNH
+(khổ giấy, lề, phông chữ; dùng cho khoá "page" và "font")
+========================================================================
+Phần I
+THỂ THỨC VÀ KỸ THUẬT TRÌNH BÀY VĂN BẢN HÀNH CHÍNH
+I. QUY ĐỊNH CHUNG
+1. Khổ giấy: Khổ A4 (210 mm x 297 mm).
+2. Kiểu trình bày: Theo chiều dài của khổ A4. Trường hợp nội dung văn bản
+có các bảng, biểu nhưng không được làm thành các phụ lục riêng thì văn bản có
+thể được trình bày theo chiều rộng.
+3. Định lề trang: Cách mép trên và mép dưới 20 - 25 mm, cách mép trái 30 -
+35 mm, cách mép phải 15 - 20 mm.
+4. Phông chữ: Phông chữ tiếng Việt Times New Roman, bộ mã ký tự Unicode
+theo Tiêu chuẩn Việt Nam TCVN 6909:2001, màu đen.
+5. Cỡ chữ và kiểu chữ: Theo quy định cụ thể cho từng yếu tố thể thức.
+6. Vị trí trình bày các thành phần thể thức: Được thực hiện theo Mục IV Phần I
+Phụ lục này.
+7. Số trang văn bản: Được đánh từ số 1, bằng chữ số Ả Rập, cỡ chữ 13 đến 14,
+
+========================================================================
+PHỤ LỤC III, MỤC I — BẢNG CHỮ VIẾT TẮT TÊN LOẠI VĂN BẢN HÀNH CHÍNH
+(dùng cho khoá "doc_types")
+========================================================================
+I. BẢNG CHỮ VIẾT TẮT TÊN LOẠI VĂN BẢN HÀNH CHÍNH VÀ
+BẢN SAO VĂN BẢN
+STT Tên loại văn bản hành chính Chữ viết tắt
+1. Nghị quyết (cá biệt) NQ
+2. Quyết định (cá biệt) QĐ
+3. Chỉ thi CT
+4. Quy chế QC
+5. Quy định QyĐ
+6. Thông cáo TC
+7. Thông báo TB
+8. Hướng dẫn HD
+9. Chương trình CTr
+10. Kế hoạch KH
+11. Phương án PA
+12. Đề án ĐA
+13. Dự án DA
+14. Báo cáo BC
+15. Biên bản BB
+16. Tờ trình TTr
+17. Hợp đồng HĐ
+18. Công điện CĐ
+19. Bản ghi nhớ BGN
+20. Bản thỏa thuận BTT
+21. Giấy ủy quyền GUQ22. Giấy mời GM
+23. Giấy giới thiệu GGT
+24. Giấy nghỉ phép GNP
+25. Phiếu gửi PG
+26. Phiếu chuyển PC
+27. Phiếu báo PB
+Bản sao văn bản
+1. Bản sao y SY
+2. Bản trích sao TrS
+3. Bản sao lục SL
+II. MẪU TRÌNH BÀY VĂN BẢN HÀNH CHÍNH, PHỤ LỤC VÀ BẢN
+SAO VĂN BẢN
