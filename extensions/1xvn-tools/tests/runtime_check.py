@@ -525,8 +525,37 @@ def mcp_server_checks(desktop, prop, run, check):
         paragraphs = [p.getString() for p in doc.getText().createEnumeration()]
         check("Máy chủ MCP: Ctrl+Z một lần trả lại như cũ", paragraphs[1],
               "Về việc áp dụng Nghị định 30/2020/NĐ-CP.")
+
+        # --- resource và prompt (bản thiết kế mục 8) ---
+        listed = friend.request("resources/list")["result"]["resources"]
+        check("Máy chủ MCP: tài liệu đang mở hiện ra thành resource",
+              any(r["uri"].startswith("1x://doc/") for r in listed), True)
+        check("Máy chủ MCP: resource của tài liệu văn bản là Markdown",
+              next((r["mimeType"] for r in listed if r["uri"].startswith("1x://doc/")), None), "text/markdown")
+        uri = next(r["uri"] for r in listed if r["uri"].startswith("1x://doc/"))
+        body = friend.request("resources/read", {"uri": uri})["result"]["contents"][0]
+        check("Máy chủ MCP: đọc resource ra đúng nội dung tài liệu", "TỜ TRÌNH" in body["text"], True)
+        prompts = friend.request("prompts/list")["result"]["prompts"]
+        check("Máy chủ MCP: mỗi skill đã cài là một prompt",
+              "soan-van-ban-nd30" in [x["name"] for x in prompts], True)
+        got = friend.request("prompts/get", {"name": "soan-van-ban-nd30",
+                                             "arguments": {"viec": "soạn giúp tôi một công văn"}})
+        check("Máy chủ MCP: prompt mang theo thân skill và câu người dùng",
+              "soạn giúp tôi một công văn" in got["result"]["messages"][0]["content"]["text"], True)
     finally:
         friend.close()
+    stranger2 = McpClient(command, "Trợ lý chưa xin phép lần hai", clients_path)
+    try:
+        stranger2.request("initialize", {"protocolVersion": "2025-06-18", "capabilities": {},
+                                         "clientInfo": {"name": "Trợ lý chưa xin phép lần hai"}})
+        seen = stranger2.request("resources/list")["result"]["resources"]
+        check("Máy chủ MCP: trợ lý chưa được phép vẫn xem được DANH SÁCH tài liệu", bool(seen), True)
+        denied = stranger2.request("resources/read", {"uri": seen[0]["uri"]})
+        check("Máy chủ MCP: trợ lý chưa được phép KHÔNG đọc được nội dung", "error" in denied, True)
+        denied = stranger2.request("prompts/get", {"name": "soan-van-ban-nd30"})
+        check("Máy chủ MCP: trợ lý chưa được phép KHÔNG đọc được thân skill", "error" in denied, True)
+    finally:
+        stranger2.close()
     doc.close(True)
     # Cửa MCP để lại socket trong /tmp; dọn luôn để không tích lại sau mỗi lần kiểm.
     try:

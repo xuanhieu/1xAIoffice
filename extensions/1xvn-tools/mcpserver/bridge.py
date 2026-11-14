@@ -17,7 +17,7 @@ from com.sun.star.awt.MessageBoxButtons import BUTTONS_YES_NO
 from com.sun.star.awt.MessageBoxType import QUERYBOX
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pythonpath"))
-from vn1x import doctools, nd30_check, nd30_check_writer, vntext  # noqa: E402
+from vn1x import doctools, mcpresources, nd30_check, nd30_check_writer, vntext  # noqa: E402
 
 WRITER = "com.sun.star.text.TextDocument"
 CALC = "com.sun.star.sheet.SpreadsheetDocument"
@@ -137,6 +137,43 @@ class OfficeBackend:
         for row in area.getDataArray():
             lines.append("\t".join("" if value == "" else str(value) for value in row))
         return doctools.page("\n".join(lines))
+
+    # --- resource: tài liệu đang mở nhìn như tài nguyên để trợ lý gắn vào ngữ cảnh ---
+    def resources(self):
+        """[{id, title, kind, sheets}] cho mọi tài liệu đang mở."""
+        out = []
+        for name, component in self._documents():
+            kind = self._kind(component)
+            row = {"id": name, "title": self._title(component), "kind": kind, "sheets": []}
+            if kind == "sheet" and component.supportsService(CALC):
+                sheets = component.getSheets()
+                row["sheets"] = [sheets.getByIndex(i).getName() for i in range(sheets.getCount())]
+            out.append(row)
+        return out
+
+    def read_resource(self, uri):
+        """Nội dung một resource: tài liệu văn bản ra Markdown, trang tính ra CSV."""
+        kind, doc_id, sheet = mcpresources.parse(uri)
+        component = self._find(doc_id)
+        if kind == "doc":
+            if not component.supportsService(WRITER):
+                raise doctools.ToolError("đây là bảng tính; dùng địa chỉ 1x://sheet/<id>/<trang>")
+            pairs = [(getattr(para, "ParaStyleName", ""), para.getString())
+                     for para in self._paragraphs(component)]
+            text, _ = doctools.page(mcpresources.to_markdown(pairs), 0)
+            return text
+        if not component.supportsService(CALC):
+            raise doctools.ToolError("đây là tài liệu văn bản; dùng địa chỉ 1x://doc/<id>")
+        sheets = component.getSheets()
+        if not sheets.hasByName(sheet):
+            raise doctools.ToolError(f"không có trang tính tên {sheet!r}")
+        page = sheets.getByName(sheet)
+        cursor = page.createCursor()
+        cursor.gotoEndOfUsedArea(False)
+        area = cursor.getRangeAddress()
+        rows = page.getCellRangeByPosition(0, 0, area.EndColumn, area.EndRow).getDataArray()
+        text, _ = doctools.page(mcpresources.to_csv(rows), 0)
+        return text
 
     # --- công cụ ghi: luôn hỏi trước ---
     def doc_insert(self, doc, text, where="end", anchor=None):

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """1xVnOffice làm máy chủ MCP: giao thức, ghép đôi, và cư xử khi không có phiên nào đang chạy."""
 import io
+import os
 import json
 import subprocess
 import sys
@@ -72,7 +73,8 @@ class ProtocolTests(ClientsFile):
         self.assertEqual(len(out.getvalue().strip().splitlines()), 1)
 
     def test_unknown_method_is_an_error_not_a_crash(self):
-        answers = talk([hello(), {"jsonrpc": "2.0", "id": 2, "method": "resources/list"}], clients_file=self.missing)
+        answers = talk([hello(), {"jsonrpc": "2.0", "id": 2, "method": "khong/co/phuong/thuc/nay"}],
+                       clients_file=self.missing)
         self.assertIn("error", answers[1])
 
 
@@ -138,3 +140,83 @@ class ProcessTests(ClientsFile):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ResourceAndPromptTests(unittest.TestCase):
+    """resources/* và prompts/* của máy chủ MCP, với một backend giả."""
+
+    class FakeBackend:
+        def __init__(self):
+            self.read = []
+
+        def resources(self):
+            return [{"id": "doc1", "title": "Tờ trình", "kind": "doc", "sheets": []},
+                    {"id": "doc2", "title": "Sổ lương", "kind": "sheet", "sheets": ["Sheet1"]}]
+
+        def read_resource(self, uri):
+            self.read.append(uri)
+            return "# Tờ trình" if "doc/" in uri else "ho_ten,luong"
+
+    def server(self, paired_name=None):
+        import tempfile
+        handle = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        json.dump({"clients": {paired_name: "allow"} if paired_name else {}, "pending": {}}, handle)
+        handle.close()
+        self.addCleanup(os.unlink, handle.name)
+        srv = server.Server(backend=self.FakeBackend(), clients_file=handle.name)
+        srv.handle("initialize", {"clientInfo": {"name": "Trợ lý Thử"}})
+        return srv
+
+    def test_initialize_announces_resources_and_prompts(self):
+        srv = self.server()
+        caps = srv.handle("initialize", {"clientInfo": {"name": "x"}})["capabilities"]
+        self.assertIn("resources", caps)
+        self.assertIn("prompts", caps)
+
+    def test_an_unpaired_assistant_may_see_the_list_of_documents(self):
+        """Tên tài liệu thì cho xem, như tools/list; nội dung mới phải xin phép."""
+        srv = self.server()
+        uris = [r["uri"] for r in srv.handle("resources/list", {})["resources"]]
+        self.assertEqual(uris, ["1x://doc/doc1", "1x://sheet/doc2/Sheet1"])
+
+    def test_an_unpaired_assistant_cannot_read_a_document(self):
+        srv = self.server()
+        with self.assertRaises(server.Unpaired):
+            srv.handle("resources/read", {"uri": "1x://doc/doc1"})
+        self.assertEqual(srv.backend.read, [], "không được chạm vào tài liệu khi chưa được phép")
+
+    def test_a_paired_assistant_reads_markdown_and_csv(self):
+        srv = self.server(paired_name="Trợ lý Thử")
+        out = srv.handle("resources/read", {"uri": "1x://doc/doc1"})["contents"][0]
+        self.assertEqual(out["mimeType"], "text/markdown")
+        self.assertEqual(out["text"], "# Tờ trình")
+        out = srv.handle("resources/read", {"uri": "1x://sheet/doc2/Sheet1"})["contents"][0]
+        self.assertEqual(out["mimeType"], "text/csv")
+
+    def test_every_installed_skill_is_offered_as_a_prompt(self):
+        srv = self.server()
+        names = [p["name"] for p in srv.handle("prompts/list", {})["prompts"]]
+        self.assertIn("soan-van-ban-nd30", names)
+        self.assertEqual(len(names), len(set(names)))
+
+    def test_an_unpaired_assistant_cannot_read_a_skill_body(self):
+        srv = self.server()
+        with self.assertRaises(server.Unpaired):
+            srv.handle("prompts/get", {"name": "soan-van-ban-nd30"})
+
+    def test_a_paired_assistant_gets_the_skill_body_and_its_question(self):
+        srv = self.server(paired_name="Trợ lý Thử")
+        out = srv.handle("prompts/get", {"name": "soan-van-ban-nd30", "arguments": {"viec": "soạn công văn"}})
+        text = out["messages"][0]["content"]["text"]
+        self.assertIn("soạn công văn", text)
+        self.assertIn("NĐ30", text.upper().replace("NGHỊ ĐỊNH 30", "NĐ30"))
+
+    def test_asking_for_a_skill_that_does_not_exist_says_so(self):
+        srv = self.server(paired_name="Trợ lý Thử")
+        with self.assertRaises(RuntimeError):
+            srv.handle("prompts/get", {"name": "khong-co-skill-nay"})
+
+    def test_a_bad_resource_address_is_refused(self):
+        srv = self.server(paired_name="Trợ lý Thử")
+        with self.assertRaises(Exception):
+            srv.handle("resources/read", {"uri": "https://example.com"})

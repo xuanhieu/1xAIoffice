@@ -23,9 +23,10 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pythonpath"))
-from vn1x import doctools  # noqa: E402
+from vn1x import doctools, mcpresources, skills  # noqa: E402
 
 PROTOCOL_VERSION = "2025-06-18"
+BUNDLED_SKILLS = Path(__file__).resolve().parent.parent / "skills"
 SERVER_INFO = {"name": "1xVnOffice", "version": "0.1.0"}
 
 
@@ -114,25 +115,83 @@ class Server:
     def handle(self, method, params):
         if method == "initialize":
             self.client = ((params.get("clientInfo") or {}).get("name") or "").strip() or "(không tên)"
-            return {"protocolVersion": PROTOCOL_VERSION, "capabilities": {"tools": {}},
+            return {"protocolVersion": PROTOCOL_VERSION,
+                    "capabilities": {"tools": {}, "resources": {}, "prompts": {}},
                     "serverInfo": SERVER_INFO}
         if method == "tools/list":
             return {"tools": doctools.declarations()}
         if method == "tools/call":
             return self.call_tool(params)
+        if method == "resources/list":
+            return {"resources": self.list_resources()}
+        if method == "resources/read":
+            return self.read_resource(params)
+        if method == "prompts/list":
+            return {"prompts": self.list_prompts()}
+        if method == "prompts/get":
+            return self.get_prompt(params)
         if method == "ping":
             return {}
         raise RuntimeError(f"máy chủ chưa hỗ trợ {method!r}")
 
     def call_tool(self, params):
-        if not paired(self.client, self.clients_file):
-            remember_pending(self.client, self.clients_file)
-            raise Unpaired(f"“{self.client}” chưa được phép điều khiển 1xVnOffice. "
-                           "Mở 1xVnOffice, vào Tiếng Việt ▸ Công cụ AI (MCP) để cho phép.")
+        self.require_pairing()
         if self.backend is None:
             return doctools.result("Chưa nối được vào phiên 1xVnOffice nào đang chạy. "
                                    "Hãy mở 1xVnOffice rồi thử lại.", is_error=True)
         return doctools.call(self.backend, params.get("name", ""), params.get("arguments") or {})
+
+
+    # --- resource ---
+    def list_resources(self):
+        """Liệt kê được cả khi chưa ghép đôi: chỉ là tên tài liệu, không phải nội dung."""
+        if self.backend is None:
+            return []
+        return mcpresources.descriptors(self.backend.resources())
+
+    def read_resource(self, params):
+        """Đọc NỘI DUNG thì phải được phép, đúng như gọi công cụ: nội dung tài liệu cũng nhạy cảm như vậy."""
+        self.require_pairing()
+        if self.backend is None:
+            raise RuntimeError("Chưa nối được vào phiên 1xVnOffice nào đang chạy.")
+        uri = params.get("uri", "")
+        return {"contents": mcpresources.contents(uri, self.backend.read_resource(uri))}
+
+    # --- prompt: mỗi skill đã cài là một prompt ---
+    def installed_skills(self):
+        found, _ = skills.discover(BUNDLED_SKILLS, user_skills_path())
+        return found
+
+    def list_prompts(self):
+        return [{"name": s["name"], "description": s["description"],
+                 "arguments": [{"name": "viec", "description": "Việc cần làm, bằng tiếng Việt.",
+                                "required": False}]}
+                for s in self.installed_skills()]
+
+    def get_prompt(self, params):
+        """Thân skill chỉ được đọc khi đã ghép đôi: đó là cách làm việc đóng gói của cơ quan, không phải thứ
+        để ai hỏi cũng đưa."""
+        self.require_pairing()
+        wanted = params.get("name", "")
+        skill = next((s for s in self.installed_skills() if s["name"] == wanted), None)
+        if skill is None:
+            raise RuntimeError(f"không có skill tên {wanted!r}")
+        question = (params.get("arguments") or {}).get("viec", "")
+        return {"description": skill["description"],
+                "messages": [{"role": "user",
+                              "content": {"type": "text", "text": skills.prompt(skill, question)}}]}
+
+    def require_pairing(self):
+        if not paired(self.client, self.clients_file):
+            remember_pending(self.client, self.clients_file)
+            raise Unpaired(f"“{self.client}” chưa được phép điều khiển 1xVnOffice. "
+                           "Mở 1xVnOffice, vào Tiếng Việt ▸ Công cụ AI (MCP) để cho phép.")
+
+
+def user_skills_path():
+    """Thư mục skill của người dùng; bước kiểm tự động trỏ chỗ khác."""
+    override = os.environ.get("ONEX_SKILLS_PATH")
+    return Path(override) if override else Path.home() / ".config" / "1xvnoffice" / "skills"
 
 
 def connect(pipe):
