@@ -220,7 +220,7 @@ step_extensions() {
   done
 }
 
-run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn|csv|ai|airewrite|mcp|mcpserver|skill|accounts
+run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn|csv|ai|airewrite|mcp|mcpserver|skill|accounts|cut
   local app="$1" part="$2" profile pipe="onex_tools_$$_$2" rc=0
   profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
   rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
@@ -272,6 +272,7 @@ step_tools() {
   run_tools_check "$app" mcpserver || rc=1
   run_tools_check "$app" skill || rc=1
   run_tools_check "$app" accounts || rc=1
+  run_tools_check "$app" cut || rc=1
   [ "$rc" = 0 ] || die "Lệnh tiếng Việt chạy sai trên app."
   info "Lệnh tiếng Việt chạy đúng trên app."
 }

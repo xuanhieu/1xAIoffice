@@ -1,0 +1,176 @@
+Subject: Calc: cắt giữ nguyên ô cho tới khi dán, như Excel/WPS/Google Sheets
+Why: Lệnh Cut của bản gốc xoá ô ngay lập tức. Excel, WPS và Google Sheets đều giữ
+ nguyên nội dung, vẽ viền đứt quanh vùng nguồn, và chỉ chuyển khi người dùng dán;
+ bấm Esc là bỏ. Người quen ba phần mềm kia mà cắt xong đổi ý sẽ tưởng vừa mất dữ
+ liệu — đúng nhóm người dùng 1xVnOffice nhắm tới.
+ Cách làm: CutToClip ghi nhớ vùng nguồn trong ScModule thay vì xoá; PasteFromClip
+ xoá vùng đó ngay sau khi mở nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu;
+ Esc gọi ClearPendingCut; ScGridWindow vẽ viền đứt quanh vùng đang chờ.
+ Vùng chọn nhiều mảnh giữ nguyên cách cũ. Vùng nguồn chồng lên vùng đích thì không
+ xoá, vì phần chồng nhau vừa bị ghi đè.
+Upstream: not suitable: đổi hành vi mặc định của Calc, upstream sẽ muốn một tuỳ chọn
+ trong Tools > Options và một cuộc bàn về tương thích ngược.
+Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một lần, và Esc rồi
+ dán (nguồn phải còn nguyên).
+--- a/sc/inc/scmod.hxx
++++ b/sc/inc/scmod.hxx
+@@ -46,6 +46,7 @@
+ namespace com::sun::star::uno { template <typename > class Sequence; }
+ 
+ class ScRange;
++class ScDocShell;
+ class ScDocument;
+ class ScViewCfg;
+ class ScDocCfg;
+@@ -101,6 +102,11 @@
+     bool                m_bIsInExecuteDrop:1;
+     bool                m_bIsInSharedDocLoading:1;
+     bool                m_bIsInSharedDocSaving:1;
++
++    // 1xVnOffice: cắt kiểu Excel/WPS/Sheets. Lệnh Cut không xoá ô ngay nữa mà ghi nhớ vùng nguồn ở đây,
++    // vẽ viền đứt quanh nó, và chỉ thật sự xoá khi người dùng dán. Bấm Esc là bỏ, dữ liệu còn nguyên.
++    ScDocShell*         m_pPendingCutShell = nullptr;
++    ScRange             m_aPendingCutRange;
+ 
+     // a way to find existing Dialogs for a given parent Window of the slot type
+     std::map<sal_uInt16, std::vector<std::pair<std::shared_ptr<SfxDialogController>, weld::Window*>>> m_mapRefController;
+@@ -153,6 +159,12 @@
+ 
+     void                SetInEditCommand( bool bNew )   { m_bIsInEditCommand = bNew; }
+ 
++    /** Vùng vừa bị cắt mà chưa dán: giữ nguyên nội dung, có viền đứt, chờ dán hoặc chờ Esc. */
++    SC_DLLPUBLIC void   SetPendingCut( ScDocShell* pShell, const ScRange& rRange );
++    SC_DLLPUBLIC void   ClearPendingCut();
++    ScDocShell*         GetPendingCutShell() const      { return m_pPendingCutShell; }
++    const ScRange&      GetPendingCutRange() const      { return m_aPendingCutRange; }
++
+     void                SetInExecuteDrop( bool bNew )   { m_bIsInExecuteDrop = bNew; }
+     bool                IsInExecuteDrop() const         { return m_bIsInExecuteDrop; }
+ 
+--- a/sc/source/ui/app/scmod.cxx
++++ b/sc/source/ui/app/scmod.cxx
+@@ -111,6 +111,28 @@
+                                             ToolbarId::Objectbar_App);
+ 
+     GetStaticInterface()->RegisterStatusBar(StatusBarId::CalcStatusBar);
++}
++
++// 1xVnOffice: vùng đã cắt nhưng chưa dán.
++// Lệnh Cut của bản gốc xoá ô ngay lập tức. Excel, WPS và Google Sheets thì giữ nguyên nội dung, vẽ viền đứt, và
++// chỉ chuyển khi người dùng dán — ai quen ba phần mềm kia mà cắt xong đổi ý sẽ tưởng mình vừa mất dữ liệu.
++void ScModule::SetPendingCut( ScDocShell* pShell, const ScRange& rRange )
++{
++    ClearPendingCut();
++    m_pPendingCutShell = pShell;
++    m_aPendingCutRange = rRange;
++    if (pShell)
++        pShell->PostPaint( rRange, PaintPartFlags::Grid );
++}
++
++void ScModule::ClearPendingCut()
++{
++    if (!m_pPendingCutShell)
++        return;
++    ScDocShell* pShell = m_pPendingCutShell;
++    ScRange aRange = m_aPendingCutRange;
++    m_pPendingCutShell = nullptr;
++    pShell->PostPaint( aRange, PaintPartFlags::Grid );   // xoá viền đứt khỏi màn hình
+ }
+ 
+ ScModule::ScModule( SfxObjectFactory* pFact ) :
+--- a/sc/source/ui/view/viewfun3.cxx
++++ b/sc/source/ui/view/viewfun3.cxx
+@@ -220,6 +220,16 @@
+ 
+         CopyToClip( nullptr, true, false, true/*bIncludeObjects*/ );           // copy to clipboard
+ 
++        // 1xVnOffice: cắt kiểu Excel/WPS/Sheets — giữ nguyên nội dung, vẽ viền đứt, chỉ xoá khi dán.
++        // Bản gốc xoá ngay tại đây; ai quen Excel mà cắt xong đổi ý sẽ tưởng vừa mất dữ liệu.
++        // Chỉ làm vậy với vùng chọn đơn giản; mọi trường hợp khác giữ nguyên cách cũ cho chắc.
++        if ( !rMark.IsMultiMarked() )
++        {
++            ScModule::get()->SetPendingCut( pDocSh, aRange );
++            aModificator.SetDocumentModified();
++            return;
++        }
++
+         ScAddress aOldEnd( aRange.aEnd );       //  combined cells in this range?
+         rDoc.ExtendMerge( aRange, true );
+ 
+@@ -1395,6 +1405,26 @@
+     {
+         OUString aUndo = ScResId( pClipDoc->IsCutMode() ? STR_UNDO_MOVE : STR_UNDO_COPY );
+         pUndoMgr->EnterListAction( aUndo, aUndo, 0, GetViewData().GetViewShell()->GetViewShellId() );
++    }
++
++    // 1xVnOffice: đây là lúc vùng đã cắt thật sự biến mất. Xoá TRƯỚC khi ghi dữ liệu vào ô đích, và nằm trong
++    // cùng nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu.
++    // Vùng nguồn chồng lên vùng đích thì không xoá: phần chồng nhau vừa được ghi đè, xoá tiếp là mất dữ liệu.
++    {
++        ScModule* pScMod = ScModule::get();
++        if ( pClipDoc->IsCutMode() && pScMod->GetPendingCutShell() == pDocSh )
++        {
++            ScRange aCutRange = pScMod->GetPendingCutRange();
++            ScRange aDestRange( nStartCol, nStartRow, nStartTab, nUndoEndCol, nUndoEndRow, nEndTab );
++            pScMod->ClearPendingCut();
++            if ( !aCutRange.Intersects( aDestRange ) )
++            {
++                ScMarkData aCutMark( rDoc.GetSheetLimits() );
++                aCutMark.SelectOneTable( aCutRange.aStart.Tab() );
++                aCutMark.SetMarkArea( aCutRange );
++                rDocFunc.DeleteContents( aCutMark, InsertDeleteFlags::ALL, bRecord, true /*bApi*/ );
++            }
++        }
+     }
+ 
+     if (bClipOver)
+--- a/sc/source/ui/view/cellsh3.cxx
++++ b/sc/source/ui/view/cellsh3.cxx
+@@ -978,6 +978,9 @@
+                     pTabViewShell->ResetBrushDocument();            // abort format paint brush
+                 else if (pTabViewShell->HasHintWindow())
+                     pTabViewShell->RemoveHintWindow();
++                // 1xVnOffice: Esc bỏ vùng đang chờ cắt, dữ liệu giữ nguyên (giống Excel/WPS/Sheets).
++                else if (pScMod->GetPendingCutShell())
++                    pScMod->ClearPendingCut();
+                 else if( ScViewUtil::IsFullScreen( *pTabViewShell ) )
+                     ScViewUtil::SetFullScreen( *pTabViewShell, false );
+                 else
+--- a/sc/source/ui/view/gridwin4.cxx
++++ b/sc/source/ui/view/gridwin4.cxx
+@@ -30,6 +30,7 @@
+ #include <sfx2/printer.hxx>
+ #include <vcl/cursor.hxx>
+ #include <vcl/settings.hxx>
++#include <vcl/lineinfo.hxx>
+ #include <vcl/svapp.hxx>
+ #include <o3tl/unit_conversion.hxx>
+ #include <osl/diagnose.h>
+@@ -987,6 +988,27 @@
+     pContentDev->SetMapMode(MapMode(MapUnit::MapPixel));
+ 
+     aOutputData.DrawClipMarks();
++
++    // 1xVnOffice: viền đứt quanh vùng vừa bị cắt mà chưa dán, như Excel/WPS/Sheets. Vẽ sau nội dung ô nên
++    // không bị ô nào đè lên. (Viền chạy được thì giống hẳn, nhưng cần một bộ đếm giờ; bản này vẽ đứng yên.)
++    if (ScDocShell* pCutShell = ScModule::get()->GetPendingCutShell())
++    {
++        const ScRange& rCut = ScModule::get()->GetPendingCutRange();
++        if (pCutShell == mrViewData.GetDocShell() && rCut.aStart.Tab() <= nTab && nTab <= rCut.aEnd.Tab())
++        {
++            Point aCutFrom = mrViewData.GetScrPos( rCut.aStart.Col(), rCut.aStart.Row(), eWhich, true );
++            Point aCutTo = mrViewData.GetScrPos( rCut.aEnd.Col() + 1, rCut.aEnd.Row() + 1, eWhich, true );
++            tools::Rectangle aCutRect( aCutFrom, Point( aCutTo.X() - 1, aCutTo.Y() - 1 ) );
++            LineInfo aCutLine( LineStyle::Dash, 1 );
++            aCutLine.SetDashCount( 0 );
++            aCutLine.SetDotCount( 1 );
++            aCutLine.SetDotLen( 4 );
++            aCutLine.SetDistance( 3 );
++            pContentDev->SetFillColor();
++            pContentDev->SetLineColor( Color( 0x4C, 0x7D, 0xFF ) );     // xanh thương hiệu 1x
++            pContentDev->DrawPolyLine( tools::Polygon( aCutRect ), aCutLine );
++        }
++    }
+ 
+     // In any case, Scenario / ChangeTracking must happen after DrawGrid, also for !bGridFirst
+ 

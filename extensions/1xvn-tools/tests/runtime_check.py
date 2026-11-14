@@ -60,6 +60,8 @@ def main():
         skill_checks(desktop, prop, run, check)
     elif part == "accounts":
         accounts_checks(desktop, prop, run, check)
+    elif part == "cut":
+        cut_checks(desktop, prop, run, check)
     elif part == "mcpserver":
         mcp_server_checks(desktop, prop, run, check)
     elif part == "mcp":
@@ -877,6 +879,52 @@ def accounts_checks(desktop, prop, run, check):
         for server in (ai, login):
             server.shutdown()
             server.server_close()
+
+
+def cut_checks(desktop, prop, run, check):
+    """Cắt kiểu Excel/WPS/Google Sheets: ô nguồn giữ nguyên cho tới khi dán, Esc là bỏ.
+
+    Bản vá patches/source/0003. Bản gốc LibreOffice xoá ô ngay khi Cut; ai quen Excel mà cắt xong đổi ý sẽ
+    tưởng vừa mất dữ liệu. Phần viền đứt phải nhìn mới thấy, nên ở đây chỉ kiểm hành vi — thứ dễ hỏng âm thầm.
+    """
+    import time as _time
+    doc = desktop.loadComponentFromURL("private:factory/scalc", "_blank", 0, (prop("Hidden", False),))
+    sheet = doc.getSheets().getByIndex(0)
+    ctrl = doc.getCurrentController()
+
+    def cell(name):
+        return sheet.getCellRangeByName(name)
+
+    local_ctx = uno.getComponentContext()
+    disp = local_ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.DispatchHelper", local_ctx)
+
+    def send(cmd):
+        disp.executeDispatch(ctrl.getFrame(), cmd, "", 0, ())
+        _time.sleep(0.6)
+
+    cell("A1").setString("noi dung cat")
+    ctrl.select(cell("A1"))
+    send(".uno:Cut")
+    check("Cắt: ô nguồn giữ nguyên nội dung", cell("A1").getString(), "noi dung cat")
+
+    ctrl.select(cell("C3"))
+    send(".uno:Paste")
+    check("Cắt: dán xong chữ sang ô đích", cell("C3").getString(), "noi dung cat")
+    check("Cắt: dán xong ô nguồn mới trống", cell("A1").getString(), "")
+
+    send(".uno:Undo")
+    check("Cắt: Ctrl+Z một lần trả lại ô nguồn", cell("A1").getString(), "noi dung cat")
+    check("Cắt: Ctrl+Z một lần dọn luôn ô đích", cell("C3").getString(), "")
+
+    cell("A5").setString("bam esc")
+    ctrl.select(cell("A5"))
+    send(".uno:Cut")
+    send(".uno:Cancel")
+    check("Cắt: bấm Esc thì ô vẫn còn chữ", cell("A5").getString(), "bam esc")
+    ctrl.select(cell("E5"))
+    send(".uno:Paste")
+    check("Cắt: Esc rồi dán thì ô nguồn không bị xoá", cell("A5").getString(), "bam esc")
+    doc.close(True)
 
 
 main()

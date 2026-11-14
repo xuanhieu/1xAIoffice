@@ -202,3 +202,31 @@ Cách làm: `scripts/l10n-merge.py` trộn `l10n/vi/**.po` vào cây dịch trư
 
 - Không chép bố cục pixel, ảnh, icon của WPS hay Microsoft.
 - Không giữ menu cổ điển làm mặc định. Người dùng vẫn chuyển được trong Xem ▸ Giao diện người dùng.
+
+## Cắt (Cmd+X) giữ ô tới khi dán (14/11/2026)
+
+Bản gốc LibreOffice Calc **xoá ô ngay** khi bấm Cut. Excel, WPS và Google Sheets đều giữ nguyên nội dung, vẽ
+viền đứt quanh vùng nguồn, và chỉ chuyển khi người dùng dán; bấm Esc là bỏ. Khác nhau ở đây là **ngữ nghĩa**,
+không phải hiệu ứng: người quen ba phần mềm kia mà cắt xong đổi ý sẽ tưởng vừa mất dữ liệu.
+
+Bản vá `patches/source/0003-calc-cut-keeps-cells-until-paste.patch`:
+
+| Chỗ | Làm gì |
+|---|---|
+| `ScModule` | Giữ vùng đang chờ cắt: `SetPendingCut`, `ClearPendingCut` |
+| `ScViewFunc::CutToClip` | Chép vào clipboard rồi **ghi nhớ** vùng nguồn thay vì xoá |
+| `ScViewFunc::PasteFromClip` | Xoá vùng nguồn ngay sau khi mở nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu |
+| `SID_CANCEL` (cellsh3) | Esc bỏ vùng đang chờ, dữ liệu giữ nguyên |
+| `ScGridWindow` (gridwin4) | Vẽ viền đứt màu xanh thương hiệu quanh vùng đang chờ |
+
+Calc vốn đã có `ScClipParam::mbCutMode` để chỉnh tham chiếu công thức khi dán dữ liệu cắt, nên phần khó nhất
+đã có sẵn; việc của bản vá chỉ là **dời thời điểm xoá**.
+
+**Hai chỗ cố ý giữ cách cũ:** vùng chọn nhiều mảnh (`IsMultiMarked`) vẫn xoá ngay, vì gộp nhiều mảnh vào một
+bước hoàn tác cần thêm việc; và vùng nguồn **chồng lên** vùng đích thì không xoá, vì phần chồng nhau vừa bị
+ghi đè, xoá tiếp là mất dữ liệu thật.
+
+**Chưa có:** viền chạy (marching ants). Viền hiện đứng yên. Muốn chạy phải thêm một bộ đếm giờ vẽ lại viền
+theo nhịp, làm sau.
+
+Kiểm: `scripts/build-macos.sh tools`, phần `cut` — bảy bước gồm cắt, dán, Ctrl+Z một lần, và Esc rồi dán.
