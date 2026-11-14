@@ -61,7 +61,7 @@ PRESETS = [
                "device_url": "https://oauth2.googleapis.com/device/code",
                "scopes": ["https://www.googleapis.com/auth/cloud-platform"],
                "extra_auth_params": {"access_type": "offline", "prompt": "consent"}},
-     "needs": ["client_id", "base_url"],
+     "needs": ["client_id", "base_url"], "client_secret": True,
      "note": "Cần client_id OAuth loại Desktop trong dự án Google Cloud của bạn, và base_url của Vertex AI "
              "theo dự án và vùng."},
     {"id": "azure", "label": "Azure OpenAI (đăng nhập Microsoft)", "wire": "azure", "base_url": "",
@@ -119,6 +119,11 @@ def secret_ref(preset_id):
     return f"1xvnoffice/{preset_id}"
 
 
+def client_secret_ref(provider_id):
+    """Tên mục cất client secret của ứng dụng OAuth. Google cấp secret này cho cả ứng dụng Desktop."""
+    return f"{secret_ref(provider_id)}/client_secret"
+
+
 def missing(preset, values):
     """Những thứ người dùng còn phải điền cho mục này."""
     return [field for field in (preset.get("needs") or []) if not (values or {}).get(field)]
@@ -146,6 +151,8 @@ def fill(preset, values):
         entry["secret_ref"] = values.get("secret_ref") or secret_ref(entry["id"])
     if preset["auth"] == "oauth":
         config = dict(preset.get("oauth") or {})
+        if preset.get("client_secret"):
+            config["client_secret_ref"] = client_secret_ref(entry["id"])
         for field in ("authorize_url", "token_url", "device_url"):
             if values.get(field):
                 config[field] = values[field]

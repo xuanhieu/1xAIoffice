@@ -119,6 +119,40 @@ def _json_or_text(raw):
         return text
 
 
+def with_client_secret(config):
+    """Cấu hình kèm client secret đọc từ kho bí mật, nếu nhà cung cấp đòi.
+
+    Google cấp client secret cho cả ứng dụng Desktop và đòi nó ở bước đổi thẻ, dù luồng đã có PKCE. Secret đó
+    nằm trong Keychain như mọi bí mật khác, không nằm trong providers.json.
+    """
+    ref = (config or {}).get("client_secret_ref")
+    if not ref:
+        return config
+    value = read_secret(ref)
+    if not value:
+        raise FlowError(f"chưa lưu client secret của ứng dụng OAuth ({ref}); mở AI ▸ Tài khoản AI để nhập lại")
+    return dict(config, client_secret=value)
+
+
+def read_secret(ref):
+    """Một bí mật thường (không phải gói thẻ) trong kho bí mật của hệ điều hành."""
+    if not ref:
+        return ""
+    override = os.environ.get("ONEX_SECRET_STORE_FOR_TEST")
+    if override:
+        try:
+            with open(override, encoding="utf-8") as handle:
+                return json.loads(handle.read() or "{}").get(ref, "")
+        except (OSError, ValueError):
+            return ""
+    try:
+        done = subprocess.run(["security", "find-generic-password", "-w", "-s", ref],
+                              capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return done.stdout.strip() if done.returncode == 0 else ""
+
+
 def _exchange(config, url, headers, body):
     status, data = post_form(url, headers, body)
     if status >= 400 or not isinstance(data, dict):
@@ -168,6 +202,7 @@ def login_browser(config, ref, timeout=LOGIN_TIMEOUT):
     if not callback:
         raise FlowError(f"chờ quá {timeout} giây mà chưa thấy đăng nhập xong")
     code = oauth.parse_redirect(callback, state)
+    config = with_client_secret(config)
     tokens = _exchange(config, *oauth.token_request(config, code, verifier, redirect_uri))
     write_bundle(ref, tokens)
     return oauth.redacted(tokens)
@@ -196,6 +231,7 @@ def device_start(config):
 
 def device_poll(config, ref, device_code, interval=5, timeout=DEVICE_POLL_TIMEOUT):
     """Hỏi lại cho tới khi người dùng đồng ý. Trả về mô tả đã che của gói thẻ."""
+    config = with_client_secret(config)
     url, headers, body = oauth.device_poll_request(config, device_code)
     stop = time.monotonic() + timeout
     wait = max(int(interval), 1)
@@ -236,6 +272,7 @@ def access_token(provider):
     if not stored.get("refresh_token"):
         raise FlowError(f"thẻ của {provider.get('id', '?')!r} đã hết hạn và không tự gia hạn được; "
                         "hãy đăng nhập lại")
+    config = with_client_secret(config)
     fresh = _exchange(config, *oauth.refresh_request(config, stored["refresh_token"]))
     merged = oauth.merge(stored, fresh)
     write_bundle(ref, merged)

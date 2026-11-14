@@ -94,6 +94,7 @@ TEXTS = {
         "acct_unknown": "There is no provider called “{name}”.",
         "acct_field": "{label}\n\n{field}:",
         "acct_key": "{label}\n\nPaste the API key. It goes straight into this computer's secret store ({ref}); it is never written into providers.json and never shown again.",
+        "acct_client_secret": "{label}\n\nPaste the client secret of your OAuth app. Google issues one even for Desktop apps. It goes into this computer's secret store, never into providers.json.",
         "acct_key_failed": "Could not write the key into the secret store.",
         "acct_oauth_how": "{label}\n\nSign in with the browser on this computer?\n\nChoose No to sign in with a short code on another device.",
         "acct_device": "Open:\n{url}\n\nand type this code:\n\n{code}\n\nThen come back and press OK.",
@@ -167,6 +168,7 @@ TEXTS = {
         "acct_unknown": "Không có nhà cung cấp nào tên “{name}”.",
         "acct_field": "{label}\n\n{field}:",
         "acct_key": "{label}\n\nDán khoá API vào đây. Khoá đi thẳng vào kho bí mật của máy này ({ref}); không ghi vào providers.json và không hiện lại lần nào nữa.",
+        "acct_client_secret": "{label}\n\nDán client secret của ứng dụng OAuth. Google cấp secret này cho cả ứng dụng Desktop. Nó đi vào kho bí mật của máy, không vào providers.json.",
         "acct_key_failed": "Không ghi được khoá vào kho bí mật của máy.",
         "acct_oauth_how": "{label}\n\nĐăng nhập bằng trình duyệt trên máy này?\n\nChọn Không để đăng nhập bằng mã ngắn trên máy khác.",
         "acct_device": "Mở:\n{url}\n\nrồi gõ mã này:\n\n{code}\n\nXong thì quay lại và bấm OK.",
@@ -741,8 +743,11 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         entry = aiproviders.fill(preset, values)
         if preset["auth"] == "key" and not self._take_api_key(preset, entry["secret_ref"]):
             return
-        if preset["auth"] == "oauth" and not self._sign_in(entry):
-            return
+        if preset["auth"] == "oauth":
+            if preset.get("client_secret") and not self._take_client_secret(preset, entry):
+                return
+            if not self._sign_in(entry):
+                return
         model = self._pick_model(preset, entry)
         if not model:
             self.message(self.t["acct_nothing"])
@@ -813,6 +818,21 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         if not key:
             return False
         if not self._store_secret(ref, key.strip()):
+            self.message(self.t["acct_key_failed"])
+            return False
+        return True
+
+    def _take_client_secret(self, preset, entry):
+        """Nhận client secret của ứng dụng OAuth và cất vào kho bí mật. Google đòi nó cả với ứng dụng Desktop."""
+        from vn1x import aiproviders
+        ref = entry["oauth"]["client_secret_ref"]
+        value = self._scripted("client_secret")
+        if value is None:
+            value = self._ask_text(self.t["acct_title"],
+                                   self.t["acct_client_secret"].format(label=preset["label"]), secret=True)
+        if not value:
+            return False
+        if not self._store_secret(ref, value.strip()):
             self.message(self.t["acct_key_failed"])
             return False
         return True

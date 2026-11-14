@@ -159,7 +159,7 @@ def _auth_problems(provider, name):
             if not config.get(field) and not (field == "authorize_url" and config.get("device_url")):
                 out.append(f"nhà cung cấp {name}: cấu hình OAuth thiếu {field}")
         for field in ("access_token", "refresh_token", "client_secret"):
-            if config.get(field):
+            if config.get(field):  # client_secret_ref (chỉ là TÊN mục) thì được; giá trị thì không
                 out.append(f"nhà cung cấp {name}: không được ghi {field} vào {FILENAME}; "
                            f"thẻ nằm trong kho bí mật của hệ điều hành")
     if mode != "oauth" and provider.get("oauth"):

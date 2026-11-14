@@ -158,3 +158,29 @@ class FlowTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ClientSecretTests(unittest.TestCase):
+    """Google cấp client secret cho cả ứng dụng Desktop và đòi nó ở bước đổi thẻ, dù đã có PKCE."""
+
+    def setUp(self):
+        self.store = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        self.store.write(json.dumps({"1xvnoffice/vertex/client_secret": "bi-mat-cua-ung-dung"}))
+        self.store.close()
+        os.environ["ONEX_SECRET_STORE_FOR_TEST"] = self.store.name
+        self.addCleanup(os.environ.pop, "ONEX_SECRET_STORE_FOR_TEST", None)
+        self.addCleanup(os.unlink, self.store.name)
+
+    def test_the_secret_is_fetched_from_the_store_at_the_moment_it_is_needed(self):
+        config = oauthflow.with_client_secret({"client_id": "c", "token_url": "https://x",
+                                               "client_secret_ref": "1xvnoffice/vertex/client_secret"})
+        self.assertEqual(config["client_secret"], "bi-mat-cua-ung-dung")
+
+    def test_a_provider_without_a_secret_is_left_alone(self):
+        config = {"client_id": "c", "token_url": "https://x"}
+        self.assertIs(oauthflow.with_client_secret(config), config)
+
+    def test_a_missing_secret_says_where_to_put_it_back(self):
+        with self.assertRaises(oauthflow.FlowError) as caught:
+            oauthflow.with_client_secret({"client_secret_ref": "khong-co-that"})
+        self.assertIn("Tài khoản AI", str(caught.exception))

@@ -24,11 +24,24 @@ class CatalogueTests(unittest.TestCase):
         ids = [preset["id"] for preset in aiproviders.PRESETS]
         self.assertEqual(len(ids), len(set(ids)))
 
-    def test_no_client_secret_or_key_ships_with_the_app(self):
-        """1xVnOffice không nhúng bí mật của ai cả: người dùng mang khoá và ứng dụng OAuth của họ."""
-        text = Path(aiproviders.__file__).read_text(encoding="utf-8")
-        for word in ("client_secret", "sk-", "api_key"):
-            self.assertNotIn(word, text)
+    def test_no_secret_value_ships_with_the_app(self):
+        """1xVnOffice không nhúng bí mật của ai cả: người dùng mang khoá và ứng dụng OAuth của họ.
+
+        Mục Google có cờ `client_secret: True` — đó là CÂU HỎI "nhà cung cấp này có đòi client secret không",
+        không phải giá trị secret.
+        """
+        for preset in aiproviders.PRESETS:
+            with self.subTest(preset["id"]):
+                self.assertIn(preset.get("client_secret", False), (True, False))
+                self.assertNotIn("client_id", preset.get("oauth") or {})
+                for field in ("api_key", "secret", "token"):
+                    self.assertNotIn(field, preset)
+
+    def test_a_provider_that_needs_a_client_secret_only_stores_its_name(self):
+        entry = aiproviders.fill(aiproviders.get("vertex"), {"client_id": "c", "base_url": "https://x/v1"})
+        self.assertEqual(entry["oauth"]["client_secret_ref"], "1xvnoffice/vertex/client_secret")
+        self.assertNotIn("client_secret", entry["oauth"])
+        self.assertEqual(aiconfig.problems({"providers": [dict(entry, models=["m"])]}), [])
 
     def test_there_are_both_key_and_oauth_and_local_choices(self):
         for mode in ("key", "oauth", "none"):
