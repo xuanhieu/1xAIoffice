@@ -208,3 +208,76 @@ class BundledSkillsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EachBundledSkillTests(unittest.TestCase):
+    """Mỗi skill đi kèm phải tự đứng vững: có đủ phần, nói rõ giới hạn, và chỉ xin đúng công cụ nó cần.
+
+    Không gọi mô hình thật nên không đo được chất lượng câu trả lời; ở đây đo những thứ đo được, và là những thứ
+    hỏng âm thầm nhất khi ai đó sửa một SKILL.md.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        found, problems = skills.discover(Path(__file__).resolve().parent.parent / "skills")
+        assert not problems, problems
+        cls.found = {s["name"]: s for s in found}
+
+    def test_there_are_eight_of_them(self):
+        self.assertEqual(len(self.found), 8)
+
+    def test_each_one_says_what_it_is_for_in_a_sentence(self):
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                description = skill["description"].strip()
+                self.assertGreater(len(description), 30, "mô tả quá ngắn để mô hình chọn đúng skill")
+                self.assertLess(len(description), 400, "mô tả quá dài, tốn ngữ cảnh của mọi lượt hỏi")
+                self.assertTrue(description.endswith("."), "mô tả nên là một câu trọn vẹn")
+
+    def test_each_body_is_substantial_and_has_at_least_a_heading(self):
+        """Không đòi phải đánh số: skill viết lại câu chữ hợp với văn xuôi hơn là các bước 1-2-3.
+
+        Chỉ đòi thân skill đủ dài để nói được điều gì, và có ít nhất một tiêu đề để mô hình bám vào.
+        """
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                body = skills.body(skill)
+                self.assertGreater(len(body), 200, "thân skill quá ngắn để hướng dẫn được việc gì")
+                self.assertTrue(any(line.lstrip().startswith("#") for line in body.splitlines()),
+                                "thân skill không có tiêu đề nào")
+
+    def test_each_one_states_its_own_limit(self):
+        """Skill nào cũng phải tự nói chỗ nó dừng lại; đó là thứ giữ cho mô hình không lấn sang việc của người."""
+        marks = ("không", "chưa", "đừng", "tránh", "giới hạn")
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                body = skills.body(skill).casefold()
+                self.assertTrue(any(word in body for word in marks),
+                                "thân skill không nói chỗ nào nó dừng lại")
+
+    def test_a_skill_that_talks_about_decree_thirty_asks_for_the_checker(self):
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                body = skills.body(skill).casefold()
+                mentions = "nghị định 30" in body or "nđ30" in body
+                if mentions and "kiểm" in body:
+                    self.assertIn("doc.nd30_check", skill["tools"],
+                                  "skill nói tới kiểm thể thức NĐ30 nhưng không xin công cụ kiểm")
+
+    def test_none_of_them_asks_for_the_network_or_to_run_programs(self):
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                self.assertEqual(skill["permissions"]["network"], [])
+                self.assertFalse(skill["permissions"]["process"])
+
+    def test_each_one_names_the_app_it_belongs_to(self):
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                self.assertTrue(skill["apps"], "skill không nói nó dùng cho app nào")
+                for app in skill["apps"]:
+                    self.assertIn(app, ("doc", "sheet", "slide"))
+
+    def test_the_prompt_of_each_one_carries_the_user_question(self):
+        for name, skill in self.found.items():
+            with self.subTest(name):
+                self.assertIn("việc cần làm của tôi", skills.prompt(skill, "việc cần làm của tôi"))

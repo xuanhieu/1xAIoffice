@@ -326,3 +326,32 @@ class SignatureColumnTests(unittest.TestCase):
 
     def test_the_warning_no_longer_claims_a_single_signature_block(self):
         self.assertNotIn("MỘT khối chữ ký", nd30.template_warning("hop_dong"))
+
+
+class DataConsistencyTests(unittest.TestCase):
+    """Cỡ chữ bộ dựng dùng phải nằm trong khoảng bộ kiểm cho phép — nếu không, app tự mâu thuẫn với chính nó."""
+
+    def test_every_size_sits_inside_its_own_allowed_range(self):
+        ranges = nd30.DATA["ranges"]
+        for key, size in nd30.DATA["sizes"].items():
+            with self.subTest(key):
+                self.assertIn(key, ranges, f"cỡ chữ {key} không có khoảng cho phép nào")
+                low, high = ranges[key]
+                self.assertTrue(low <= size <= high, f"{key} = {size}, ngoài khoảng {low}–{high}")
+
+    def test_the_body_defaults_sit_inside_their_ranges(self):
+        body, ranges = nd30.DATA["body"], nd30.DATA["ranges"]
+        for key in ("first_line_indent_mm", "space_after_pt", "line_spacing_percent"):
+            with self.subTest(key):
+                low, high = ranges[key]
+                self.assertTrue(low <= body[key] <= high, f"{key} = {body[key]}, ngoài khoảng {low}–{high}")
+
+    def test_the_page_defaults_sit_inside_their_ranges(self):
+        page, ranges = nd30.DATA["page"], nd30.DATA["ranges"]
+        for key in ("margin_top_mm", "margin_bottom_mm", "margin_left_mm", "margin_right_mm"):
+            with self.subTest(key):
+                low, high = ranges[key]
+                self.assertTrue(low <= page[key] <= high, f"{key} = {page[key]}, ngoài khoảng {low}–{high}")
+
+    def test_a4_is_the_page_size(self):
+        self.assertEqual((nd30.DATA["page"]["width_mm"], nd30.DATA["page"]["height_mm"]), (210, 297))
