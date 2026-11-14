@@ -84,14 +84,50 @@ Mục "Ủng hộ tác giả" trong hướng dẫn 1xDoc có mã VietQR nằm s�
 - **Icon Fluent:** `branding/fluent-map.json` ánh xạ 232 lệnh ribbon sang Fluent UI System Icons (MIT). `make-brand.py --fluent <icons>` sinh đủ ba cỡ (`cmd/sc_`, `cmd/lc_`, `cmd/32/`) vào `images_1x.zip`, nét màu `#E3E5EB` hợp nền than chì. Lệnh chưa có trong bảng dùng icon `colibre_dark`; muốn thêm lệnh thì chỉ cần sửa file JSON.
 - **Bố cục:** bước build `ribbon` (`scripts/ui/ribbon.py`) ghi lại `notebookbar.ui` đã cài của Writer, Calc, Impress và Draw từ bản gốc, chạy lại không cộng dồn và không cần build lại lõi.
   - Ẩn tên nhóm (239 nhãn).
-  - Paste, Clone Formatting, Find and Replace là nút lớn có chữ.
   - Cut, Copy, Clear chỉ hiện icon.
+  - Nút lớn giữ nguyên như bản gốc; chỉ hạ những nút đã nhìn tận mắt thấy gây hại (`DEMOTE_LARGE`).
+  - Vạch ngăn nhóm, thêm 14/11/2026 (xem mục dưới).
+
+## Nhịp nhóm trên ribbon, đo từ WPS (14/11/2026)
+
+Gỡ tên nhóm xong mà không thay bằng gì thì cả dải chỉ còn một hàng icon, không phân biệt được nhóm nào với nhóm
+nào. WPS cũng không ghi tên nhóm, nhưng nó giữ **vạch ngăn và nhịp khoảng cách**. Số đo lấy từ chính bộ cài WPS
+Office trên máy (`Resources/office6/skins/2018white_dark/*.kuip`, là XML token thường):
+
+| Thứ | WPS (nền tối) | 1xVnOffice làm theo |
+|---|---|---|
+| Thang khoảng cách | 0 / 4 / 8 / 12 / 16 / 20 / 24 / 32 | `GROUP_GAP = 6` mỗi bên vạch → 12px giữa hai nhóm |
+| Vạch ngăn | trắng 10% (`#FFFFFF1A`); loại đậm hơn là 20% | theo màu đường kẻ của theme |
+| Kiểu vạch | gradient, mờ hẳn ở 20% trên và 20% dưới nên không cắt ngang cả dải | `SEPARATOR_INSET = 6`: vạch ngắn hơn chiều cao nhóm (VCL không vẽ được gradient) |
+| Bo góc | 4 và 6 | theme đang dùng |
+| Nền | `#2D2D2D` (dải lệnh), `#1E1E1E` (vùng sâu), `#323233` (nổi) | đối chiếu với `config/1x-theme.xcd` |
+
+Chỉ lấy **số đo và cách làm**, không chép tài nguyên của WPS vào kho.
+
+**Hai bẫy đã gặp khi chèn vạch ngăn** (cả hai chỉ lộ ra khi mở app thật, không bài kiểm nào bắt được):
+
+1. Nhóm của bản gốc mang `packing/position` 0,1,2… Vạch ngăn mới không có `position` thì VCL coi như 0 và dồn
+   hết chúng về mép trái thành ba bốn vạch dính nhau. Phải đánh số lại cả hộp (`_renumber`).
+2. Nhóm rỗng hoặc đang ẩn mà vẫn kèm vạch ngăn thì ribbon đầy vạch thừa, nên `_has_content` bỏ qua chúng.
+
+**Nút lớn tên dài là thủ phạm của mảng trống giữa ribbon.** `.uno:ToggleMergeCells` ("Merge and Center Cells")
+là nút lớn chữ-dưới-icon của bản gốc; tên dài kéo cả cột rộng ra, và khi lệnh bị vô hiệu (chọn một ô) nó trông
+như một dòng chữ xám lơ lửng. Hạ xuống chỉ-icon là hết. Không hạ hàng loạt: ribbon của mình vốn đã ít chữ hơn
+WPS, mỗi nút lớn bị hạ là mất thêm một cái nhãn.
+
+**Vì sao chưa gắn chữ cho nhiều lệnh như WPS:** WPS ghi chữ cạnh gần như mọi lệnh trên Home (Wrap Text, Merge,
+Rows and Columns, Sheets, Fill, AutoSum, Sort, Filter, Find, Freeze Panes). Bên LibreOffice phần lớn cụm trên
+Home là **một toolbox chứa nhiều lệnh** (ví dụ `bxHomeCharFormat` gồm B, I, U, S), nên bật chữ sẽ gắn chữ cho
+từng nút một chứ không gắn cho cả cụm. Muốn giống WPS phải tách cụm ra, là việc khác và lớn hơn.
 - **Còn khác WPS:**
   - Thẻ đang chọn vẫn vẽ dạng viên thuốc, vì plugin macOS (Aqua) tự vẽ cả vùng thẻ.
   - Chưa có thẻ tài liệu trên thanh tiêu đề.
   - Impress còn hàng công cụ vẽ và thanh Properties.
   - Thẻ "Extension" vẫn hiện.
   - Chưa có nút NĐ30 và công cụ tiếng Việt ngay trên thẻ Home.
+  - Cụm lệnh tiếng Việt tuy đã khai ở cuối thẻ Home vẫn được VCL vẽ ở ngoài cùng bên trái.
+  - Dải thẻ (File | Home | Insert…) có vạch ngăn giữa các thẻ do VCL tự vẽ, WPS thì không có.
+  - Còn trống khoảng một phần ba bề ngang bên phải dải lệnh.
 
 ## Bộ hướng dẫn nhanh đi kèm (13/11/2026)
 
