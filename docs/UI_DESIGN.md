@@ -132,7 +132,15 @@ từng nút một chứ không gắn cho cả cụm. Muốn giống WPS phải t
   - Impress còn hàng công cụ vẽ và thanh Properties.
   - Thẻ "Extension" vẫn hiện.
   - Chưa có nút NĐ30 và công cụ tiếng Việt ngay trên thẻ Home.
-  - Dải thẻ (File | Home | Insert…) có vạch ngăn giữa các thẻ do VCL tự vẽ, WPS thì không có.
+  - Dải thẻ (File | Home | Insert…) có vạch ngăn giữa các thẻ, WPS thì không có. **Nguyên nhân** (đã tra,
+    14/11/2026): `vcl/osx/salnativewidgets.cxx` vẽ mỗi `ControlType::TabItem` bằng một **NSSegmentedControl**
+    ba ô của macOS, và chính NSSegmentedControl vẽ vạch ngăn giữa các ô. Vạch đó không nằm trong tệp `.ui`
+    nên `ribbon.py` không với tới được.
+    Ba cách chữa, đều đắt hơn hẳn những việc đã làm: (a) `EnableNativeWidget(false)` trên thẻ ribbon — **không
+    dùng được**, vì nó lan xuống mọi con nên cả dải lệnh mất kiểu vẽ gốc của hệ điều hành; (b) báo
+    `ControlType::TabItem` là không hỗ trợ trong plugin macOS — ảnh hưởng mọi hộp thoại có thẻ trong cả bộ;
+    (c) vá `vcl/source/control/tabctrl.cxx` thêm một cờ chỉ tắt vẽ-gốc cho thẻ của notebookbar, rồi dựng lại
+    lõi. Chỉ (c) là đúng phạm vi, nhưng cần vá lõi và build lại.
   - Còn trống khoảng một phần ba bề ngang bên phải dải lệnh.
 
 ## Bộ hướng dẫn nhanh đi kèm (13/11/2026)
