@@ -10,6 +10,8 @@ import json
 from pathlib import Path
 
 DATA = json.loads((Path(__file__).resolve().parent.parent.parent / "data" / "nd30.json").read_text(encoding="utf-8"))
+TEMPLATES = json.loads((Path(__file__).resolve().parent.parent.parent / "data" / "nd30-mau.json")
+                       .read_text(encoding="utf-8"))
 
 
 class Nd30Error(ValueError):
@@ -61,6 +63,27 @@ def recipients_lines(recipients, archive_unit, copies=None):
     return lines
 
 
+def body_template(type_key):
+    """Khung phần thân dựng sẵn cho một loại văn bản; bỏ trống nội dung thì dùng khung này.
+
+    Bảy loại (nghị quyết, quyết định, công điện, giấy mời, giấy giới thiệu, biên bản, giấy nghỉ phép) có lời văn
+    do chính Nghị định 30 quy định tại các Mẫu 1.1-1.10 Phụ lục III; khung của chúng chép đúng lời văn đó.
+    Những loại còn lại Nghị định để trống phần thân, nên khung chỉ là dàn ý theo thông lệ văn phòng — xem khoá
+    "nguon" trong data/nd30-mau.json để biết khung nào thuộc loại nào.
+
+    Loại chưa có khung, kể cả hợp đồng và giấy uỷ quyền, trả về chỗ trống như cũ: dựng sẵn điều khoản cho những
+    thứ có hiệu lực pháp lý là việc của người soạn, không phải của phần mềm.
+    """
+    found = TEMPLATES["mau"].get(type_key)
+    return list(found["than"]) if found else ["[Nội dung văn bản]"]
+
+
+def template_source(type_key):
+    """Khung của loại này lấy từ đâu, để nói rõ với người dùng. Rỗng nghĩa là chưa có khung."""
+    found = TEMPLATES["mau"].get(type_key)
+    return found["nguon"] if found else ""
+
+
 def build(fields):
     """fields: dict với các khoá type, parent_org, org, org_abbr, unit_abbr, number, place, date (datetime.date),
     summary (trích yếu), body (danh sách đoạn), recipient_to (Kính gửi, cho công văn), authority (TM./KT./...),
@@ -100,7 +123,7 @@ def build(fields):
     elif f.get("recipient_to", "").strip():
         title = [{"text": f"Kính gửi: {f['recipient_to'].strip()}", "size": s["noi_dung"], "space_before": 12}]
 
-    body = [p.strip() for p in f.get("body", []) if p.strip()] or ["[Nội dung văn bản]"]
+    body = [p.strip() for p in f.get("body", []) if p.strip()] or body_template(f.get("type", ""))
 
     authority = f.get("authority", "").strip()
     if authority and authority not in DATA["authority_prefixes"]:

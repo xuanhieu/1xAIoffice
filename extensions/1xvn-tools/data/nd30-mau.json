@@ -1,0 +1,221 @@
+{
+  "source": "Phần thân của 7 loại lấy nguyên lời văn các Mẫu 1.1-1.10 tại Phụ lục III Mục II của Nghị định 30/2020/NĐ-CP (trích tại docs/legal/sources/nd-30-2020-trich-2026-11-15.txt). Những loại còn lại Nghị định để trống phần thân (Mẫu 1.4 - Văn bản có tên loại); dàn ý ở đây là THÔNG LỆ VĂN PHÒNG, không phải quy định, và người dùng sửa thoải mái.",
+  "khong_co_man": {
+    "ghi_chu": "Nghị định 30 để trống phần thân cho loại này (Mẫu 1.4 - Văn bản có tên loại)"
+  },
+  "mau": {
+    "nghi_quyet": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.1",
+      "than": [
+        "Căn cứ …………;",
+        "Căn cứ …………;",
+        "QUYẾT NGHỊ:",
+        "…………"
+      ]
+    },
+    "quyet_dinh": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.2 - quy định trực tiếp",
+      "than": [
+        "Căn cứ …………;",
+        "Căn cứ …………;",
+        "Theo đề nghị của ………….",
+        "QUYẾT ĐỊNH:",
+        "Điều 1. …………",
+        "Điều 2. …………",
+        "Điều 3. ………… chịu trách nhiệm thi hành Quyết định này./."
+      ]
+    },
+    "cong_dien": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.6",
+      "than": [
+        "………… điện:",
+        "- …………;",
+        "- …………",
+        "…………"
+      ]
+    },
+    "giay_moi": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.7",
+      "than": [
+        "………… trân trọng kính mời: …………",
+        "Tới dự …………",
+        "Chủ trì: …………",
+        "Thời gian: …………",
+        "Địa điểm: …………"
+      ]
+    },
+    "giay_gioi_thieu": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.8",
+      "than": [
+        "………… trân trọng giới thiệu:",
+        "Ông (bà): …………",
+        "Chức vụ: …………",
+        "Được cử đến: …………",
+        "Về việc: …………",
+        "Đề nghị Quý cơ quan tạo điều kiện để ông (bà) có tên ở trên hoàn thành nhiệm vụ.",
+        "Giấy này có giá trị đến hết ngày …………./."
+      ]
+    },
+    "bien_ban": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.9",
+      "than": [
+        "Thời gian bắt đầu: …………",
+        "Địa điểm: …………",
+        "Thành phần tham dự: …………",
+        "Chủ trì (chủ tọa): …………",
+        "Thư ký (người ghi biên bản): …………",
+        "Nội dung (theo diễn biến cuộc họp/hội nghị/hội thảo):",
+        "…………",
+        "Cuộc họp (hội nghị, hội thảo) kết thúc vào ………… giờ …………, ngày …………./."
+      ]
+    },
+    "giay_nghi_phep": {
+      "nguon": "Nghị định 30/2020/NĐ-CP, Phụ lục III, Mẫu 1.10",
+      "than": [
+        "Xét Đơn đề nghị nghỉ phép ngày ………… của ông (bà) …………,",
+        "………… cấp cho:",
+        "Ông (bà): …………",
+        "Chức vụ: …………",
+        "Được nghỉ phép trong thời gian ………… kể từ ngày ………… đến hết ngày ………… tại ………….",
+        "Số ngày nghỉ phép nêu trên được tính vào thời gian …………./."
+      ]
+    },
+    "bao_cao": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. TÌNH HÌNH CHUNG",
+        "…………",
+        "II. KẾT QUẢ ĐẠT ĐƯỢC",
+        "…………",
+        "III. HẠN CHẾ VÀ NGUYÊN NHÂN",
+        "…………",
+        "IV. PHƯƠNG HƯỚNG, NHIỆM VỤ THỜI GIAN TỚI",
+        "…………"
+      ]
+    },
+    "to_trinh": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. SỰ CẦN THIẾT",
+        "…………",
+        "II. NỘI DUNG ĐỀ NGHỊ",
+        "…………",
+        "III. KIẾN NGHỊ",
+        "Kính đề nghị ………… xem xét, quyết định./."
+      ]
+    },
+    "ke_hoach": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. MỤC ĐÍCH, YÊU CẦU",
+        "…………",
+        "II. NỘI DUNG",
+        "…………",
+        "III. TỔ CHỨC THỰC HIỆN",
+        "…………"
+      ]
+    },
+    "chuong_trinh": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. MỤC ĐÍCH, YÊU CẦU",
+        "…………",
+        "II. NỘI DUNG CHƯƠNG TRÌNH",
+        "…………",
+        "III. TỔ CHỨC THỰC HIỆN",
+        "…………"
+      ]
+    },
+    "phuong_an": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. CĂN CỨ VÀ MỤC TIÊU",
+        "…………",
+        "II. NỘI DUNG PHƯƠNG ÁN",
+        "…………",
+        "III. TỔ CHỨC THỰC HIỆN",
+        "…………"
+      ]
+    },
+    "de_an": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. SỰ CẦN THIẾT",
+        "…………",
+        "II. MỤC TIÊU",
+        "…………",
+        "III. NỘI DUNG ĐỀ ÁN",
+        "…………",
+        "IV. KINH PHÍ VÀ NGUỒN LỰC",
+        "…………",
+        "V. TỔ CHỨC THỰC HIỆN",
+        "…………"
+      ]
+    },
+    "huong_dan": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. PHẠM VI, ĐỐI TƯỢNG",
+        "…………",
+        "II. NỘI DUNG HƯỚNG DẪN",
+        "…………",
+        "III. TỔ CHỨC THỰC HIỆN",
+        "…………"
+      ]
+    },
+    "quy_che": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "Chương I. QUY ĐỊNH CHUNG",
+        "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng: …………",
+        "Chương II. NHỮNG QUY ĐỊNH CỤ THỂ",
+        "Điều 2. …………",
+        "Chương III. ĐIỀU KHOẢN THI HÀNH",
+        "Điều 3. …………"
+      ]
+    },
+    "quy_dinh": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "Chương I. QUY ĐỊNH CHUNG",
+        "Điều 1. Phạm vi điều chỉnh và đối tượng áp dụng: …………",
+        "Chương II. NHỮNG QUY ĐỊNH CỤ THỂ",
+        "Điều 2. …………",
+        "Chương III. ĐIỀU KHOẢN THI HÀNH",
+        "Điều 3. …………"
+      ]
+    },
+    "thong_bao": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "………… thông báo:",
+        "…………"
+      ]
+    },
+    "phieu_gui": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "Kính gửi: …………",
+        "………… gửi tới Quý cơ quan các tài liệu sau:",
+        "- …………;",
+        "Đề nghị Quý cơ quan xác nhận đã nhận đủ./."
+      ]
+    },
+    "phieu_chuyen": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "Kính chuyển: …………",
+        "Hồ sơ, văn bản chuyển: …………",
+        "Lý do chuyển: …………",
+        "Đề nghị ………… xem xét, giải quyết theo thẩm quyền./."
+      ]
+    },
+    "phieu_bao": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "Kính gửi: …………",
+        "………… xin báo: …………"
+      ]
+    }
+  }
+}

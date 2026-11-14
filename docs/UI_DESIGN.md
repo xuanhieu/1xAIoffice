@@ -297,3 +297,25 @@ phải `GƯQ`; `TTr` chứ không phải `TT`), nên `tests/test_nd30.py` chép 
 khớp từng chữ, cộng thêm phép thử dựng được văn bản cho cả 28 loại.
 
 Hộp thoại và bộ dựng đều đọc thẳng từ `data/nd30.json`, nên thêm loại chỉ là thêm dữ liệu, không sửa mã.
+
+## Khung phần thân dựng sẵn (15/11/2026)
+
+Bỏ trống ô nội dung thì văn bản không còn ra `[Nội dung văn bản]` nữa mà ra khung của đúng loại đó
+(`data/nd30-mau.json`, dùng qua `nd30.body_template`). Gõ bất cứ thứ gì vào ô nội dung thì những gì người dùng
+gõ luôn thắng.
+
+**Hai hạng khung, ghi rõ nguồn ở khoá `nguon` của từng mục:**
+
+| Hạng | Loại | Nguồn |
+|---|---|---|
+| Lời văn của Nghị định | nghị quyết, quyết định, công điện, giấy mời, giấy giới thiệu, biên bản, giấy nghỉ phép | Mẫu 1.1–1.10, Phụ lục III Mục II |
+| Dàn ý thông lệ | báo cáo, tờ trình, kế hoạch, chương trình, phương án, đề án, hướng dẫn, quy chế, quy định, thông báo, phiếu gửi, phiếu chuyển, phiếu báo | thông lệ văn phòng, **không phải quy định** |
+
+Bảy loại ở hạng đầu có lời văn do chính Nghị định 30 viết ra (`QUYẾT NGHỊ:`, `trân trọng kính mời`, `Xét Đơn đề
+nghị nghỉ phép`…), nên khung chép đúng lời văn đó. Với mọi loại còn lại, Nghị định **để trống phần thân** (Mẫu
+1.4 — Văn bản có tên loại), nên dàn ý chỉ là thông lệ và dữ liệu nói thẳng điều đó; test bắt mọi mục ngoài bảy
+loại kia phải chứa chữ "KHÔNG phải quy định".
+
+**Tám loại cố ý không có khung:** công văn, chỉ thị, thông cáo, dự án, và bốn loại **hợp đồng, bản ghi nhớ, bản
+thỏa thuận, giấy uỷ quyền**. Bốn loại sau là thứ có hiệu lực pháp lý giữa các bên; dựng sẵn điều khoản cho
+chúng là việc của người soạn thảo, không phải của phần mềm. Một điều khoản mẫu sai còn tệ hơn một trang trắng.

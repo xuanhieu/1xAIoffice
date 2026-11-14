@@ -168,3 +168,55 @@ class AbbreviationTableTests(unittest.TestCase):
                                      "summary": "việc thử dựng văn bản", "body": ["Một đoạn."],
                                      "signer_title": "Giám đốc", "signer_name": "Nguyễn Văn A"})
                 self.assertTrue(blocks)
+
+
+class BodyTemplateTests(unittest.TestCase):
+    """Khung phần thân dựng sẵn: bảy loại chép lời văn của Nghị định, còn lại là dàn ý thông lệ."""
+
+    DECREE_TYPES = ("nghi_quyet", "quyet_dinh", "cong_dien", "giay_moi",
+                    "giay_gioi_thieu", "bien_ban", "giay_nghi_phep")
+
+    def test_the_seven_decree_bodies_keep_the_decree_wording(self):
+        """Những cụm từ này là lời văn của chính Nghị định 30, không phải của mình."""
+        for key, phrase in (("nghi_quyet", "QUYẾT NGHỊ:"), ("quyet_dinh", "QUYẾT ĐỊNH:"),
+                            ("giay_moi", "trân trọng kính mời"), ("giay_gioi_thieu", "trân trọng giới thiệu"),
+                            ("bien_ban", "Thư ký (người ghi biên bản)"),
+                            ("giay_nghi_phep", "Xét Đơn đề nghị nghỉ phép"), ("cong_dien", "điện:")):
+            with self.subTest(key):
+                self.assertTrue(any(phrase in line for line in nd30.body_template(key)),
+                                f"{key} thiếu cụm {phrase!r}")
+
+    def test_decree_bodies_say_they_come_from_the_decree(self):
+        for key in self.DECREE_TYPES:
+            with self.subTest(key):
+                self.assertIn("Nghị định 30", nd30.template_source(key))
+
+    def test_every_other_template_admits_it_is_only_office_practice(self):
+        for key, value in nd30.TEMPLATES["mau"].items():
+            if key in self.DECREE_TYPES:
+                continue
+            with self.subTest(key):
+                self.assertIn("KHÔNG phải quy định", value["nguon"])
+
+    def test_a_type_without_a_template_still_gets_the_old_placeholder(self):
+        """Hợp đồng, giấy uỷ quyền, bản thỏa thuận: không dựng sẵn điều khoản có hiệu lực pháp lý."""
+        for key in ("hop_dong", "giay_uy_quyen", "ban_thoa_thuan", "ban_ghi_nho"):
+            with self.subTest(key):
+                self.assertEqual(nd30.body_template(key), ["[Nội dung văn bản]"])
+                self.assertEqual(nd30.template_source(key), "")
+
+    def test_every_template_names_a_type_that_exists(self):
+        for key in nd30.TEMPLATES["mau"]:
+            with self.subTest(key):
+                self.assertIn(key, nd30.DATA["doc_types"])
+
+    def test_an_empty_body_falls_back_to_the_template(self):
+        blocks = build(dict(BASE, type="bien_ban", body=[]))
+        text = " ".join(blocks["body"])
+        self.assertIn("Thời gian bắt đầu", text)
+
+    def test_what_the_user_typed_always_wins_over_the_template(self):
+        blocks = build(dict(BASE, type="bien_ban", body=["Chỉ một dòng của tôi."]))
+        text = " ".join(blocks["body"])
+        self.assertEqual(text, "Chỉ một dòng của tôi.")
+        self.assertNotIn("Thời gian bắt đầu", text)
