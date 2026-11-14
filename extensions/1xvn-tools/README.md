@@ -139,7 +139,19 @@ Ba lớp chặn, theo đúng thứ tự một trợ lý phải đi qua:
 2. **Trợ lý phải được bạn cho phép.** Lần đầu một trợ lý gọi công cụ, nó bị từ chối và tên nó được ghi lại; lần sau bạn mở lệnh trên menu, 1xVnOffice hỏi bạn cho phép hay không. Trợ lý chưa được phép chỉ xem được danh sách công cụ.
 3. **Mỗi lần sửa tài liệu đều hỏi.** Công cụ ghi hiện hộp xem trước ngay trong app (chữ trước, chữ sau) rồi mới áp, và mọi thay đổi gom trong một bước hoàn tác.
 
-Đường nối là **UNO pipe cục bộ** của riêng tài khoản bạn trên máy này, không phải cổng mạng, nên không máy nào khác với tới được. Bản nối qua HTTP kèm token, resources và prompts để sau.
+Ngoài công cụ, máy chủ còn mở ra **resource** và **prompt**:
+
+| Thứ | Địa chỉ | Trợ lý nhận được |
+|---|---|---|
+| Tài liệu văn bản đang mở | `1x://doc/<mã>` | Markdown (tiêu đề thành `#`) |
+| Trang tính đang mở | `1x://sheet/<mã>/<tên trang>` | CSV đúng RFC 4180 |
+| Mỗi skill đã cài | prompt cùng tên skill | Thân `SKILL.md` kèm việc bạn giao |
+
+Mỗi **trang tính** là một resource riêng, không gộp cả sổ vào một tệp CSV: gộp thì mất ranh giới giữa các trang và trợ lý dễ đọc nhầm số của trang khác. Markdown chỉ đổi tiêu đề thành `#`, cố ý không đoán in đậm, danh sách hay bảng — đoán sai thì trợ lý đọc ra một tài liệu không giống bản bạn đang nhìn.
+
+Quyền vẫn một luật như với công cụ: trợ lý **chưa được bạn cho phép** vẫn xem được *danh sách* tài liệu và danh sách skill, nhưng **không đọc được nội dung** tài liệu lẫn thân skill. Đọc trộm cũng tệ như sửa trộm.
+
+Đường nối là **UNO pipe cục bộ** của riêng tài khoản bạn trên máy này, không phải cổng mạng, nên không máy nào khác với tới được. Bản nối qua HTTP kèm token để sau.
 
 Kiểm trên app thật: `scripts/build-macos.sh tools`, phần `mcpserver` — chạy máy chủ như tiến trình riêng, thử một trợ lý chưa được phép (bị chặn, tài liệu không đổi), rồi duyệt và thử lại (đọc, kiểm NĐ30, sửa một đoạn, Ctrl+Z một lần trả lại như cũ).
 

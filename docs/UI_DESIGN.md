@@ -353,3 +353,18 @@ xuống dưới bảng chữ ký thay vì nằm bên trái như văn bản một
 
 **Cân dòng:** cột người ký chính thường có thêm dòng chức vụ, nên `_level_signature_columns` chừa thêm dòng
 trống ở cột kia để hai họ tên nằm ngang nhau — không cân thì nhìn là thấy lệch ngay.
+
+## Tài liệu đang mở nhìn như MCP resource (15/11/2026)
+
+Bản thiết kế mục 8 đòi hai thứ mà M4 chưa làm: resource và prompt. Nay có cả hai.
+
+- `1x://doc/<mã>` — tài liệu văn bản ở dạng Markdown. Chỉ đổi tiêu đề thành `#`; **cố ý không đoán** in đậm,
+  danh sách hay bảng, vì đoán sai thì trợ lý đọc ra một tài liệu không giống bản người dùng đang nhìn, mà đó
+  mới là thứ nguy hiểm.
+- `1x://sheet/<mã>/<tên trang>` — **mỗi trang tính một resource**, CSV đúng RFC 4180. Gộp cả sổ vào một tệp thì
+  mất ranh giới giữa các trang. Tên trang có dấu gạch chéo ("Quý 1/2026") vẫn đọc đúng.
+- Mỗi skill đã cài là một MCP prompt, nên skill "Soạn văn bản NĐ30" dùng được thẳng trong Claude Desktop.
+
+**Quyền, một luật cho cả ba:** trợ lý chưa ghép đôi xem được *danh sách* tài liệu và danh sách prompt, nhưng
+không đọc được nội dung tài liệu lẫn thân skill. Đọc trộm cũng tệ như sửa trộm. Có bước kiểm trên app thật cho
+đúng điều đó.
