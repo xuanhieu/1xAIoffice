@@ -38,6 +38,7 @@ FIELD_LABELS = {
 
 IMPL = "org.1xvnoffice.tools.ProtocolHandler"
 PROTOCOL = "vnd.1x.tools:"
+BOLD_WEIGHT = 150.0      # com.sun.star.awt.FontWeight.BOLD
 TCVN3_REPLACEMENT_FONT = "Times New Roman"
 
 TEXTS = {
@@ -1009,8 +1010,42 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             item = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
             item.Name, item.Value = name, value
             args.append(item)
-        desktop.loadComponentFromURL(uno.systemPathToFileUrl(path), "_blank", 0, tuple(args))
+        doc = desktop.loadComponentFromURL(uno.systemPathToFileUrl(path), "_blank", 0, tuple(args))
+        self._tidy_csv(doc)
         self.message(self.t["csv_done"].format(name=os.path.basename(path)))
+
+    def _tidy_csv(self, doc):
+        """Giãn cột cho vừa chữ, và nếu dòng đầu là tiêu đề thì tô đậm rồi ghim lại.
+
+        Mở CSV ra mà cột nào cũng hẹp, phải tự kéo từng cái, là việc máy làm được thay người. Sửa xong đặt lại
+        cờ "chưa sửa đổi": người dùng chỉ mở ra xem, đóng lại không nên bị hỏi có lưu không.
+        """
+        from vn1x import csvsafe
+        if doc is None or not hasattr(doc, "getSheets"):
+            return
+        try:
+            sheet = doc.getSheets().getByIndex(0)
+            cursor = sheet.createCursor()
+            cursor.gotoEndOfUsedArea(False)
+            area = cursor.getRangeAddress()
+            if area.EndColumn < 0 or area.EndRow < 0:
+                return
+            columns = sheet.getColumns()
+            for index in range(area.EndColumn + 1):
+                columns.getByIndex(index).OptimalWidth = True
+
+            def row_text(row):
+                return [sheet.getCellByPosition(col, row).getString() for col in range(area.EndColumn + 1)]
+
+            if area.EndRow >= 1 and csvsafe.looks_like_header(row_text(0), row_text(1)):
+                header = sheet.getCellRangeByPosition(0, 0, area.EndColumn, 0)
+                header.CharWeight = BOLD_WEIGHT
+                controller = doc.getCurrentController()
+                if hasattr(controller, "freezeAtPosition"):
+                    controller.freezeAtPosition(0, 1)
+            doc.setModified(False)
+        except Exception:  # noqa: BLE001 - dọn dẹp cho đẹp mắt, hỏng thì tệp vẫn mở bình thường
+            return
 
     def _pick_file(self):
         """Hộp chọn tệp CSV. Trả về đường dẫn hệ thống, hoặc chuỗi rỗng khi người dùng huỷ."""

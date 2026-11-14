@@ -22,10 +22,46 @@
   </oor:component-data>
 
   <!-- English user interface by default (owner's decision 2026-11-13); Vietnamese is fully translated and chosen in
-       Tools > Options > Language Settings > Languages. -->
+       Tools > Options > Language Settings > Languages.
+       The DOCUMENT language is Vietnamese: spell checking, sorting, number and date formats all follow it, and the
+       status bar of an untouched document said "English (USA)" before this. A Vietnamese office suite that opens a
+       new document in English is wrong whatever language its menus are in. -->
   <oor:component-data oor:package="org.openoffice.Office" oor:name="Linguistic">
     <node oor:name="General">
       <prop oor:name="UILocale" oor:op="fuse"><value>en-US</value></prop>
+      <prop oor:name="DefaultLocale" oor:op="fuse"><value>vi-VN</value></prop>
+    </node>
+  </oor:component-data>
+
+  <!-- Default fonts for Vietnamese documents.
+       Nghị định 30/2020/NĐ-CP, Phụ lục I asks for Times New Roman at 13-14pt for administrative documents, and that
+       is what Vietnamese offices use for everything else too. Upstream has no "vi" entry here, so both 1xDoc and
+       1xSheet fell back to the English list and opened with Liberation Sans - a name that also tells everyone which
+       suite this was built from.
+       Times New Roman comes first because macOS and Windows both ship it; Liberation Serif right after it is
+       metric-compatible, so Linux lays out the same page. Fixed-width and presentation fonts stay as upstream:
+       Nghị định 30 says nothing about slides, and Times New Roman on a slide looks dated. -->
+  <oor:component-data oor:package="org.openoffice" oor:name="VCL">
+    <node oor:name="DefaultFonts">
+      <node oor:name="vi" oor:op="replace">
+        <prop oor:name="LATIN_TEXT" oor:type="xs:string" oor:op="replace">
+          <value>Times New Roman;Liberation Serif;Thorndale AMT;Thorndale;Tinos;Nimbus Roman No9 L;DejaVu Serif;Times;Serif</value>
+        </prop>
+        <prop oor:name="LATIN_SPREADSHEET" oor:type="xs:string" oor:op="replace">
+          <value>Times New Roman;Liberation Serif;Thorndale AMT;Thorndale;Tinos;Nimbus Roman No9 L;DejaVu Serif;Times;Serif</value>
+        </prop>
+        <prop oor:name="LATIN_HEADING" oor:type="xs:string" oor:op="replace">
+          <value>Times New Roman;Liberation Serif;Thorndale AMT;Thorndale;Tinos;Nimbus Roman No9 L;DejaVu Serif;Times;Serif</value>
+        </prop>
+      </node>
+    </node>
+  </oor:component-data>
+
+  <!-- 13pt body text: the lower of the two sizes Nghị định 30 allows, and the one Vietnamese offices use most.
+       The unit is twips (1/20 pt), so 13pt = 260. -->
+  <oor:component-data oor:package="org.openoffice.Office" oor:name="Writer">
+    <node oor:name="DefaultFont">
+      <prop oor:name="StandardHeight" oor:op="fuse"><value>260</value></prop>
     </node>
   </oor:component-data>
 

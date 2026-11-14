@@ -250,3 +250,30 @@ nguyên một cột rồi vẽ lại cả cột 6 lần mỗi giây thì vừa c
 
 Kiểm: `scripts/build-macos.sh tools`, phần `cut` — mười một bước gồm cắt, dán, Ctrl+Z một lần, Esc rồi dán,
 chèn dòng rồi dán, thêm trang tính, và đóng tài liệu khi còn chờ dán.
+
+## Mặc định cho người Việt (15/11/2026)
+
+Ba thứ nhỏ nhưng lộ ngay khi mở app, đều sửa bằng cấu hình chứ không phải vá lõi.
+
+**Ngôn ngữ văn bản là tiếng Việt.** `Office.Linguistic/General/DefaultLocale = vi-VN`. Giao diện vẫn tiếng Anh
+theo quyết định của chủ dự án 13/11; đây là ngôn ngữ của *tài liệu*, thứ quyết định kiểm chính tả, thứ tự sắp
+xếp, định dạng số và ngày. Trước đó thanh trạng thái của một tài liệu mới ghi "English (USA)".
+
+**Phông mặc định là Times New Roman.** Nghị định 30/2020/NĐ-CP Phụ lục I đòi Times New Roman cỡ 13–14 cho văn
+bản hành chính, và các cơ quan dùng luôn phông đó cho mọi thứ khác. Chỗ đặt không hiển nhiên: Writer có
+`Office.Writer/DefaultFont`, còn **Calc không có khoá riêng** — nó hỏi bảng `VCL/DefaultFonts/<ngôn ngữ>`. Bảng
+đó không có mục `vi`, nên cả 1xDoc lẫn 1xSheet rơi về danh sách tiếng Anh và mở ra với `Liberation Sans`, cái
+tên cũng nói luôn bộ này dựng từ đâu. Nay thêm mục `vi` với Times New Roman đứng đầu và Liberation Serif ngay
+sau (tương thích thước đo, nên Linux dàn trang y hệt). Cỡ chữ 13pt (`StandardHeight = 260`, đơn vị twip).
+Phông đơn cách và phông slide giữ nguyên: Nghị định 30 không nói gì về slide, và Times New Roman trên slide
+trông cũ kỹ.
+
+**Mở CSV an toàn gọn mắt hơn:** giãn cột cho vừa chữ, và nếu dòng đầu *thật sự* là tiêu đề thì tô đậm rồi ghim
+lại. Đoán tiêu đề bằng `csvsafe.looks_like_header`: mọi ô dòng đầu phải có chữ và không ô nào là số, đồng thời
+dòng thứ hai phải có ít nhất một ô là số. Danh sách toàn chữ (tên người, địa chỉ) không bị nhận nhầm. Hàm nhận
+cả `1.250.000` kiểu Việt Nam lẫn `1,250.50` kiểu Anh Mỹ. Dọn xong đặt lại cờ "chưa sửa đổi", vì người dùng chỉ
+mở ra xem thì đóng lại không nên bị hỏi có lưu không.
+
+Kiểm: `scripts/build-macos.sh defaults` đọc thẳng cấu hình từ app đang chạy; phần đoán tiêu đề có bảy test
+trong `tests/test_csvsafe.py`. Phần UNO của việc dọn CSV (giãn cột, tô đậm, ghim) kiểm bằng mắt trên app có
+giao diện, vì soffice headless trên macOS không mở được tài liệu thứ hai trong một phiên.

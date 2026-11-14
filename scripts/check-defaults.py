@@ -13,6 +13,9 @@ EXPECTED = [
     ("/org.openoffice.Office.UI.ToolbarMode/Applications/Impress", "Active", "notebookbar.ui"),
     ("/org.openoffice.Office.UI.ToolbarMode/Applications/Draw", "Active", "notebookbar.ui"),
     ("/org.openoffice.Office.Linguistic/General", "UILocale", "en-US"),
+    # Giao diện tiếng Anh nhưng VĂN BẢN mặc định là tiếng Việt, và phông theo Nghị định 30.
+    ("/org.openoffice.Office.Linguistic/General", "DefaultLocale", "vi-VN"),
+    ("/org.openoffice.Office.Writer/DefaultFont", "StandardHeight", 260),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.text.TextDocument", "ooSetupFactoryDefaultFilter", "MS Word 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.sheet.SpreadsheetDocument", "ooSetupFactoryDefaultFilter", "Calc MS Excel 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.presentation.PresentationDocument", "ooSetupFactoryDefaultFilter", "Impress MS PowerPoint 2007 XML"),

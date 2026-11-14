@@ -53,3 +53,31 @@ class GuessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HeaderGuessTests(unittest.TestCase):
+    """Chỉ tô đậm và ghim dòng đầu khi nó thật sự là tiêu đề; đoán sai còn khó chịu hơn không làm gì."""
+
+    def test_text_header_above_numbers_is_a_header(self):
+        self.assertTrue(csvsafe.looks_like_header(["Họ tên", "Lương"], ["Nguyễn Văn A", "7500000"]))
+
+    def test_two_rows_of_text_are_not_a_header(self):
+        """Danh sách tên thuần chữ: dòng đầu cũng là dữ liệu."""
+        self.assertFalse(csvsafe.looks_like_header(["Nguyễn Văn A", "Hà Nội"], ["Trần Thị B", "Huế"]))
+
+    def test_a_number_in_the_first_row_rules_it_out(self):
+        self.assertFalse(csvsafe.looks_like_header(["2026", "Lương"], ["Nguyễn Văn A", "7500000"]))
+
+    def test_an_empty_cell_in_the_first_row_rules_it_out(self):
+        self.assertFalse(csvsafe.looks_like_header(["Họ tên", ""], ["Nguyễn Văn A", "7500000"]))
+
+    def test_a_file_with_one_row_has_no_header(self):
+        self.assertFalse(csvsafe.looks_like_header(["Họ tên", "Lương"], []))
+
+    def test_vietnamese_and_english_number_formats_both_count(self):
+        self.assertTrue(csvsafe.looks_like_header(["Mặt hàng", "Giá"], ["Gạo", "1.250.000"]))
+        self.assertTrue(csvsafe.looks_like_header(["Mặt hàng", "Giá"], ["Gạo", "1,250,000.50"]))
+
+    def test_a_phone_number_keeps_its_leading_zero_and_still_reads_as_a_number(self):
+        """0912… vẫn là số theo nghĩa này; đó là lý do dấu hiệu thứ hai cần cả dòng đầu toàn chữ."""
+        self.assertTrue(csvsafe.looks_like_header(["Họ tên", "Điện thoại"], ["Nguyễn Văn A", "0912345678"]))

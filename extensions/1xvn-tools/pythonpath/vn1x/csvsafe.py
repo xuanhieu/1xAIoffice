@@ -54,3 +54,42 @@ def guess_separator(first_line):
         elif not inside and ch in ",;\t|":
             counts[ch] = counts.get(ch, 0) + 1
     return max(counts, key=counts.get) if counts else ","
+
+
+def looks_like_header(first_row, second_row):
+    """Dòng đầu của tệp CSV có phải là dòng tiêu đề không? (thuần Python, có test riêng)
+
+    Nhiều tệp CSV không có tiêu đề — dòng đầu đã là dữ liệu. Tô đậm và ghim nhầm dòng dữ liệu thì khó chịu hơn
+    là không làm gì, nên chỉ nhận khi có đủ hai dấu hiệu:
+
+      * mọi ô ở dòng đầu đều có chữ và KHÔNG ô nào là số (tiêu đề không ai đặt tên cột là "1234");
+      * có ít nhất một ô ở dòng thứ hai là số, tức hai dòng khác kiểu nhau.
+
+    Tệp chỉ có một dòng, hoặc cả hai dòng đều toàn chữ (danh sách tên chẳng hạn), đều trả về False.
+    """
+    if not first_row or not second_row:
+        return False
+    if any(not str(cell).strip() for cell in first_row):
+        return False
+    if any(_is_number(cell) for cell in first_row):
+        return False
+    return any(_is_number(cell) for cell in second_row)
+
+
+def _is_number(cell):
+    """Ô này đọc được thành số không? Nhận cả dấu phẩy thập phân và dấu chấm phân nhóm kiểu Việt Nam."""
+    text = str(cell).strip().replace(" ", "")
+    if not text:
+        return False
+    # 1.234,56 (kiểu Việt Nam) và 1,234.56 (kiểu Anh Mỹ) đều quy về dạng máy đọc được.
+    if "," in text and "." in text:
+        text = text.replace(".", "").replace(",", ".") if text.rfind(",") > text.rfind(".") else text.replace(",", "")
+    elif "," in text:
+        text = text.replace(",", ".")
+    elif text.count(".") > 1:
+        text = text.replace(".", "")      # 1.250.000 kiểu Việt Nam; một dấu chấm thì để nguyên vì float đọc được
+    try:
+        float(text)
+    except ValueError:
+        return False
+    return True
