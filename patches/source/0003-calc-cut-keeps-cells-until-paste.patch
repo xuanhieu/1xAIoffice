@@ -5,24 +5,42 @@ Why: Lệnh Cut của bản gốc xoá ô ngay lập tức. Excel, WPS và Googl
  liệu — đúng nhóm người dùng 1xVnOffice nhắm tới.
  Cách làm: CutToClip ghi nhớ vùng nguồn trong ScModule thay vì xoá; PasteFromClip
  xoá vùng đó ngay sau khi mở nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu;
- Esc gọi ClearPendingCut; ScGridWindow vẽ viền đứt quanh vùng đang chờ.
+ Esc gọi ClearPendingCut; ScGridWindow vẽ viền NÉT ĐỨT CHẠY quanh vùng đang chờ,
+ nhịp do một bộ đếm giờ trong ScModule dịch pha, và mỗi nhịp chỉ vẽ lại bốn dải
+ viền chứ không vẽ lại cả vùng.
  Vùng chọn nhiều mảnh giữ nguyên cách cũ. Vùng nguồn chồng lên vùng đích thì không
  xoá, vì phần chồng nhau vừa bị ghi đè.
 Upstream: not suitable: đổi hành vi mặc định của Calc, upstream sẽ muốn một tuỳ chọn
  trong Tools > Options và một cuộc bàn về tương thích ngược.
 Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một lần, và Esc rồi
- dán (nguồn phải còn nguyên).
 --- a/sc/inc/scmod.hxx
 +++ b/sc/inc/scmod.hxx
-@@ -46,6 +46,7 @@
+@@ -22,6 +22,7 @@
+ #include "scdllapi.h"
+ #include <o3tl/deleter.hxx>
+ #include <vcl/timer.hxx>
++#include <tools/long.hxx>
+ #include <svl/lstner.hxx>
+ #include <sfx2/app.hxx>
+ #include <sfx2/module.hxx>
+@@ -46,6 +47,16 @@
  namespace com::sun::star::uno { template <typename > class Sequence; }
  
  class ScRange;
 +class ScDocShell;
++
++// 1xVnOffice: hình dạng và nhịp của viền chạy quanh vùng đã cắt (marching ants).
++// Nét 5 điểm ảnh, hở 3, nên một chu kỳ là 8; mỗi nhịp dịch 2 điểm ảnh sau 150ms, tức khoảng 13 điểm ảnh/giây —
++// đủ thấy là đang chạy mà không phải vẽ lại liên tục.
++inline constexpr tools::Long SC_CUTMARK_DASH = 5;
++inline constexpr tools::Long SC_CUTMARK_GAP = 3;
++inline constexpr tools::Long SC_CUTMARK_PERIOD = SC_CUTMARK_DASH + SC_CUTMARK_GAP;
++inline constexpr tools::Long SC_CUTMARK_STEP = 2;
++inline constexpr sal_uInt64 SC_CUTMARK_TICK_MS = 150;
  class ScDocument;
  class ScViewCfg;
  class ScDocCfg;
-@@ -101,6 +102,11 @@
+@@ -101,6 +112,13 @@
      bool                m_bIsInExecuteDrop:1;
      bool                m_bIsInSharedDocLoading:1;
      bool                m_bIsInSharedDocSaving:1;
@@ -31,10 +49,20 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +    // vẽ viền đứt quanh nó, và chỉ thật sự xoá khi người dùng dán. Bấm Esc là bỏ, dữ liệu còn nguyên.
 +    ScDocShell*         m_pPendingCutShell = nullptr;
 +    ScRange             m_aPendingCutRange;
++    Timer               m_aCutMarkTimer;        // nhịp cho viền chạy
++    tools::Long         m_nCutMarkPhase = 0;    // dịch bao nhiêu điểm ảnh quanh chu vi
  
      // a way to find existing Dialogs for a given parent Window of the slot type
      std::map<sal_uInt16, std::vector<std::pair<std::shared_ptr<SfxDialogController>, weld::Window*>>> m_mapRefController;
-@@ -153,6 +159,12 @@
+@@ -125,6 +143,7 @@
+                         // moved by the application
+ 
+     DECL_DLLPRIVATE_LINK( IdleHandler, Timer*, void ); // Timer instead of idle
++    DECL_DLLPRIVATE_LINK( CutMarkHandler, Timer*, void );   // viền chạy quanh vùng đã cắt
+     DECL_DLLPRIVATE_LINK( CalcFieldValueHdl, EditFieldInfo*, void );
+ 
+     void                Execute( SfxRequest& rReq );
+@@ -153,6 +172,13 @@
  
      void                SetInEditCommand( bool bNew )   { m_bIsInEditCommand = bNew; }
  
@@ -43,13 +71,14 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +    SC_DLLPUBLIC void   ClearPendingCut();
 +    ScDocShell*         GetPendingCutShell() const      { return m_pPendingCutShell; }
 +    const ScRange&      GetPendingCutRange() const      { return m_aPendingCutRange; }
++    tools::Long         GetCutMarkPhase() const         { return m_nCutMarkPhase; }
 +
      void                SetInExecuteDrop( bool bNew )   { m_bIsInExecuteDrop = bNew; }
      bool                IsInExecuteDrop() const         { return m_bIsInExecuteDrop; }
  
 --- a/sc/source/ui/app/scmod.cxx
 +++ b/sc/source/ui/app/scmod.cxx
-@@ -111,6 +111,28 @@
+@@ -111,6 +111,55 @@
                                              ToolbarId::Objectbar_App);
  
      GetStaticInterface()->RegisterStatusBar(StatusBarId::CalcStatusBar);
@@ -63,21 +92,69 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +    ClearPendingCut();
 +    m_pPendingCutShell = pShell;
 +    m_aPendingCutRange = rRange;
++    m_nCutMarkPhase = 0;
 +    if (pShell)
++    {
 +        pShell->PostPaint( rRange, PaintPartFlags::Grid );
++        m_aCutMarkTimer.Start();                         // bắt đầu cho viền chạy
++    }
 +}
 +
 +void ScModule::ClearPendingCut()
 +{
 +    if (!m_pPendingCutShell)
 +        return;
++    m_aCutMarkTimer.Stop();
 +    ScDocShell* pShell = m_pPendingCutShell;
 +    ScRange aRange = m_aPendingCutRange;
 +    m_pPendingCutShell = nullptr;
 +    pShell->PostPaint( aRange, PaintPartFlags::Grid );   // xoá viền đứt khỏi màn hình
++}
++
++// Mỗi nhịp dịch nét đứt vài điểm ảnh quanh chu vi rồi xin vẽ lại ĐÚNG dải viền.
++// Vẽ lại cả vùng thì một vùng to sẽ chớp liên tục và tốn máy, nên chỉ vẽ lại hàng trên, hàng dưới, cột trái
++// và cột phải — bốn dải mỏng, bất kể vùng rộng bao nhiêu.
++IMPL_LINK_NOARG(ScModule, CutMarkHandler, Timer *, void)
++{
++    if (!m_pPendingCutShell)
++    {
++        m_aCutMarkTimer.Stop();
++        return;
++    }
++    m_nCutMarkPhase = (m_nCutMarkPhase + SC_CUTMARK_STEP) % SC_CUTMARK_PERIOD;
++    const ScRange& r = m_aPendingCutRange;
++    const SCTAB nTab1 = r.aStart.Tab(), nTab2 = r.aEnd.Tab();
++    const SCCOL nCol1 = r.aStart.Col(), nCol2 = r.aEnd.Col();
++    const SCROW nRow1 = r.aStart.Row(), nRow2 = r.aEnd.Row();
++    m_pPendingCutShell->PostPaint( ScRange( nCol1, nRow1, nTab1, nCol2, nRow1, nTab2 ), PaintPartFlags::Grid );
++    m_pPendingCutShell->PostPaint( ScRange( nCol1, nRow2, nTab1, nCol2, nRow2, nTab2 ), PaintPartFlags::Grid );
++    m_pPendingCutShell->PostPaint( ScRange( nCol1, nRow1, nTab1, nCol1, nRow2, nTab2 ), PaintPartFlags::Grid );
++    m_pPendingCutShell->PostPaint( ScRange( nCol2, nRow1, nTab1, nCol2, nRow2, nTab2 ), PaintPartFlags::Grid );
++    m_aCutMarkTimer.Start();
  }
  
  ScModule::ScModule( SfxObjectFactory* pFact ) :
+@@ -124,7 +173,8 @@
+     m_bIsInEditCommand( false ),
+     m_bIsInExecuteDrop( false ),
+     m_bIsInSharedDocLoading( false ),
+-    m_bIsInSharedDocSaving( false )
++    m_bIsInSharedDocSaving( false ),
++    m_aCutMarkTimer("sc ScModule CutMarkTimer")
+ {
+     // The ResManager (DLL data) is not yet initialized in the ctor!
+     SetName(u"StarCalc"_ustr); // for Basic
+@@ -145,6 +195,10 @@
+     m_aIdleTimer.SetTimeout(SC_IDLE_STEP);
+     m_aIdleTimer.SetInvokeHandler( LINK( this, ScModule, IdleHandler ) );
+     m_aIdleTimer.Start();
++
++    // 1xVnOffice: nhịp cho viền chạy quanh vùng đã cắt; chỉ chạy khi có vùng đang chờ dán.
++    m_aCutMarkTimer.SetTimeout( SC_CUTMARK_TICK_MS );
++    m_aCutMarkTimer.SetInvokeHandler( LINK( this, ScModule, CutMarkHandler ) );
+ 
+     m_pMessagePool = new ScMessagePool;
+     SetPool( m_pMessagePool.get() );
 --- a/sc/source/ui/view/viewfun3.cxx
 +++ b/sc/source/ui/view/viewfun3.cxx
 @@ -220,6 +220,16 @@
@@ -138,21 +215,65 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
                  else
 --- a/sc/source/ui/view/gridwin4.cxx
 +++ b/sc/source/ui/view/gridwin4.cxx
-@@ -30,6 +30,7 @@
+@@ -30,6 +30,8 @@
  #include <sfx2/printer.hxx>
  #include <vcl/cursor.hxx>
  #include <vcl/settings.hxx>
 +#include <vcl/lineinfo.hxx>
++#include <algorithm>
  #include <vcl/svapp.hxx>
  #include <o3tl/unit_conversion.hxx>
  #include <osl/diagnose.h>
-@@ -987,6 +988,27 @@
-     pContentDev->SetMapMode(MapMode(MapUnit::MapPixel));
+@@ -364,6 +366,43 @@
+     }
+ }
+ 
++// 1xVnOffice: vẽ viền nét đứt chạy quanh một hình chữ nhật.
++// VCL không có tham số "pha" cho nét đứt, nên tự đi vòng chu vi và vẽ từng đoạn nét một. Đi theo chu vi (chứ
++// không vẽ từng cạnh riêng) thì nét chạy liền mạch qua góc, giống Excel. Vẽ theo ĐOẠN chứ không theo điểm ảnh,
++// nên một vùng rộng cũng chỉ tốn chu-vi/8 lệnh vẽ.
++static void lcl_DrawMarchingAnts( OutputDevice& rDev, const tools::Rectangle& rRect, tools::Long nPhase )
++{
++    const Point aCorner[5] = { rRect.TopLeft(), rRect.TopRight(), rRect.BottomRight(),
++                               rRect.BottomLeft(), rRect.TopLeft() };
++    tools::Long nWalked = 0;
++    for ( int nEdge = 0; nEdge < 4; ++nEdge )
++    {
++        const Point& rFrom = aCorner[nEdge];
++        const Point& rTo = aCorner[nEdge + 1];
++        const bool bHoriz = ( rFrom.Y() == rTo.Y() );
++        const tools::Long nLen = bHoriz ? std::abs( rTo.X() - rFrom.X() ) : std::abs( rTo.Y() - rFrom.Y() );
++        const tools::Long nDir = bHoriz ? ( rTo.X() > rFrom.X() ? 1 : -1 ) : ( rTo.Y() > rFrom.Y() ? 1 : -1 );
++        tools::Long nPos = 0;
++        while ( nPos < nLen )
++        {
++            const tools::Long nOff = ( nWalked + nPos + nPhase ) % SC_CUTMARK_PERIOD;
++            if ( nOff >= SC_CUTMARK_DASH )          // đang ở quãng hở
++            {
++                nPos += SC_CUTMARK_PERIOD - nOff;
++                continue;
++            }
++            const tools::Long nRun = std::min( SC_CUTMARK_DASH - nOff, nLen - nPos );
++            const Point aFrom = bHoriz ? Point( rFrom.X() + nDir * nPos, rFrom.Y() )
++                                       : Point( rFrom.X(), rFrom.Y() + nDir * nPos );
++            const Point aTo = bHoriz ? Point( rFrom.X() + nDir * ( nPos + nRun - 1 ), rFrom.Y() )
++                                     : Point( rFrom.X(), rFrom.Y() + nDir * ( nPos + nRun - 1 ) );
++            rDev.DrawLine( aFrom, aTo );
++            nPos += nRun;
++        }
++        nWalked += nLen;
++    }
++}
++
+ void ScGridWindow::Paint( vcl::RenderContext& /*rRenderContext*/, const tools::Rectangle& rRect )
+ {
+     ScDocument& rDoc = mrViewData.GetDocument();
+@@ -988,6 +1027,22 @@
  
      aOutputData.DrawClipMarks();
-+
-+    // 1xVnOffice: viền đứt quanh vùng vừa bị cắt mà chưa dán, như Excel/WPS/Sheets. Vẽ sau nội dung ô nên
-+    // không bị ô nào đè lên. (Viền chạy được thì giống hẳn, nhưng cần một bộ đếm giờ; bản này vẽ đứng yên.)
+ 
++    // 1xVnOffice: viền chạy quanh vùng vừa bị cắt mà chưa dán, như Excel/WPS/Sheets. Vẽ sau nội dung ô nên
++    // không bị ô nào đè lên; pha do bộ đếm giờ trong ScModule dịch dần nên nét đứt chạy vòng quanh chu vi.
 +    if (ScDocShell* pCutShell = ScModule::get()->GetPendingCutShell())
 +    {
 +        const ScRange& rCut = ScModule::get()->GetPendingCutRange();
@@ -161,16 +282,12 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +            Point aCutFrom = mrViewData.GetScrPos( rCut.aStart.Col(), rCut.aStart.Row(), eWhich, true );
 +            Point aCutTo = mrViewData.GetScrPos( rCut.aEnd.Col() + 1, rCut.aEnd.Row() + 1, eWhich, true );
 +            tools::Rectangle aCutRect( aCutFrom, Point( aCutTo.X() - 1, aCutTo.Y() - 1 ) );
-+            LineInfo aCutLine( LineStyle::Dash, 1 );
-+            aCutLine.SetDashCount( 0 );
-+            aCutLine.SetDotCount( 1 );
-+            aCutLine.SetDotLen( 4 );
-+            aCutLine.SetDistance( 3 );
 +            pContentDev->SetFillColor();
 +            pContentDev->SetLineColor( Color( 0x4C, 0x7D, 0xFF ) );     // xanh thương hiệu 1x
-+            pContentDev->DrawPolyLine( tools::Polygon( aCutRect ), aCutLine );
++            lcl_DrawMarchingAnts( *pContentDev, aCutRect, ScModule::get()->GetCutMarkPhase() );
 +        }
 +    }
- 
++
      // In any case, Scenario / ChangeTracking must happen after DrawGrid, also for !bGridFirst
  
+     //! test if ChangeTrack display is active

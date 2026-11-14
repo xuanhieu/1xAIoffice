@@ -217,7 +217,7 @@ Bản vá `patches/source/0003-calc-cut-keeps-cells-until-paste.patch`:
 | `ScViewFunc::CutToClip` | Chép vào clipboard rồi **ghi nhớ** vùng nguồn thay vì xoá |
 | `ScViewFunc::PasteFromClip` | Xoá vùng nguồn ngay sau khi mở nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu |
 | `SID_CANCEL` (cellsh3) | Esc bỏ vùng đang chờ, dữ liệu giữ nguyên |
-| `ScGridWindow` (gridwin4) | Vẽ viền đứt màu xanh thương hiệu quanh vùng đang chờ |
+| `ScGridWindow` (gridwin4) | Vẽ viền nét đứt **chạy** quanh vùng đang chờ |
 
 Calc vốn đã có `ScClipParam::mbCutMode` để chỉnh tham chiếu công thức khi dán dữ liệu cắt, nên phần khó nhất
 đã có sẵn; việc của bản vá chỉ là **dời thời điểm xoá**.
@@ -226,7 +226,14 @@ Calc vốn đã có `ScClipParam::mbCutMode` để chỉnh tham chiếu công th
 bước hoàn tác cần thêm việc; và vùng nguồn **chồng lên** vùng đích thì không xoá, vì phần chồng nhau vừa bị
 ghi đè, xoá tiếp là mất dữ liệu thật.
 
-**Chưa có:** viền chạy (marching ants). Viền hiện đứng yên. Muốn chạy phải thêm một bộ đếm giờ vẽ lại viền
-theo nhịp, làm sau.
+**Viền chạy (marching ants).** VCL không có tham số "pha" cho nét đứt, nên `lcl_DrawMarchingAnts` tự đi vòng
+chu vi và vẽ từng đoạn nét. Đi theo chu vi chứ không vẽ từng cạnh riêng, nên nét chạy liền mạch qua góc như
+Excel. Vẽ theo đoạn chứ không theo điểm ảnh, nên vùng rộng cũng chỉ tốn chu-vi/8 lệnh vẽ.
+
+Số đo: nét 5 điểm ảnh, hở 3 (chu kỳ 8), mỗi nhịp dịch 2 điểm ảnh sau 150ms — khoảng 13 điểm ảnh/giây.
+
+Mỗi nhịp **chỉ vẽ lại bốn dải viền** (hàng trên, hàng dưới, cột trái, cột phải), không vẽ lại cả vùng: cắt
+nguyên một cột rồi vẽ lại cả cột 6 lần mỗi giây thì vừa chớp vừa tốn máy. Bộ đếm giờ chỉ chạy khi có vùng
+đang chờ dán, dừng ngay khi dán hoặc bấm Esc.
 
 Kiểm: `scripts/build-macos.sh tools`, phần `cut` — bảy bước gồm cắt, dán, Ctrl+Z một lần, và Esc rồi dán.
