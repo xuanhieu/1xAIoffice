@@ -309,15 +309,16 @@ gõ luôn thắng.
 | Hạng | Loại | Nguồn |
 |---|---|---|
 | Lời văn của Nghị định | nghị quyết, quyết định, công điện, giấy mời, giấy giới thiệu, biên bản, giấy nghỉ phép | Mẫu 1.1–1.10, Phụ lục III Mục II |
-| Dàn ý thông lệ | báo cáo, tờ trình, kế hoạch, chương trình, phương án, đề án, hướng dẫn, quy chế, quy định, thông báo, phiếu gửi, phiếu chuyển, phiếu báo | thông lệ văn phòng, **không phải quy định** |
+| Dàn ý thông lệ | 21 loại còn lại: báo cáo, tờ trình, kế hoạch, công văn, chỉ thị, thông cáo, dự án, chương trình, phương án, đề án, hướng dẫn, quy chế, quy định, thông báo, phiếu gửi, phiếu chuyển, phiếu báo, và bốn loại ràng buộc bên dưới | thông lệ văn phòng, **không phải quy định** |
 
 Bảy loại ở hạng đầu có lời văn do chính Nghị định 30 viết ra (`QUYẾT NGHỊ:`, `trân trọng kính mời`, `Xét Đơn đề
 nghị nghỉ phép`…), nên khung chép đúng lời văn đó. Với mọi loại còn lại, Nghị định **để trống phần thân** (Mẫu
 1.4 — Văn bản có tên loại), nên dàn ý chỉ là thông lệ và dữ liệu nói thẳng điều đó; test bắt mọi mục ngoài bảy
 loại kia phải chứa chữ "KHÔNG phải quy định".
 
-**Bốn loại cố ý không có khung:** công văn, chỉ thị, thông cáo, dự án — chưa có dàn ý nào đủ phổ biến để đáng
-dựng sẵn.
+Bốn loại cuối (công văn, chỉ thị, thông cáo, dự án) được bổ sung ngày 15/11/2026, nên **cả 28 loại đều có
+khung**. Công văn theo lối viết quen thuộc ba phần: nêu việc, nêu ý kiến, rồi đề nghị — Nghị định 30 để thân
+công văn tự do (Mẫu 1.5), nên đây cũng chỉ là thông lệ.
 
 ### Bốn loại có hiệu lực pháp lý giữa các bên (15/11/2026)
 

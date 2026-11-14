@@ -200,11 +200,16 @@ class BodyTemplateTests(unittest.TestCase):
 
     LEGAL_TYPES = ("hop_dong", "giay_uy_quyen", "ban_thoa_thuan", "ban_ghi_nho")
 
-    def test_a_type_without_a_template_still_gets_the_old_placeholder(self):
-        for key in ("cong_van", "chi_thi", "thong_cao", "du_an"):
+    def test_all_twenty_eight_types_now_have_a_template(self):
+        for key in nd30.DATA["doc_types"]:
             with self.subTest(key):
-                self.assertEqual(nd30.body_template(key), ["[Nội dung văn bản]"])
-                self.assertEqual(nd30.template_source(key), "")
+                self.assertIn(key, nd30.TEMPLATES["mau"])
+                self.assertTrue(nd30.body_template(key))
+                self.assertNotEqual(nd30.body_template(key), ["[Nội dung văn bản]"])
+
+    def test_an_unknown_type_still_falls_back_to_the_old_placeholder(self):
+        self.assertEqual(nd30.body_template("khong_co_loai_nay"), ["[Nội dung văn bản]"])
+        self.assertEqual(nd30.template_source("khong_co_loai_nay"), "")
 
     def test_the_four_binding_types_are_labels_only_and_carry_no_clause(self):
         """Khung của hợp đồng, bản ghi nhớ, bản thỏa thuận, giấy uỷ quyền chỉ được là NHÃN MỤC để điền.

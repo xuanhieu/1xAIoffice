@@ -311,6 +311,51 @@
         "Thời hạn uỷ quyền: từ ngày ………… đến ngày …………",
         "Cam kết của các bên: …………./."
       ]
+    },
+    "cong_van": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "…………",
+        "Về việc nêu trên, ………… có ý kiến như sau:",
+        "…………",
+        "Đề nghị ………… quan tâm, phối hợp thực hiện./."
+      ]
+    },
+    "chi_thi": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "…………",
+        "Để …………, ………… yêu cầu:",
+        "1. …………",
+        "2. …………",
+        "Yêu cầu ………… nghiêm túc triển khai thực hiện Chỉ thị này./."
+      ]
+    },
+    "thong_cao": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "………… thông cáo:",
+        "…………"
+      ]
+    },
+    "du_an": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30",
+      "than": [
+        "I. SỰ CẦN THIẾT",
+        "…………",
+        "II. MỤC TIÊU",
+        "…………",
+        "III. NỘI DUNG VÀ QUY MÔ",
+        "…………",
+        "IV. TỔNG MỨC ĐẦU TƯ VÀ NGUỒN VỐN",
+        "…………",
+        "V. THỜI GIAN VÀ TIẾN ĐỘ THỰC HIỆN",
+        "…………",
+        "VI. TỔ CHỨC THỰC HIỆN",
+        "…………",
+        "VII. HIỆU QUẢ DỰ KIẾN",
+        "…………"
+      ]
     }
   },
   "canh_bao": "Bốn loại hợp đồng, bản ghi nhớ, bản thỏa thuận và giấy uỷ quyền có hiệu lực pháp lý giữa các bên. Khung ở đây CHỈ là nhãn mục để điền, không chứa điều khoản nào và không thay cho ý kiến pháp lý. Ngoài ra bộ dựng chỉ tạo MỘT khối chữ ký, nên văn bản hai bên cần tự thêm khối ký của bên còn lại."
