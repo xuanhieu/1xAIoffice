@@ -29,6 +29,7 @@ import urllib.error
 import urllib.request
 
 RETRY_CODES = (429, 500, 502, 503, 504)
+OPENAI_WIRE = ("openai", "ollama", "azure")
 MAX_TOOL_STEPS = 8          # bản thiết kế nói 12; hạ xuống cho bản đầu để vòng lặp hỏng không chạy lâu
 TOOL_LOOP_SECONDS = 120
 MAX_RETRIES = 2
@@ -43,6 +44,8 @@ ERRORS = {
     "config": "Cấu hình nhà cung cấp chưa đúng: {detail}",
     "server": "Nhà cung cấp trả lỗi {status}: {detail}",
     "answer": "Không đọc được câu trả lời của nhà cung cấp.",
+    "login": "{detail}",
+    "action": "Việc không hỗ trợ: {action!r}.",
     "tool_unknown": "Mô hình đòi dùng công cụ {name!r} chưa được cho phép, nên đã bị từ chối.",
     "tool_failed": "Công cụ {name!r} lỗi: {detail}",
     "tool_steps": "Mô hình gọi công cụ quá {steps} lượt mà chưa xong; đã dừng.",
@@ -68,11 +71,47 @@ def read_secret(ref):
     return out.stdout.strip() if out.returncode == 0 else ""
 
 
+def _auth_headers(kind, mode, secret):
+    """Header xác thực. Thẻ OAuth luôn là Bearer; khoá API thì mỗi hãng một kiểu."""
+    if not secret or mode == "none":
+        return {}
+    if mode == "oauth":
+        return {"Authorization": f"Bearer {secret}"}
+    if kind == "anthropic":
+        return {"x-api-key": secret}
+    if kind == "gemini":
+        return {"x-goog-api-key": secret}
+    if kind == "azure":
+        return {"api-key": secret}
+    return {"Authorization": f"Bearer {secret}"}
+
+
+def credential(provider):
+    """(cách xác thực, giá trị) cho một nhà cung cấp. Ném ValueError kèm lời nhắn tiếng Việt khi chưa sẵn sàng.
+
+    Khoá API và thẻ OAuth chỉ tồn tại trong tiến trình này; không ghi ra đâu cả.
+    """
+    mode = provider.get("auth") or ("oauth" if provider.get("oauth") else
+                                    ("key" if provider.get("secret_ref") else "none"))
+    if mode == "none":
+        return "none", ""
+    if mode == "oauth":
+        import oauthflow
+        try:
+            return "oauth", oauthflow.access_token(provider)
+        except oauthflow.FlowError as exc:
+            raise ValueError(str(exc)) from None
+    secret = read_secret(provider.get("secret_ref"))
+    if not secret:
+        raise KeyError(provider.get("secret_ref") or "")
+    return "key", secret
+
+
 def tool_declarations(kind, tools):
     """Khai báo công cụ theo đúng hình dạng của từng nhà cung cấp."""
     if not tools:
         return None
-    if kind in ("openai", "ollama"):
+    if kind in OPENAI_WIRE:
         return [{"type": "function",
                  "function": {"name": t["name"], "description": t.get("description", ""),
                               "parameters": t.get("schema") or {"type": "object", "properties": {}}}}
@@ -91,7 +130,7 @@ def parse_tool_calls(kind, data):
     """[{id, name, arguments}] mô hình muốn gọi, rỗng nếu không gọi gì."""
     out = []
     try:
-        if kind in ("openai", "ollama"):
+        if kind in OPENAI_WIRE:
             for call in (data["choices"][0]["message"].get("tool_calls") or []):
                 function = call.get("function") or {}
                 arguments = function.get("arguments") or "{}"
@@ -113,17 +152,31 @@ def parse_tool_calls(kind, data):
     return [call for call in out if call["name"]]
 
 
-def build_request(provider, model, messages, max_tokens, secret, tools=None):
-    """(url, headers, body) cho từng loại nhà cung cấp. Lỗi cấu hình thì ném ValueError."""
+def build_request(provider, model, messages, max_tokens, secret, tools=None, mode="key"):
+    """(url, headers, body) cho từng loại nhà cung cấp. Lỗi cấu hình thì ném ValueError.
+
+    `mode` là cách xác thực: "key" (khoá API, mỗi hãng một kiểu header), "oauth" (thẻ truy cập, luôn là
+    Authorization: Bearer), hoặc "none" (máy chủ cục bộ).
+    """
     kind = provider.get("type", "")
     base = (provider.get("base_url") or "").rstrip("/")
     system = "\n\n".join(m["content"] for m in messages if m.get("role") == "system")
     chat = [m for m in messages if m.get("role") != "system"]
-    if kind in ("openai", "ollama"):
+    if kind == "azure":
+        if not base:
+            raise ValueError("Azure OpenAI cần base_url của tài nguyên")
+        headers = {"Content-Type": "application/json"}
+        headers.update(_auth_headers(kind, mode, secret))
+        body = {"model": model, "messages": messages, "max_tokens": max_tokens, "stream": False}
+        declared = tool_declarations(kind, tools)
+        if declared:
+            body["tools"] = declared
+        version = provider.get("api_version") or "2024-10-21"
+        return f"{base}/deployments/{model}/chat/completions?api-version={version}", headers, body
+    if kind in OPENAI_WIRE:
         base = base or ("http://127.0.0.1:11434/v1" if kind == "ollama" else "https://api.openai.com/v1")
         headers = {"Content-Type": "application/json"}
-        if secret:
-            headers["Authorization"] = f"Bearer {secret}"
+        headers.update(_auth_headers(kind, mode, secret))
         body = {"model": model, "messages": messages, "max_tokens": max_tokens, "stream": False}
         declared = tool_declarations(kind, tools)
         if declared:
@@ -131,7 +184,8 @@ def build_request(provider, model, messages, max_tokens, secret, tools=None):
         return f"{base}/chat/completions", headers, body
     if kind == "anthropic":
         base = base or "https://api.anthropic.com/v1"
-        headers = {"Content-Type": "application/json", "anthropic-version": "2023-06-01", "x-api-key": secret}
+        headers = {"Content-Type": "application/json", "anthropic-version": "2023-06-01"}
+        headers.update(_auth_headers(kind, mode, secret))
         body = {"model": model, "messages": chat, "max_tokens": max_tokens}
         if system:
             body["system"] = system
@@ -141,7 +195,8 @@ def build_request(provider, model, messages, max_tokens, secret, tools=None):
         return f"{base}/messages", headers, body
     if kind == "gemini":
         base = base or "https://generativelanguage.googleapis.com/v1beta"
-        headers = {"Content-Type": "application/json", "x-goog-api-key": secret}
+        headers = {"Content-Type": "application/json"}
+        headers.update(_auth_headers(kind, mode, secret))
         body = {"contents": [{"role": "user" if m["role"] == "user" else "model",
                               "parts": [{"text": m["content"]}]} for m in chat],
                 "generationConfig": {"maxOutputTokens": max_tokens}}
@@ -150,14 +205,15 @@ def build_request(provider, model, messages, max_tokens, secret, tools=None):
         declared = tool_declarations(kind, tools)
         if declared:
             body["tools"] = declared
-        return f"{base}/models/{model}:generateContent", headers, body
+        path = (provider.get("model_path") or "models").strip("/")
+        return f"{base}/{path}/{model}:generateContent", headers, body
     raise ValueError(f"loại nhà cung cấp không hỗ trợ: {kind!r}")
 
 
 def parse_answer(kind, data):
     """(chữ trả lời, số token). Trả về (None, _) khi không đọc được."""
     try:
-        if kind in ("openai", "ollama"):
+        if kind in OPENAI_WIRE:
             text = data["choices"][0]["message"]["content"]
             usage = data.get("usage") or {}
             return text, {"input": usage.get("prompt_tokens", 0), "output": usage.get("completion_tokens", 0)}
@@ -192,7 +248,7 @@ def post(url, headers, body, timeout):
 
 def tool_result_message(kind, call, text):
     """Đưa kết quả công cụ lại cho mô hình, đúng hình dạng từng nhà cung cấp. Kết quả luôn là dữ liệu."""
-    if kind in ("openai", "ollama"):
+    if kind in OPENAI_WIRE:
         return {"role": "tool", "tool_call_id": call["id"], "content": text}
     if kind == "anthropic":
         return {"role": "user", "content": [{"type": "tool_result", "tool_use_id": call["id"], "content": text}]}
@@ -203,7 +259,7 @@ def tool_result_message(kind, call, text):
 
 def assistant_turn_message(kind, data, calls):
     """Lượt của mô hình (gồm lời gọi công cụ) để ghi vào lịch sử trước khi trả kết quả."""
-    if kind in ("openai", "ollama"):
+    if kind in OPENAI_WIRE:
         return data["choices"][0]["message"]
     if kind == "anthropic":
         return {"role": "assistant", "content": data.get("content", [])}
@@ -232,15 +288,18 @@ def run_tool(tools, call):
 def ask(request):
     provider = request.get("provider") or {}
     kind = provider.get("type", "")
-    secret = read_secret(provider.get("secret_ref"))
-    if provider.get("secret_ref") and not secret:
-        return fail("secret", ref=provider["secret_ref"])
+    try:
+        mode, secret = credential(provider)
+    except KeyError as exc:
+        return fail("secret", ref=str(exc.args[0]))
+    except ValueError as exc:
+        return fail("login", detail=str(exc))
     tools = request.get("tools") or []
     messages = list(request.get("messages") or [])
     steps = []
     started = time.monotonic()
     for _ in range(MAX_TOOL_STEPS + 1):
-        answer = _one_turn(provider, kind, request, messages, secret, tools)
+        answer = _one_turn(provider, kind, request, messages, secret, tools, mode)
         if not answer.get("ok"):
             return answer
         calls = answer.pop("_calls", [])
@@ -258,11 +317,11 @@ def ask(request):
     return fail("tool_steps", steps=MAX_TOOL_STEPS)
 
 
-def _one_turn(provider, kind, request, messages, secret, tools):
+def _one_turn(provider, kind, request, messages, secret, tools, mode="key"):
     """Một lượt gọi mô hình. Trả về {"ok":True,"text":...,"_calls":[...],"_raw":data} hoặc lỗi."""
     try:
         url, headers, body = build_request(provider, request["model"], messages,
-                                           request.get("max_tokens", 1000), secret, tools)
+                                           request.get("max_tokens", 1000), secret, tools, mode)
     except (ValueError, KeyError) as exc:
         return fail("config", detail=str(exc))
     timeout = request.get("timeout", DEFAULT_TIMEOUT)
@@ -293,6 +352,104 @@ def _one_turn(provider, kind, request, messages, secret, tools):
     return fail("quota")
 
 
+def list_models(request):
+    """Hỏi nhà cung cấp xem có những mô hình nào, để người dùng không phải tự gõ tên mô hình."""
+    provider = request.get("provider") or {}
+    kind = provider.get("type", "")
+    try:
+        mode, secret = credential(provider)
+    except KeyError as exc:
+        return fail("secret", ref=str(exc.args[0]))
+    except ValueError as exc:
+        return fail("login", detail=str(exc))
+    base = (provider.get("base_url") or "").rstrip("/")
+    if kind == "azure":
+        # Azure OpenAI không liệt kê mô hình theo kiểu này: tên mô hình là tên deployment do người dùng đặt.
+        return fail("config", detail="Azure OpenAI: hãy gõ tên deployment thay vì chọn trong danh sách")
+    if kind in OPENAI_WIRE:
+        base = base or ("http://127.0.0.1:11434/v1" if kind == "ollama" else "https://api.openai.com/v1")
+        url = f"{base}/models"
+    elif kind == "anthropic":
+        url = (base or "https://api.anthropic.com/v1") + "/models"
+    elif kind == "gemini":
+        url = (base or "https://generativelanguage.googleapis.com/v1beta") + "/models"
+    else:
+        return fail("config", detail=f"không hỏi được danh sách mô hình của {kind!r}")
+    headers = {"Accept": "application/json"}
+    headers.update(_auth_headers(kind, mode, secret))
+    if kind == "anthropic":
+        headers["anthropic-version"] = "2023-06-01"
+    try:
+        status, data = get(url, headers, request.get("timeout", DEFAULT_TIMEOUT))
+    except TimeoutError:
+        return fail("timeout")
+    except urllib.error.URLError:
+        return fail("network")
+    if status in (401, 403):
+        return fail("auth")
+    if status >= 400:
+        detail = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
+        return fail("server", status=status, detail=detail[:300])
+    return {"ok": True, "models": _model_names(data)}
+
+
+def _model_names(data):
+    """Tên mô hình trong câu trả lời, bất kể hãng xếp theo kiểu nào."""
+    if not isinstance(data, dict):
+        return []
+    rows = data.get("data") or data.get("models") or []
+    out = []
+    for row in rows if isinstance(rows, list) else []:
+        name = row.get("id") or row.get("name") or row.get("model") if isinstance(row, dict) else None
+        if name:
+            out.append(str(name).rsplit("/", 1)[-1])
+    return sorted(set(out))
+
+
+def get(url, headers, timeout):
+    """(mã HTTP, dữ liệu) cho một yêu cầu GET."""
+    request = urllib.request.Request(url, headers=headers, method="GET")
+    try:
+        with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as response:
+            return response.status, json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raw = exc.read().decode("utf-8", "replace")
+        try:
+            return exc.code, json.loads(raw)
+        except ValueError:
+            return exc.code, raw
+
+
+def oauth_action(action, request):
+    """Đăng nhập, lấy mã thiết bị, hỏi lại, hoặc quên thẻ. Thẻ không bao giờ đi ngược ra ngoài tiến trình này."""
+    import oauthflow
+    provider = request.get("provider") or {}
+    config = provider.get("oauth") or {}
+    ref = provider.get("secret_ref") or ""
+    try:
+        if action == "login":
+            return {"ok": True, "state": oauthflow.login_browser(config, ref,
+                                                                 request.get("timeout", oauthflow.LOGIN_TIMEOUT))}
+        if action == "device_start":
+            started = oauthflow.device_start(config)
+            return {"ok": True, "user_code": started["user_code"], "url": started["verification_url"],
+                    "device_code": started["device_code"], "interval": started["interval"]}
+        if action == "device_poll":
+            return {"ok": True, "state": oauthflow.device_poll(config, ref, request.get("device_code", ""),
+                                                               request.get("interval", 5),
+                                                               request.get("timeout",
+                                                                           oauthflow.DEVICE_POLL_TIMEOUT))}
+        if action == "logout":
+            oauthflow.forget(ref)
+            return {"ok": True, "state": "đã quên thẻ của tài khoản này"}
+        if action == "status":
+            from vn1x import oauth as oauthlib
+            return {"ok": True, "state": oauthlib.redacted(oauthflow.read_bundle(ref))}
+    except (oauthflow.FlowError, ValueError) as exc:
+        return fail("login", detail=str(exc))
+    return fail("action", action=action)
+
+
 def main():
     try:
         request = json.loads(sys.stdin.read() or "{}")
@@ -300,7 +457,14 @@ def main():
         print(json.dumps(fail("config", detail=str(exc))), flush=True)
         return 1
     action = request.get("action")
-    result = ask(request) if action == "ask" else fail("config", detail=f"việc không hỗ trợ: {action!r}")
+    if action == "ask":
+        result = ask(request)
+    elif action == "models":
+        result = list_models(request)
+    elif action in ("login", "device_start", "device_poll", "logout", "status"):
+        result = oauth_action(action, request)
+    else:
+        result = fail("action", action=action)
     print(json.dumps(result, ensure_ascii=False), flush=True)
     return 0 if result.get("ok") else 2
 

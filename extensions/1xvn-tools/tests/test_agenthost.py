@@ -268,3 +268,100 @@ class ToolLoopTests(HostTestCase):
 
 def _json_dumps(value):
     return json.dumps(value, ensure_ascii=False)
+
+
+class AuthModeTests(unittest.TestCase):
+    """Khoá API thì mỗi hãng một kiểu header; thẻ OAuth thì luôn là Authorization: Bearer."""
+
+    def test_an_api_key_goes_where_each_provider_wants_it(self):
+        self.assertEqual(host._auth_headers("anthropic", "key", "k"), {"x-api-key": "k"})
+        self.assertEqual(host._auth_headers("gemini", "key", "k"), {"x-goog-api-key": "k"})
+        self.assertEqual(host._auth_headers("azure", "key", "k"), {"api-key": "k"})
+        self.assertEqual(host._auth_headers("openai", "key", "k"), {"Authorization": "Bearer k"})
+
+    def test_an_oauth_token_is_always_a_bearer(self):
+        for kind in ("openai", "anthropic", "gemini", "azure"):
+            self.assertEqual(host._auth_headers(kind, "oauth", "t"), {"Authorization": "Bearer t"},
+                             kind)
+
+    def test_a_local_server_gets_no_authorisation_header(self):
+        self.assertEqual(host._auth_headers("ollama", "none", ""), {})
+
+    def test_gemini_with_a_token_does_not_also_send_the_key_header(self):
+        _, headers, _ = host.build_request({"type": "gemini"}, "g", [{"role": "user", "content": "a"}],
+                                           10, "the", None, "oauth")
+        self.assertNotIn("x-goog-api-key", headers)
+        self.assertEqual(headers["Authorization"], "Bearer the")
+
+    def test_azure_addresses_the_deployment_and_the_api_version(self):
+        url, headers, body = host.build_request(
+            {"type": "azure", "base_url": "https://coquan.openai.azure.com/openai",
+             "api_version": "2024-10-21"}, "trien-khai-1",
+            [{"role": "user", "content": "a"}], 10, "k")
+        self.assertEqual(url, "https://coquan.openai.azure.com/openai/deployments/trien-khai-1"
+                              "/chat/completions?api-version=2024-10-21")
+        self.assertEqual(headers["api-key"], "k")
+        self.assertIn("messages", body)
+
+    def test_azure_without_an_address_is_a_configuration_error(self):
+        with self.assertRaises(ValueError):
+            host.build_request({"type": "azure"}, "m", [], 10, "k")
+
+    def test_vertex_uses_its_own_model_path(self):
+        url, _, _ = host.build_request(
+            {"type": "gemini", "base_url": "https://aiplatform.vd/v1/projects/p/locations/l",
+             "model_path": "publishers/google/models"}, "gemini-x",
+            [{"role": "user", "content": "a"}], 10, "t", None, "oauth")
+        self.assertTrue(url.endswith("/publishers/google/models/gemini-x:generateContent"), url)
+
+
+class CredentialTests(unittest.TestCase):
+    def test_a_local_provider_needs_nothing(self):
+        self.assertEqual(host.credential({"type": "ollama", "auth": "none"}), ("none", ""))
+
+    def test_a_missing_api_key_names_the_entry_not_the_value(self):
+        with self.assertRaises(KeyError) as caught:
+            host.credential({"type": "openai", "auth": "key", "secret_ref": "khong-co-that"})
+        self.assertEqual(caught.exception.args[0], "khong-co-that")
+
+    def test_an_oauth_provider_that_is_not_signed_in_says_so_in_vietnamese(self):
+        with self.assertRaises(ValueError) as caught:
+            host.credential({"id": "cong-noi-bo", "auth": "oauth", "secret_ref": "khong-co-that",
+                             "oauth": {"token_url": "https://x", "client_id": "c"}})
+        self.assertIn("đăng nhập", str(caught.exception))
+
+    def test_old_configurations_without_an_auth_field_still_work(self):
+        os.environ["ONEX_AI_SECRET_FOR_TEST"] = "khoa"
+        try:
+            self.assertEqual(host.credential({"type": "openai", "secret_ref": "r"}), ("key", "khoa"))
+        finally:
+            del os.environ["ONEX_AI_SECRET_FOR_TEST"]
+
+
+class ModelListTests(unittest.TestCase):
+    def test_names_are_read_from_whatever_shape_the_provider_uses(self):
+        self.assertEqual(host._model_names({"data": [{"id": "b"}, {"id": "a"}]}), ["a", "b"])
+        self.assertEqual(host._model_names({"models": [{"name": "models/gemini-x"}]}), ["gemini-x"])
+        self.assertEqual(host._model_names({"data": [{"id": "a"}, {"id": "a"}]}), ["a"])
+
+    def test_an_answer_it_cannot_read_gives_an_empty_list_not_a_crash(self):
+        self.assertEqual(host._model_names("khong phai JSON"), [])
+        self.assertEqual(host._model_names({"data": "sai kieu"}), [])
+
+    def test_a_provider_that_cannot_list_models_is_refused_politely(self):
+        out = host.list_models({"provider": {"type": "azure", "auth": "none",
+                                             "base_url": "https://x/openai"}})
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["code"], "config")
+
+
+class ActionTests(unittest.TestCase):
+    def test_an_unknown_action_is_named_back(self):
+        out = host.oauth_action("khong-co", {})
+        self.assertFalse(out["ok"])
+        self.assertIn("khong-co", out["error"])
+
+    def test_status_of_an_account_never_shows_the_token(self):
+        out = host.oauth_action("status", {"provider": {"secret_ref": "khong-co-that"}})
+        self.assertTrue(out["ok"])
+        self.assertIn("chưa đăng nhập", out["state"])

@@ -28,6 +28,14 @@ from vn1x.vnname import salutation, sort_key, split_name
 from vn1x.vntext import (normalize_full, remove_diacritics, tcvn3_to_unicode, tone_style,
                          vni_to_unicode, viqr_to_unicode)
 
+FIELD_LABELS = {
+    "client_id": "client_id của ứng dụng OAuth",
+    "tenant": "mã tenant (thư mục Entra ID của cơ quan)",
+    "base_url": "địa chỉ máy chủ",
+    "authorize_url": "địa chỉ đăng nhập (authorize)",
+    "token_url": "địa chỉ cấp thẻ (token)",
+}
+
 IMPL = "org.1xvnoffice.tools.ProtocolHandler"
 PROTOCOL = "vnd.1x.tools:"
 TCVN3_REPLACEMENT_FONT = "Times New Roman"
@@ -80,6 +88,21 @@ TEXTS = {
         "ai_answer": "{text}\n\n— {provider}/{model}, sent {note}, {tokens} tokens.",
         "ai_no_config": ("No AI provider is set up yet.\n\nWrite your own providers.json at:\n{path}\n\n"
                          "Example (the key itself stays in the system keychain, never in this file):\n{example}"),
+        "acct_title": "AI accounts",
+        "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
+        "acct_pick": "Type the number or the name of the provider to add (empty to close):",
+        "acct_unknown": "There is no provider called “{name}”.",
+        "acct_field": "{label}\n\n{field}:",
+        "acct_key": "{label}\n\nPaste the API key. It goes straight into this computer's secret store ({ref}); it is never written into providers.json and never shown again.",
+        "acct_key_failed": "Could not write the key into the secret store.",
+        "acct_oauth_how": "{label}\n\nSign in with the browser on this computer?\n\nChoose No to sign in with a short code on another device.",
+        "acct_device": "Open:\n{url}\n\nand type this code:\n\n{code}\n\nThen come back and press OK.",
+        "acct_login_ok": "Signed in: {state}.",
+        "acct_login_failed": "Sign-in failed: {error}",
+        "acct_model_ask": "Which model? Known: {models}",
+        "acct_model_free": "Type the model name (for Azure OpenAI this is the deployment name):",
+        "acct_saved": "Saved the account “{id}” ({model}).\n\n{file}",
+        "acct_nothing": "Nothing was saved.",
         "ai_bad_config": "providers.json has problems:\n\n{list}\n\nFile: {path}",
         "ai_failed": "{error}",
         "csv_title": "Open a CSV file safely",
@@ -138,6 +161,21 @@ TEXTS = {
         "ai_answer": "{text}\n\n— {provider}/{model}, đã gửi {note}, {tokens} token.",
         "ai_no_config": ("Chưa khai báo nhà cung cấp AI nào.\n\nTạo tệp providers.json của bạn tại:\n{path}\n\n"
                          "Ví dụ (khoá API nằm trong kho bí mật của hệ điều hành, không bao giờ ghi vào tệp này):\n{example}"),
+        "acct_title": "Tài khoản AI",
+        "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
+        "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
+        "acct_unknown": "Không có nhà cung cấp nào tên “{name}”.",
+        "acct_field": "{label}\n\n{field}:",
+        "acct_key": "{label}\n\nDán khoá API vào đây. Khoá đi thẳng vào kho bí mật của máy này ({ref}); không ghi vào providers.json và không hiện lại lần nào nữa.",
+        "acct_key_failed": "Không ghi được khoá vào kho bí mật của máy.",
+        "acct_oauth_how": "{label}\n\nĐăng nhập bằng trình duyệt trên máy này?\n\nChọn Không để đăng nhập bằng mã ngắn trên máy khác.",
+        "acct_device": "Mở:\n{url}\n\nrồi gõ mã này:\n\n{code}\n\nXong thì quay lại và bấm OK.",
+        "acct_login_ok": "Đã đăng nhập: {state}.",
+        "acct_login_failed": "Đăng nhập không thành công: {error}",
+        "acct_model_ask": "Dùng mô hình nào? Đang có: {models}",
+        "acct_model_free": "Gõ tên mô hình (với Azure OpenAI thì đây là tên deployment):",
+        "acct_saved": "Đã lưu tài khoản “{id}” ({model}).\n\n{file}",
+        "acct_nothing": "Chưa lưu gì cả.",
         "ai_bad_config": "providers.json đang có lỗi:\n\n{list}\n\nTệp: {path}",
         "ai_failed": "{error}",
         "csv_title": "Mở tệp CSV an toàn",
@@ -682,6 +720,166 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         self.message(self.t["ai_answer"].format(text=result["text"], provider=provider.get("id", "?"), model=model,
                                                 note=note, tokens=usage.get("input", 0) + usage.get("output", 0)))
 
+    def cmd_AiAccounts(self, doc, is_writer):
+        """Gắn tài khoản AI: khoá API của nhiều hãng, hoặc đăng nhập OAuth (trình duyệt / mã thiết bị).
+
+        Khoá và thẻ KHÔNG bao giờ nằm trong providers.json: tệp đó chỉ giữ tên mục trong kho bí mật của máy.
+        """
+        from vn1x import aiconfig, aiproviders
+        path = self._ai_config_path()
+        try:
+            config = aiconfig.load(path)
+        except aiconfig.ConfigError as exc:
+            self.message(self.t["ai_bad_config"].format(list=str(exc), path=path))
+            return
+        preset = self._pick_preset(config)
+        if preset is None:
+            return
+        values = self._ask_preset_fields(preset)
+        if values is None:
+            return
+        entry = aiproviders.fill(preset, values)
+        if preset["auth"] == "key" and not self._take_api_key(preset, entry["secret_ref"]):
+            return
+        if preset["auth"] == "oauth" and not self._sign_in(entry):
+            return
+        model = self._pick_model(preset, entry)
+        if not model:
+            self.message(self.t["acct_nothing"])
+            return
+        entry["models"] = [model] + [m for m in entry.get("models", []) if m != model]
+        role = None if (config.get("roles") or {}).get(aiconfig.DEFAULT_ROLE) else aiconfig.DEFAULT_ROLE
+        aiconfig.save(path, aiconfig.put_provider(config, entry, role=role))
+        self.message(self.t["acct_saved"].format(id=entry["id"], model=model, file=path))
+
+    @staticmethod
+    def _scripted(key):
+        """Câu trả lời dựng sẵn cho bước kiểm tự động trên app thật, nơi không bấm được vào hộp thoại.
+
+        Lúc chạy thật không có biến môi trường này, nên mọi câu đều do người dùng trả lời.
+        """
+        path = os.environ.get("ONEX_ACCOUNT_ANSWERS_PATH")
+        if path and Path(path).is_file():
+            try:
+                return json.loads(Path(path).read_text(encoding="utf-8")).get(key)
+            except ValueError:
+                return None
+        return os.environ.get("ONEX_ACCOUNT_" + key.upper())
+
+    def _pick_preset(self, config):
+        """Nhà cung cấp người dùng chọn trong danh mục, hoặc None khi thoát."""
+        from vn1x import aiconfig, aiproviders
+        current = "\n".join(
+            f"- {p.get('id')} ({aiconfig.auth_mode(p)}, {', '.join(p.get('models') or []) or 'chưa chọn mô hình'})"
+            for p in config.get("providers") or []) or "(chưa có)"
+        catalogue = "\n".join(f"{i}. {aiproviders.summary(preset)}"
+                               for i, preset in enumerate(aiproviders.PRESETS, 1))
+        wanted = self._scripted("preset")
+        if not wanted:
+            self.message(self.t["acct_overview"].format(current=current, catalogue=catalogue))
+            wanted = self._ask_text(self.t["acct_title"], self.t["acct_pick"])
+        if not wanted:
+            return None
+        wanted = wanted.strip()
+        if wanted.isdigit() and 1 <= int(wanted) <= len(aiproviders.PRESETS):
+            return aiproviders.PRESETS[int(wanted) - 1]
+        preset = aiproviders.BY_ID.get(wanted)
+        if preset is None:
+            self.message(self.t["acct_unknown"].format(name=wanted))
+        return preset
+
+    def _ask_preset_fields(self, preset):
+        """Những thứ nhà cung cấp này còn đòi (client_id, tenant, địa chỉ...). None khi người dùng huỷ."""
+        given = self._scripted("fields") or {}
+        values = dict(given)
+        for field in preset.get("needs") or []:
+            if given.get(field):
+                values[field] = given[field]
+                continue
+            answer = self._ask_text(self.t["acct_title"],
+                                    self.t["acct_field"].format(label=preset["note"],
+                                                                field=FIELD_LABELS.get(field, field)))
+            if not answer:
+                return None
+            values[field] = answer.strip()
+        return values
+
+    def _take_api_key(self, preset, ref):
+        """Nhận khoá API và đưa thẳng vào kho bí mật của máy. Không ghi ra tệp, không hiện lại."""
+        key = self._scripted("secret")
+        if key is None:
+            key = self._ask_text(self.t["acct_title"],
+                                 self.t["acct_key"].format(label=preset["label"], ref=ref), secret=True)
+        if not key:
+            return False
+        if not self._store_secret(ref, key.strip()):
+            self.message(self.t["acct_key_failed"])
+            return False
+        return True
+
+    @staticmethod
+    def _store_secret(ref, value):
+        """Ghi một bí mật vào Keychain qua ĐẦU VÀO CHUẨN, nên giá trị không nằm trong tham số dòng lệnh."""
+        import subprocess
+        override = os.environ.get("ONEX_SECRET_STORE_FOR_TEST")
+        if override:
+            store = {}
+            if Path(override).is_file():
+                try:
+                    store = json.loads(Path(override).read_text(encoding="utf-8") or "{}")
+                except ValueError:
+                    store = {}
+            store[ref] = value
+            Path(override).write_text(json.dumps(store, ensure_ascii=False), encoding="utf-8")
+            return True
+        try:
+            done = subprocess.run(["security", "add-generic-password", "-U", "-a", "1xvnoffice", "-s", ref,
+                                   "-D", "1xVnOffice", "-w"],
+                                  input=value + "\n" + value + "\n", capture_output=True, text=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return False
+        return done.returncode == 0
+
+    def _sign_in(self, entry):
+        """Đăng nhập OAuth: trình duyệt trên máy này, hoặc mã ngắn gõ ở máy khác."""
+        mode = self._scripted("login")
+        browser = mode != "device" if mode else self.ask(
+            self.t["acct_oauth_how"].format(label=entry["id"]))
+        if browser:
+            result = self._agent_host({"action": "login", "provider": entry, "timeout": 300}, timeout=330)
+        else:
+            started = self._agent_host({"action": "device_start", "provider": entry}, timeout=60)
+            if not started.get("ok"):
+                self.message(self.t["acct_login_failed"].format(error=started.get("error", "?")))
+                return False
+            self.message(self.t["acct_device"].format(url=started.get("url", ""),
+                                                      code=started.get("user_code", "")))
+            result = self._agent_host({"action": "device_poll", "provider": entry,
+                                       "device_code": started["device_code"],
+                                       "interval": started.get("interval", 5), "timeout": 300}, timeout=330)
+        if not result.get("ok"):
+            self.message(self.t["acct_login_failed"].format(error=result.get("error", "?")))
+            return False
+        self.message(self.t["acct_login_ok"].format(state=result.get("state", "")))
+        return True
+
+    def _pick_model(self, preset, entry):
+        """Tên mô hình sẽ dùng. Hỏi nhà cung cấp trước để người dùng khỏi gõ tay, hỏi không được thì gõ tay."""
+        chosen = self._scripted("model")
+        if chosen:
+            return chosen.strip()
+        models = list(entry.get("models") or [])
+        if preset.get("can_list_models"):
+            listed = self._agent_host({"action": "models", "provider": entry}, timeout=60)
+            if listed.get("ok") and listed.get("models"):
+                models = listed["models"]
+        if not models:
+            answer = self._ask_text(self.t["acct_title"], self.t["acct_model_free"])
+            return (answer or "").strip()
+        answer = self._ask_text(self.t["acct_title"],
+                                self.t["acct_model_ask"].format(models=", ".join(models[:20])))
+        return (answer or "").strip() or models[0]
+
     def _ai_config_path(self):
         """providers.json trong hồ sơ người dùng (bước kiểm tự động trỏ chỗ khác qua ONEX_AI_CONFIG_PATH)."""
         from vn1x import aiconfig
@@ -719,7 +917,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     rows.append("\t".join(cells))
         return selection, "\n".join(rows)
 
-    def _agent_host(self, request):
+    def _agent_host(self, request, timeout=120):
         """Gọi tiến trình Agent Host. Mọi kết nối mạng đi qua đây, không đi thẳng từ trong tài liệu."""
         import subprocess
         host = Path(__file__).resolve().parent / "agenthost" / "host.py"
@@ -727,7 +925,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             return {"ok": False, "error": f"không thấy Agent Host tại {host}"}
         try:
             done = subprocess.run([self._python_executable(), "-I", str(host)],
-                                  input=json.dumps(request), capture_output=True, text=True, timeout=120)
+                                  input=json.dumps(request), capture_output=True, text=True, timeout=timeout)
         except (OSError, subprocess.SubprocessError) as exc:
             return {"ok": False, "error": f"không chạy được Agent Host: {exc}"}
         try:
@@ -745,8 +943,8 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                 return candidate
         return "python3"
 
-    def _ask_text(self, title, prompt):
-        """Hộp nhập một dòng. Trả về chuỗi rỗng khi người dùng huỷ."""
+    def _ask_text(self, title, prompt, secret=False):
+        """Hộp nhập một dòng. `secret=True` thì che chữ (dùng cho khoá API). Trả về None khi huỷ."""
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
             return ""
         smgr = self.ctx.ServiceManager
@@ -758,6 +956,8 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         model.insertByName("lbl", label)
         edit = model.createInstance("com.sun.star.awt.UnoControlEditModel")
         edit.PositionX, edit.PositionY, edit.Width, edit.Height = 8, 36, 244, 16
+        if secret:
+            edit.EchoChar = ord("*")
         model.insertByName("q", edit)
         for name, text, kind, pos in (("ok", "OK", 1, 0), ("cancel", "Huỷ", 2, 1)):
             button = model.createInstance("com.sun.star.awt.UnoControlButtonModel")

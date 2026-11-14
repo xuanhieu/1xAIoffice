@@ -103,3 +103,66 @@ class ResolveTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AuthModeTests(unittest.TestCase):
+    OAUTH = {"id": "cong", "type": "openai", "models": ["m"], "auth": "oauth",
+             "base_url": "https://ai.coquan.gov.vn/v1", "secret_ref": "1xvnoffice/cong",
+             "oauth": {"authorize_url": "https://sso/a", "token_url": "https://sso/t", "client_id": "c"}}
+
+    def test_a_signed_in_provider_is_a_valid_configuration(self):
+        self.assertEqual(aiconfig.problems({"providers": [self.OAUTH]}), [])
+        self.assertEqual(aiconfig.auth_mode(self.OAUTH), "oauth")
+
+    def test_an_oauth_provider_without_its_addresses_is_caught(self):
+        entry = dict(self.OAUTH, oauth={"client_id": "c"})
+        found = " | ".join(aiconfig.problems({"providers": [entry]}))
+        self.assertIn("token_url", found)
+
+    def test_a_token_written_into_the_file_is_refused(self):
+        """Thẻ phải nằm trong kho bí mật của máy, không nằm trong providers.json."""
+        entry = dict(self.OAUTH, oauth=dict(self.OAUTH["oauth"], refresh_token="dung-ghi-vao-day"))
+        found = " | ".join(aiconfig.problems({"providers": [entry]}))
+        self.assertIn("kho bí mật", found)
+
+    def test_saving_a_token_into_the_file_is_refused(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".json") as handle:
+            with self.assertRaises(aiconfig.ConfigError):
+                aiconfig.save(handle.name, {"providers": [{"id": "x", "access_token": "the"}]})
+
+    def test_an_unknown_auth_mode_is_named(self):
+        found = " | ".join(aiconfig.problems({"providers": [{"id": "x", "type": "openai", "models": ["m"],
+                                                             "auth": "bang-gi-do"}]}))
+        self.assertIn("bang-gi-do", found)
+
+    def test_an_oauth_block_without_the_oauth_mode_is_caught(self):
+        entry = {"id": "x", "type": "openai", "models": ["m"], "auth": "key", "secret_ref": "r",
+                 "oauth": {"client_id": "c"}}
+        self.assertTrue(any("oauth" in p for p in aiconfig.problems({"providers": [entry]})))
+
+
+class PutAndRemoveTests(unittest.TestCase):
+    ENTRY = {"id": "moi", "type": "openai", "auth": "key", "secret_ref": "r", "models": ["m1", "m2"]}
+
+    def test_adding_a_provider_can_also_set_the_role(self):
+        config = aiconfig.put_provider(aiconfig.EMPTY, self.ENTRY, role="soan_thao")
+        self.assertEqual(config["roles"]["soan_thao"], "moi/m1")
+        self.assertEqual(aiconfig.resolve(config)[1], "m1")
+
+    def test_adding_the_same_id_twice_replaces_it(self):
+        config = aiconfig.put_provider(aiconfig.EMPTY, self.ENTRY)
+        config = aiconfig.put_provider(config, dict(self.ENTRY, models=["khac"]))
+        self.assertEqual(len(config["providers"]), 1)
+        self.assertEqual(config["providers"][0]["models"], ["khac"])
+
+    def test_the_original_configuration_is_not_changed(self):
+        before = {"providers": [], "roles": {}}
+        aiconfig.put_provider(before, self.ENTRY, role="nhanh")
+        self.assertEqual(before, {"providers": [], "roles": {}})
+
+    def test_removing_a_provider_also_drops_the_roles_pointing_at_it(self):
+        config = aiconfig.put_provider(aiconfig.EMPTY, self.ENTRY, role="soan_thao")
+        config = aiconfig.remove_provider(config, "moi")
+        self.assertEqual(config["providers"], [])
+        self.assertEqual(config["roles"], {})

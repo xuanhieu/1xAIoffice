@@ -220,7 +220,7 @@ step_extensions() {
   done
 }
 
-run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn|csv|ai|airewrite|mcp|mcpserver|skill
+run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn|csv|ai|airewrite|mcp|mcpserver|skill|accounts
   local app="$1" part="$2" profile pipe="onex_tools_$$_$2" rc=0
   profile="$(mktemp -d "$ONEX_WORK/profile.XXXXXX")"
   rm -f "/tmp/OSL_PIPE_$(id -u)_$pipe"
@@ -233,6 +233,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn
     ONEX_MCP_SERVERS_PATH="$LOG_DIR/ai/mcp_servers.json" ONEX_MCP_TOOLS_PATH="$LOG_DIR/ai/mcp_tools.json" \
     ONEX_MCP_SERVER_PATH="$LOG_DIR/ai/mcp_server.json" ONEX_MCP_CLIENTS_PATH="$LOG_DIR/ai/mcp_clients.json" \
     ONEX_SKILL_NAME="kiem-chinh-ta-tieng-viet" ONEX_SKILL_QUESTION="Rà giúp tôi lỗi chính tả." \
+    ONEX_ACCOUNT_ANSWERS_PATH="$LOG_DIR/ai/account_answers.json" ONEX_SECRET_STORE_FOR_TEST="$LOG_DIR/ai/secrets.json" ONEX_OAUTH_STORE_FOR_TEST="$LOG_DIR/ai/tokens.json" \
     ONEX_TOOLS_ND30_FIELDS="$nd30_fields" \
     "$app/Contents/MacOS/soffice" --headless --norestore -env:UserInstallation="file://$profile" \
     "--accept=pipe,name=$pipe;urp;" >/dev/null 2>&1 &
@@ -245,6 +246,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn
     ONEX_MCP_SERVERS_PATH="$LOG_DIR/ai/mcp_servers.json" ONEX_MCP_TOOLS_PATH="$LOG_DIR/ai/mcp_tools.json" \
     ONEX_MCP_SERVER_PATH="$LOG_DIR/ai/mcp_server.json" ONEX_MCP_CLIENTS_PATH="$LOG_DIR/ai/mcp_clients.json" \
     ONEX_SKILL_NAME="kiem-chinh-ta-tieng-viet" ONEX_SKILL_QUESTION="Rà giúp tôi lỗi chính tả." \
+    ONEX_ACCOUNT_ANSWERS_PATH="$LOG_DIR/ai/account_answers.json" ONEX_SECRET_STORE_FOR_TEST="$LOG_DIR/ai/secrets.json" ONEX_OAUTH_STORE_FOR_TEST="$LOG_DIR/ai/tokens.json" \
     "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xvn-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
   sleep 2; kill -9 "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
@@ -269,6 +271,7 @@ step_tools() {
   run_tools_check "$app" mcp || rc=1
   run_tools_check "$app" mcpserver || rc=1
   run_tools_check "$app" skill || rc=1
+  run_tools_check "$app" accounts || rc=1
   [ "$rc" = 0 ] || die "Lệnh tiếng Việt chạy sai trên app."
   info "Lệnh tiếng Việt chạy đúng trên app."
 }

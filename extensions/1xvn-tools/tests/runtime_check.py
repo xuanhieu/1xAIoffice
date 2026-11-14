@@ -58,6 +58,8 @@ def main():
         ai_checks(desktop, prop, run, check)
     elif part == "skill":
         skill_checks(desktop, prop, run, check)
+    elif part == "accounts":
+        accounts_checks(desktop, prop, run, check)
     elif part == "mcpserver":
         mcp_server_checks(desktop, prop, run, check)
     elif part == "mcp":
@@ -728,6 +730,153 @@ def calc_checks(desktop, prop, run, check):
     check("Calc =SAPTEN sắp đúng d trước đ",
           sheet.getCellByPosition(1, 8).getString() < sheet.getCellByPosition(1, 7).getString(), True)
     calc.close(True)
+
+
+def accounts_checks(desktop, prop, run, check):
+    """Gắn tài khoản AI trên app thật: khoá API của một hãng, và đăng nhập OAuth bằng mã thiết bị.
+
+    Cả nhà cung cấp AI lẫn máy chủ đăng nhập đều là đồ giả chạy trên 127.0.0.1, nên không ra Internet và không
+    cần khoá thật. Kho khoá và kho thẻ cũng trỏ sang tệp tạm, không chạm Keychain của máy.
+
+    Điều cần chứng minh: khoá và thẻ KHÔNG bao giờ nằm trong providers.json, và thẻ OAuth thật sự đi tới nhà
+    cung cấp dưới dạng Authorization: Bearer khi hỏi AI.
+    """
+    import json as _json
+    import os
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    answer = "Tài liệu này là một tờ trình."
+    seen = []
+
+    class FakeAi(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self._send({"data": [{"id": "mo-hinh-gia"}, {"id": "mo-hinh-gia-2"}]})
+
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            seen.append(self.headers.get("Authorization", ""))
+            self._send({"choices": [{"message": {"content": answer}}],
+                        "usage": {"prompt_tokens": 1, "completion_tokens": 1}})
+
+        def _send(self, payload):
+            body = _json.dumps(payload).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    class FakeLogin(BaseHTTPRequestHandler):
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            if self.path == "/device":
+                payload = {"device_code": "ma-thiet-bi", "user_code": "ABCD-1234",
+                           "verification_uri": "https://dangnhap.gia/nhapma", "interval": 0}
+            else:
+                payload = {"access_token": "the-cua-thiet-bi", "refresh_token": "r", "expires_in": 3600}
+            body = _json.dumps(payload).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    ai = HTTPServer(("127.0.0.1", 0), FakeAi)
+    login = HTTPServer(("127.0.0.1", 0), FakeLogin)
+    for server in (ai, login):
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+    ai_url = f"http://127.0.0.1:{ai.server_port}/v1"
+    login_url = f"http://127.0.0.1:{login.server_port}"
+    answers_path = os.environ["ONEX_ACCOUNT_ANSWERS_PATH"]
+    config_path = os.environ["ONEX_AI_CONFIG_PATH"]
+    secrets_path = os.environ["ONEX_SECRET_STORE_FOR_TEST"]
+    tokens_path = os.environ["ONEX_OAUTH_STORE_FOR_TEST"]
+
+    def script(answers):
+        os.makedirs(os.path.dirname(answers_path), exist_ok=True)
+        with open(answers_path, "w", encoding="utf-8") as handle:
+            _json.dump(answers, handle, ensure_ascii=False)
+
+    def saved():
+        with open(config_path, encoding="utf-8") as handle:
+            return _json.load(handle)
+
+    def stored(path):
+        if not os.path.exists(path):
+            return {}
+        with open(path, encoding="utf-8") as handle:
+            return _json.loads(handle.read() or "{}")
+
+    try:
+        for path in (config_path, secrets_path, tokens_path):
+            if os.path.exists(path):
+                os.remove(path)
+        doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, (prop("Hidden", False),))
+        doc.getText().setString("TỜ TRÌNH")
+
+        # 1. Máy chủ nội bộ nói hình dạng OpenAI: không cần khoá, và danh sách mô hình hỏi thẳng máy chủ.
+        script({"preset": "vllm", "fields": {"base_url": ai_url}})
+        run(doc, "AiAccounts")
+        config = saved()
+        entry = next((p for p in config["providers"] if p["id"] == "vllm"), {})
+        check("Gắn máy chủ nội bộ: đã lưu nhà cung cấp", bool(entry), True)
+        check("Gắn máy chủ nội bộ: mô hình lấy từ chính máy chủ", entry.get("models"), ["mo-hinh-gia"])
+        check("Gắn máy chủ nội bộ: không đòi khoá", "secret_ref" in entry, False)
+
+        # 2. Khoá API: vào kho bí mật, KHÔNG vào providers.json.
+        script({"preset": "openai", "secret": "khoa-gia-khong-duoc-ghi-ra", "model": "mo-hinh-gia"})
+        run(doc, "AiAccounts")
+        config = saved()
+        entry = next((p for p in config["providers"] if p["id"] == "openai"), {})
+        check("Gắn khoá API: đã lưu nhà cung cấp", entry.get("auth"), "key")
+        check("Gắn khoá API: tệp cấu hình chỉ giữ TÊN mục khoá", entry.get("secret_ref"), "1xvnoffice/openai")
+        with open(config_path, encoding="utf-8") as handle:
+            check("Gắn khoá API: khoá không nằm trong providers.json",
+                  "khoa-gia-khong-duoc-ghi-ra" in handle.read(), False)
+        check("Gắn khoá API: khoá nằm trong kho bí mật của máy",
+              stored(secrets_path).get("1xvnoffice/openai"), "khoa-gia-khong-duoc-ghi-ra")
+
+        # 3. Đăng nhập OAuth bằng mã thiết bị vào một cổng AI nội bộ.
+        script({"preset": "oidc", "login": "device", "model": "mo-hinh-gia",
+                "fields": {"client_id": "ung-dung-co-quan", "authorize_url": login_url + "/auth",
+                           "token_url": login_url + "/token", "device_url": login_url + "/device",
+                           "base_url": ai_url}})
+        run(doc, "AiAccounts")
+        config = saved()
+        entry = next((p for p in config["providers"] if p["id"] == "oidc"), {})
+        check("Đăng nhập OAuth: đã lưu nhà cung cấp", entry.get("auth"), "oauth")
+        check("Đăng nhập OAuth: giữ client_id của cơ quan",
+              (entry.get("oauth") or {}).get("client_id"), "ung-dung-co-quan")
+        check("Đăng nhập OAuth: thẻ nằm trong kho bí mật",
+              stored(tokens_path).get("1xvnoffice/oidc", {}).get("access_token"), "the-cua-thiet-bi")
+        with open(config_path, encoding="utf-8") as handle:
+            check("Đăng nhập OAuth: thẻ không nằm trong providers.json",
+                  "the-cua-thiet-bi" in handle.read(), False)
+
+        # 4. Hỏi AI qua tài khoản vừa đăng nhập: thẻ phải tới nhà cung cấp dưới dạng Bearer.
+        config["roles"] = {"soan_thao": "oidc/mo-hinh-gia"}
+        with open(config_path, "w", encoding="utf-8") as handle:
+            _json.dump(config, handle, ensure_ascii=False)
+        script({})
+        seen.clear()
+        run(doc, "AiAsk")
+        check("Hỏi AI bằng tài khoản đã đăng nhập: có gọi nhà cung cấp", len(seen), 1)
+        if seen:
+            check("Hỏi AI bằng tài khoản đã đăng nhập: gửi thẻ dạng Bearer",
+                  seen[0], "Bearer the-cua-thiet-bi")
+        check("Hỏi AI bằng tài khoản đã đăng nhập: không sửa tài liệu",
+              doc.getText().getString(), "TỜ TRÌNH")
+        doc.close(True)
+    finally:
+        for server in (ai, login):
+            server.shutdown()
+            server.server_close()
 
 
 main()

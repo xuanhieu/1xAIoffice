@@ -58,7 +58,27 @@ Lưu khoá vào Keychain bằng lệnh của macOS (lệnh tự hỏi giá trị
 security add-generic-password -U -a "$USER" -s 1xvnoffice/anthropic -w
 ```
 
-Hỗ trợ bốn loại: `anthropic`, `openai` (dùng được cho Azure OpenAI, DeepSeek, vLLM, LM Studio và máy chủ nội bộ qua `base_url`), `gemini`, và `ollama` chạy cục bộ. Máy chủ tự dựng khai `base_url` thì không cần khoá; dịch vụ đám mây thì bắt buộc.
+Hỗ trợ năm hình dạng API: `anthropic`, `openai` (dùng chung cho OpenRouter, Groq, DeepSeek, Mistral, xAI, Together, Fireworks, Cerebras, LM Studio, vLLM và máy chủ nội bộ qua `base_url`), `gemini`, `azure` (Azure OpenAI, mô hình là tên deployment), và `ollama` chạy cục bộ.
+
+**Tài khoản AI (khoá API hoặc đăng nhập)...** (menu Tiếng Việt): không phải tự gõ `providers.json` nữa. Lệnh này đưa ra danh mục nhà cung cấp cài sẵn (`pythonpath/vn1x/aiproviders.py`), hỏi những thứ còn thiếu, nhận khoá hoặc đưa bạn qua đăng nhập, rồi hỏi thẳng nhà cung cấp xem có mô hình nào để bạn chọn thay vì gõ tay.
+
+Ba cách gắn tài khoản:
+
+| Cách | Dùng cho | Chỗ cất bí mật |
+|---|---|---|
+| **Khoá API** | OpenAI, Anthropic, Gemini, OpenRouter, Groq, DeepSeek, Mistral, xAI, Together, Fireworks, Cerebras, Azure OpenAI | Keychain, mục `1xvnoffice/<id>` |
+| **Đăng nhập OAuth** | Google Cloud Vertex AI, Azure OpenAI qua Entra ID, cổng AI nội bộ của cơ quan có SSO (OIDC) | Keychain, cùng mục, dạng gói thẻ |
+| **Không cần gì** | Ollama, LM Studio, vLLM chạy ngay trên máy | — |
+
+Khoá gõ vào hộp **che chữ** và đi thẳng vào Keychain qua đầu vào chuẩn của lệnh `security`, nên không hiện trên màn hình, không nằm trong tham số dòng lệnh và không bao giờ nằm trong `providers.json` — tệp đó chỉ giữ *tên mục* `secret_ref`. Muốn tự lưu khoá bằng tay thì vẫn dùng lệnh `security` ở trên.
+
+Đăng nhập OAuth dùng **mã uỷ quyền + PKCE**, không cần client secret: 1xVnOffice mở trình duyệt của bạn và nhận mã trả về ở một cổng loopback `127.0.0.1` dựng tạm rồi đóng ngay. Máy không mở được trình duyệt, hoặc bạn muốn đăng nhập trên điện thoại, thì chọn **mã thiết bị**: app hiện một đường dẫn và một mã ngắn. Thẻ truy cập tự gia hạn bằng refresh token khi còn 2 phút là hết hạn; hết hạn mà không gia hạn được thì app nói rõ phải đăng nhập lại chứ không im lặng hỏng.
+
+1xVnOffice **không nhúng client_id của ai cả.** `client_id` gắn với một ứng dụng đã đăng ký, và cơ quan thường tự đăng ký ứng dụng nội bộ của mình, nên bạn dán client_id của chính bạn (ứng dụng loại Desktop trong Google Cloud, ứng dụng trong Entra ID của cơ quan, hoặc client_id quản trị viên cấp cho cổng AI nội bộ).
+
+Mọi việc chạm mạng và chạm kho bí mật đều nằm trong tiến trình Agent Host (`agenthost/oauthflow.py`); phần logic thuần (PKCE, hình dạng yêu cầu, hạn thẻ) ở `pythonpath/vn1x/oauth.py` và có test riêng. Thẻ không bao giờ đi ngược ra ngoài tiến trình đó: lệnh trên menu chỉ nhận lại một dòng mô tả kiểu "đã đăng nhập, thẻ còn 58 phút, có thể tự gia hạn".
+
+Kiểm trên app thật: `scripts/build-macos.sh tools`, phần `accounts` — gắn máy chủ nội bộ (lấy danh sách mô hình từ chính máy chủ), gắn khoá API (khoá vào kho bí mật, không vào `providers.json`), đăng nhập OAuth bằng mã thiết bị, rồi hỏi AI và khẳng định thẻ tới nhà cung cấp dưới dạng `Authorization: Bearer`. Nhà cung cấp AI và máy chủ đăng nhập đều là đồ giả chạy trên `127.0.0.1`, nên không ra Internet và không cần khoá thật.
 
 Mọi kết nối mạng đi qua **1x Agent Host**, một tiến trình riêng (`agenthost/host.py`, chạy với cờ `-I`): lỗi hay treo ở phần AI không làm sập tài liệu đang mở, và chỉ tiến trình đó đọc khoá API. Lỗi được dịch sang tiếng Việt và nói rõ nguyên nhân (sai khoá, vượt hạn mức, quá giờ, mất mạng).
 
