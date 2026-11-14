@@ -111,19 +111,29 @@ def group_rhythm(root):
 
 
 def _renumber(box):
-    """Đánh lại packing/position theo đúng thứ tự trong tệp.
+    """Đánh lại packing/position theo đúng thứ tự trong tệp, bằng số ÂM.
 
-    Các nhóm của bản gốc mang position 0,1,2… Vạch ngăn mới chèn vào mà không có position thì VCL coi như 0 và
-    dồn hết chúng về đầu dải — nhìn thấy ngay: ba bốn vạch dính nhau ở mép trái. Đánh số lại cho cả hộp là xong.
+    Hai lý do, đều đọc ra từ mã nguồn VCL (vcl/source/window/builder.cxx):
+
+    * Dựng xong một hộp, VCL sắp lại toàn bộ con theo `m_nPosition` (`sortIntoBestTabTraversalOrder`). Vạch ngăn
+      mới chèn vào mà không có position thì bị coi như 0 và dồn hết về đầu dải — ba bốn vạch dính nhau ở mép trái.
+    * Con nào KHÔNG có position thì `m_nPosition` mặc định là **-1**. Các cụm lệnh của extension do
+      `NotebookBarAddonsMerger::MergeNotebookBarAddons` dựng thẳng bằng C++, không đi qua packing của tệp .ui,
+      nên luôn mang -1 — tức luôn đứng TRƯỚC mọi nhóm đánh số 0,1,2… Đó là lý do cụm lệnh tiếng Việt bị vẽ ở
+      ngoài cùng bên trái dù đã khai ở cuối thẻ Home.
+
+    Đánh số âm (-n-1 … -2) cho những gì mình điều khiển được thì -1 của extension thành lớn nhất, nên cụm lệnh
+    tiếng Việt về đúng cuối dải. Không phải vá lõi, chỉ dùng đúng cơ chế sẵn có.
     """
-    for index, slot in enumerate(box.findall("child")):
+    slots = box.findall("child")
+    for index, slot in enumerate(slots):
         packing = slot.find("packing")
         if packing is None:
             packing = ET.SubElement(slot, "packing")
         position = next((q for q in packing.findall("property") if q.get("name") == "position"), None)
         if position is None:
             position = ET.SubElement(packing, "property", {"name": "position"})
-        position.text = str(index)
+        position.text = str(index - len(slots) - 1)
 
 
 def _has_content(group):

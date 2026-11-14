@@ -104,11 +104,18 @@ Office trên máy (`Resources/office6/skins/2018white_dark/*.kuip`, là XML toke
 
 Chỉ lấy **số đo và cách làm**, không chép tài nguyên của WPS vào kho.
 
-**Hai bẫy đã gặp khi chèn vạch ngăn** (cả hai chỉ lộ ra khi mở app thật, không bài kiểm nào bắt được):
+**Ba bẫy đã gặp, đều chỉ lộ ra khi mở app thật, không bài kiểm nào bắt được:**
 
 1. Nhóm của bản gốc mang `packing/position` 0,1,2… Vạch ngăn mới không có `position` thì VCL coi như 0 và dồn
    hết chúng về mép trái thành ba bốn vạch dính nhau. Phải đánh số lại cả hộp (`_renumber`).
 2. Nhóm rỗng hoặc đang ẩn mà vẫn kèm vạch ngăn thì ribbon đầy vạch thừa, nên `_has_content` bỏ qua chúng.
+3. **Cụm lệnh tiếng Việt bị vẽ ngoài cùng bên trái** dù đã khai ở cuối thẻ Home. Nguyên nhân nằm trong
+   `vcl/source/window/builder.cxx`: dựng xong một hộp, VCL sắp lại toàn bộ con theo `m_nPosition`
+   (`sortIntoBestTabTraversalOrder`), mà con nào không có `position` thì mặc định là **-1**. Các cụm lệnh của
+   extension do `NotebookBarAddonsMerger::MergeNotebookBarAddons` dựng thẳng bằng C++, không đi qua packing của
+   tệp `.ui`, nên luôn mang -1 — tức luôn đứng trước mọi nhóm đánh số 0,1,2…
+   Cách chữa: `_renumber` đánh số **âm** (-n-1 … -2) cho những gì mình điều khiển được, thế là -1 của extension
+   thành lớn nhất và cụm lệnh tiếng Việt về đúng cuối dải. Không vá lõi, chỉ dùng đúng cơ chế sẵn có.
 
 **Nút lớn tên dài là thủ phạm của mảng trống giữa ribbon.** `.uno:ToggleMergeCells` ("Merge and Center Cells")
 là nút lớn chữ-dưới-icon của bản gốc; tên dài kéo cả cột rộng ra, và khi lệnh bị vô hiệu (chọn một ô) nó trông
@@ -125,7 +132,6 @@ từng nút một chứ không gắn cho cả cụm. Muốn giống WPS phải t
   - Impress còn hàng công cụ vẽ và thanh Properties.
   - Thẻ "Extension" vẫn hiện.
   - Chưa có nút NĐ30 và công cụ tiếng Việt ngay trên thẻ Home.
-  - Cụm lệnh tiếng Việt tuy đã khai ở cuối thẻ Home vẫn được VCL vẽ ở ngoài cùng bên trái.
   - Dải thẻ (File | Home | Insert…) có vạch ngăn giữa các thẻ do VCL tự vẽ, WPS thì không có.
   - Còn trống khoảng một phần ba bề ngang bên phải dải lệnh.
 
