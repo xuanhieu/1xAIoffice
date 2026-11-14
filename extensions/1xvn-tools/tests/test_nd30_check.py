@@ -80,3 +80,66 @@ class WholeDocumentTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SpacingTests(unittest.TestCase):
+    """Phụ lục I mục 6đ: giãn dòng từ dòng đơn tới 1,5 lines; khoảng cách đoạn TỐI THIỂU 6pt."""
+
+    def body(self, **extra):
+        base = {"text": "Một đoạn nội dung.", "size": 14, "font": "Times New Roman", "adjust": 2,
+                "indent_mm": 12.7, "line_percent": 100, "space_after_pt": 6}
+        return [dict(base, **extra)]
+
+    def keys(self, paragraphs):
+        return {issue.key for issue in nd30_check.check_body(paragraphs)}
+
+    def test_single_spacing_and_six_points_are_fine(self):
+        self.assertEqual(self.keys(self.body()), set())
+
+    def test_one_and_a_half_lines_is_the_most_the_decree_allows(self):
+        self.assertEqual(self.keys(self.body(line_percent=150)), set())
+        self.assertIn("body_line_spacing", self.keys(self.body(line_percent=200)))
+
+    def test_less_than_single_spacing_is_wrong_too(self):
+        self.assertIn("body_line_spacing", self.keys(self.body(line_percent=90)))
+
+    def test_paragraph_spacing_has_only_a_minimum(self):
+        """Nghị định chỉ nói "tối thiểu 6pt", nên 12pt hay 18pt đều đúng; báo oan là lỗi của bộ kiểm."""
+        self.assertEqual(self.keys(self.body(space_after_pt=6)), set())
+        self.assertEqual(self.keys(self.body(space_after_pt=18)), set())
+        self.assertIn("body_space_after", self.keys(self.body(space_after_pt=0)))
+
+    def test_one_well_spaced_paragraph_is_enough(self):
+        """Đoạn cuối thường không có khoảng cách dưới; chỉ cần văn bản có chỗ đạt là được."""
+        paragraphs = self.body() + self.body(space_after_pt=0)
+        self.assertNotIn("body_space_after", self.keys(paragraphs))
+
+    def test_a_document_that_sets_spacing_another_way_is_not_accused(self):
+        """Đặt khoảng cách dòng cố định theo mm thì không quy ra "dòng" được; im lặng còn hơn báo bừa."""
+        self.assertEqual(self.keys(self.body(line_percent=None)), set())
+
+    def test_the_message_names_the_number_it_found(self):
+        issues = nd30_check.check_body(self.body(line_percent=200))
+        self.assertIn("200", issues[0].message)
+
+
+class NumberFormatTests(unittest.TestCase):
+    """Số trong lời nhắn phải đọc ra đúng con số ấy."""
+
+    def test_round_numbers_keep_their_zeros(self):
+        """Bản cũ bỏ cả số 0 cuối của số nguyên: lề 20 mm hiện thành "2 mm", khổ A4 210 mm thành "21 mm"."""
+        for value, want in ((210, "210"), (297, "297"), (20, "20"), (30, "30"), (100, "100"), (150, "150")):
+            with self.subTest(value=value):
+                self.assertEqual(nd30_check._mm(value), want)
+
+    def test_decimals_drop_the_padding_but_keep_the_digit(self):
+        self.assertEqual(nd30_check._mm(12.7), "12.7")
+        self.assertEqual(nd30_check._mm(13.0), "13")
+
+    def test_the_page_size_message_shows_the_real_width(self):
+        issues = nd30_check.check_page({"width_mm": 216, "height_mm": 279, "margin_top_mm": 20,
+                                        "margin_bottom_mm": 20, "margin_left_mm": 30, "margin_right_mm": 15,
+                                        "font": "Times New Roman"})
+        message = next(i.message for i in issues if i.key == "page_size")
+        self.assertIn("216", message)
+        self.assertIn("210", message)      # khổ A4 mà NĐ30 yêu cầu

@@ -14,6 +14,18 @@ khoá thật, không cần mạng, và không chạm vào nhóm việc phải xi
 | 5 | CSV của trang tính | Đúng RFC 4180 (bọc nháy kép khi có phẩy, nháy, xuống dòng) | Địa chỉ kiểu "Hà Nội, Việt Nam" rất thường gặp; không bọc là lệch cột | `mcpresources.to_csv` |
 | 6 | Tên trang tính có dấu gạch chéo | Giữ nguyên, phần sau `1x://sheet/<id>/` lấy trọn | "Quý 1/2026" là cách đặt tên phổ biến ở Việt Nam | `mcpresources.parse` |
 
+| 7 | Khoảng cách giữa các đoạn | Chỉ bắt lỗi khi **nhỏ hơn** 6pt, không có mức tối đa | Phụ lục I mục 6đ chỉ nói "tối thiểu là 6pt". Bắt cả mức trên là báo oan văn bản đúng, mà báo oan còn tệ hơn bỏ sót | `nd30_check._check_spacing` |
+| 8 | Giãn dòng đặt kiểu khác | Bỏ qua, không báo lỗi | Tài liệu đặt khoảng cách dòng cố định theo mm thì không quy ra "dòng đơn / 1,5 lines" được nếu không biết cỡ chữ và phông; im lặng còn hơn báo bừa | cùng chỗ |
+
+## Lỗi có sẵn đã sửa trong đêm
+
+- **Bộ kiểm NĐ30 thiếu hai quy định của Phụ lục I**: giãn dòng (dòng đơn đến 1,5 lines) và khoảng cách giữa các
+  đoạn (tối thiểu 6pt). Nay có `body_line_spacing` và `body_space_after`; `nd30_check_writer.describe` đọc thêm
+  `ParaLineSpacing` và `ParaBottomMargin`.
+- **Số trong lời nhắn hiện sai**: `_mm` gọi `.rstrip("0")` lên cả số nguyên, nên lề 20 mm hiện thành "2 mm" và
+  khổ A4 rộng 210 mm hiện thành "21 mm". Người dùng đọc lời nhắn đó sẽ không hiểu gì. Đã sửa và có test riêng
+  cho từng con số tròn.
+
 ## Việc đang chờ chủ dự án
 
 Không có việc nào trong đêm chạm tới nhóm phải xin phép (gửi tin, đăng công khai, chi tiền, xoá vĩnh viễn, nhập

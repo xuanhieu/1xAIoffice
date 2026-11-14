@@ -33,7 +33,13 @@ def _in_range(value, name):
 
 
 def _mm(value):
-    return f"{value:.0f}".rstrip("0").rstrip(".") if float(value).is_integer() else f"{value:.1f}"
+    """Số cho người đọc: 210 ra "210", 12.7 ra "12,7" — nhưng 20 KHÔNG được ra "2".
+
+    Bản cũ gọi .rstrip("0") lên cả số nguyên, nên lề 20 mm hiện thành "2 mm" và khổ A4 rộng 210 mm hiện thành
+    "21 mm". Chỉ số thập phân mới cần bỏ số 0 thừa.
+    """
+    value = float(value)
+    return f"{value:.0f}" if value.is_integer() else f"{value:.1f}"
 
 
 def check_page(page):
@@ -82,6 +88,34 @@ def check_body(paragraphs):
         low, high = R["first_line_indent_mm"]
         out.append(Issue("body_indent", f"Chưa thấy đoạn nào lùi đầu dòng {_mm(low)}–{_mm(high)} mm.",
                          where="nội dung"))
+    out.extend(_check_spacing(body))
+    return out
+
+
+def _check_spacing(body):
+    """Giãn dòng và khoảng cách giữa các đoạn.
+
+    Phụ lục I mục 6đ: "khoảng cách giữa các đoạn văn tối thiểu là 6pt; khoảng cách giữa các dòng tối thiểu là
+    dòng đơn, tối đa là 1,5 lines". Để ý: khoảng cách đoạn chỉ có mức TỐI THIỂU, không có mức tối đa — nên chỉ
+    bắt lỗi khi nhỏ hơn 6pt. Báo oan một văn bản đúng còn tệ hơn bỏ sót.
+
+    Giãn dòng chỉ đo được khi tài liệu đặt theo tỉ lệ phần trăm (dòng đơn, 1,5 lines…). Đặt theo kiểu khác
+    (khoảng cách cố định theo mm) thì bỏ qua, vì quy đổi sang "dòng" còn tuỳ cỡ chữ và phông.
+    """
+    out = []
+    percents = sorted({round(float(p["line_percent"]), 1) for p in body if p.get("line_percent")})
+    low, high = R["line_spacing_percent"]
+    wrong = [x for x in percents if not low <= x <= high]
+    if wrong:
+        out.append(Issue("body_line_spacing",
+                         f"Giãn dòng {', '.join(_mm(x) for x in wrong)}%, NĐ30 cho phép từ dòng đơn "
+                         f"({_mm(low)}%) đến 1,5 lines ({_mm(high)}%).", where="nội dung"))
+    spaces = [round(float(p["space_after_pt"]), 1) for p in body if p.get("space_after_pt") is not None]
+    least = R["space_after_pt"][0]
+    if spaces and max(spaces) < least:
+        out.append(Issue("body_space_after",
+                         f"Khoảng cách giữa các đoạn lớn nhất là {_mm(max(spaces))} pt, "
+                         f"NĐ30 yêu cầu tối thiểu {_mm(least)} pt.", where="nội dung"))
     return out
 
 

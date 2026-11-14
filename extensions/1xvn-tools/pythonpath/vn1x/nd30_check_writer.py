@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Đọc một tài liệu Writer thành bản mô tả cho nd30_check.check(), và sửa phần trang khi người dùng đồng ý (cần UNO)."""
 CENTER = 3
+PT100 = 35.28        # 1 pt = 0,3528 mm, mà UNO đo bằng 1/100 mm
 MM100 = 100.0
 
 
@@ -37,6 +38,17 @@ def _page_style(doc):
     return pages.getByName("Standard")
 
 
+def _line_percent(para):
+    """Giãn dòng theo phần trăm, hoặc None khi tài liệu đặt kiểu khác (khoảng cách cố định).
+
+    com.sun.star.style.LineSpacingMode.PROP là 0: Height khi đó chính là phần trăm (100 = dòng đơn).
+    """
+    spacing = getattr(para, "ParaLineSpacing", None)
+    if spacing is None or getattr(spacing, "Mode", None) != 0:
+        return None
+    return float(spacing.Height)
+
+
 def describe(doc):
     """Bản mô tả tài liệu: khổ trang, các đoạn nội dung và toàn bộ chữ (kể cả trong bảng)."""
     style = _page_style(doc)
@@ -52,7 +64,8 @@ def describe(doc):
         if not content.strip() or para.ParaAdjust == CENTER:
             continue    # bỏ phần canh giữa: tên loại, trích yếu, Kính gửi
         body.append({"text": content, "size": para.CharHeight, "font": para.CharFontName,
-                     "adjust": para.ParaAdjust, "indent_mm": para.ParaFirstLineIndent / MM100})
+                     "adjust": para.ParaAdjust, "indent_mm": para.ParaFirstLineIndent / MM100,
+                     "line_percent": _line_percent(para), "space_after_pt": para.ParaBottomMargin / PT100})
     texts.extend(_tables_text(doc))
     return {"page": page, "body": body, "texts": texts}
 
