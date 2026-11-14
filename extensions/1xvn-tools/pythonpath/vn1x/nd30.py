@@ -78,6 +78,16 @@ def body_template(type_key):
     return list(found["than"]) if found else ["[Nội dung văn bản]"]
 
 
+def template_warning(type_key):
+    """Lời nhắc cần hiện MỘT LẦN cho loại văn bản có hiệu lực pháp lý giữa các bên; rỗng nghĩa là không cần.
+
+    Cố ý trả về lời nhắc để hiện trên hộp thoại, KHÔNG chèn vào văn bản: một dòng cảnh báo nằm trong bản hợp
+    đồng đem đi ký là chuyện khác hẳn.
+    """
+    found = TEMPLATES["mau"].get(type_key) or {}
+    return TEMPLATES["canh_bao"] if found.get("canh_bao") else ""
+
+
 def template_source(type_key):
     """Khung của loại này lấy từ đâu, để nói rõ với người dùng. Rỗng nghĩa là chưa có khung."""
     found = TEMPLATES["mau"].get(type_key)

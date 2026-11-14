@@ -216,6 +216,102 @@
         "Kính gửi: …………",
         "………… xin báo: …………"
       ]
+    },
+    "hop_dong": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30; chỉ là NHÃN MỤC để điền, không chứa điều khoản nào",
+      "canh_bao": true,
+      "than": [
+        "Căn cứ …………;",
+        "Căn cứ …………;",
+        "Hôm nay, ngày ………… tháng ………… năm …………, tại …………, chúng tôi gồm:",
+        "BÊN A (BÊN …………):",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Mã số thuế: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "BÊN B (BÊN …………):",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Mã số thuế: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "Hai bên thống nhất ký kết hợp đồng với các điều khoản sau:",
+        "Điều 1. Nội dung hợp đồng: …………",
+        "Điều 2. Giá trị hợp đồng và phương thức thanh toán: …………",
+        "Điều 3. Thời gian và địa điểm thực hiện: …………",
+        "Điều 4. Quyền và nghĩa vụ của Bên A: …………",
+        "Điều 5. Quyền và nghĩa vụ của Bên B: …………",
+        "Điều 6. Điều khoản chung: …………",
+        "Hợp đồng gồm ………… trang, lập thành ………… bản có giá trị như nhau, mỗi bên giữ ………… bản./."
+      ]
+    },
+    "ban_ghi_nho": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30; chỉ là NHÃN MỤC để điền, không chứa điều khoản nào",
+      "canh_bao": true,
+      "than": [
+        "Hôm nay, ngày ………… tháng ………… năm …………, tại …………, chúng tôi gồm:",
+        "BÊN A:",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Mã số thuế: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "BÊN B:",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Mã số thuế: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "Hai bên cùng thống nhất ghi nhớ với các nội dung sau:",
+        "Điều 1. Mục đích: …………",
+        "Điều 2. Nội dung hợp tác: …………",
+        "Điều 3. Trách nhiệm của mỗi bên: …………",
+        "Điều 4. Thời hạn và hiệu lực: …………",
+        "Điều 5. Điều khoản chung: …………",
+        "Văn bản này gồm ………… trang, lập thành ………… bản có giá trị như nhau, mỗi bên giữ ………… bản./."
+      ]
+    },
+    "ban_thoa_thuan": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30; chỉ là NHÃN MỤC để điền, không chứa điều khoản nào",
+      "canh_bao": true,
+      "than": [
+        "Hôm nay, ngày ………… tháng ………… năm …………, tại …………, chúng tôi gồm:",
+        "BÊN A:",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Mã số thuế: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "BÊN B:",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Mã số thuế: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "Hai bên cùng thống nhất thỏa thuận với các nội dung sau:",
+        "Điều 1. Mục đích: …………",
+        "Điều 2. Nội dung hợp tác: …………",
+        "Điều 3. Trách nhiệm của mỗi bên: …………",
+        "Điều 4. Thời hạn và hiệu lực: …………",
+        "Điều 5. Điều khoản chung: …………",
+        "Văn bản này gồm ………… trang, lập thành ………… bản có giá trị như nhau, mỗi bên giữ ………… bản./."
+      ]
+    },
+    "giay_uy_quyen": {
+      "nguon": "thông lệ văn phòng, KHÔNG phải quy định của Nghị định 30; chỉ là NHÃN MỤC để điền, không chứa điều khoản nào",
+      "canh_bao": true,
+      "than": [
+        "Căn cứ …………;",
+        "Hôm nay, ngày ………… tháng ………… năm …………, tại …………,",
+        "BÊN UỶ QUYỀN:",
+        "- Tên: …………",
+        "- Địa chỉ: …………",
+        "- Người đại diện: ………… — Chức vụ: …………",
+        "BÊN ĐƯỢC UỶ QUYỀN:",
+        "- Họ và tên: …………",
+        "- Chức vụ, đơn vị công tác: …………",
+        "- Số định danh cá nhân: ………… — Cấp ngày: ………… — Nơi cấp: …………",
+        "Nội dung uỷ quyền: …………",
+        "Phạm vi uỷ quyền: …………",
+        "Thời hạn uỷ quyền: từ ngày ………… đến ngày …………",
+        "Cam kết của các bên: …………./."
+      ]
     }
-  }
+  },
+  "canh_bao": "Bốn loại hợp đồng, bản ghi nhớ, bản thỏa thuận và giấy uỷ quyền có hiệu lực pháp lý giữa các bên. Khung ở đây CHỈ là nhãn mục để điền, không chứa điều khoản nào và không thay cho ý kiến pháp lý. Ngoài ra bộ dựng chỉ tạo MỘT khối chữ ký, nên văn bản hai bên cần tự thêm khối ký của bên còn lại."
 }

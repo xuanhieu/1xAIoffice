@@ -316,6 +316,20 @@ nghị nghỉ phép`…), nên khung chép đúng lời văn đó. Với mọi l
 1.4 — Văn bản có tên loại), nên dàn ý chỉ là thông lệ và dữ liệu nói thẳng điều đó; test bắt mọi mục ngoài bảy
 loại kia phải chứa chữ "KHÔNG phải quy định".
 
-**Tám loại cố ý không có khung:** công văn, chỉ thị, thông cáo, dự án, và bốn loại **hợp đồng, bản ghi nhớ, bản
-thỏa thuận, giấy uỷ quyền**. Bốn loại sau là thứ có hiệu lực pháp lý giữa các bên; dựng sẵn điều khoản cho
-chúng là việc của người soạn thảo, không phải của phần mềm. Một điều khoản mẫu sai còn tệ hơn một trang trắng.
+**Bốn loại cố ý không có khung:** công văn, chỉ thị, thông cáo, dự án — chưa có dàn ý nào đủ phổ biến để đáng
+dựng sẵn.
+
+### Bốn loại có hiệu lực pháp lý giữa các bên (15/11/2026)
+
+Hợp đồng, bản ghi nhớ, bản thỏa thuận và giấy uỷ quyền lúc đầu không có khung, vì một điều khoản mẫu sai nằm
+sẵn trong bản đem đi ký còn tệ hơn một trang trắng. Chủ dự án yêu cầu làm, nên làm theo cách giữ nguyên được
+lo ngại đó:
+
+- **Khung chỉ gồm nhãn mục để điền**, không một điều khoản nào. Có test đi từng dòng: dòng nào mang nội dung mà
+  không kết thúc bằng chỗ trống thì test đỏ, trừ vài câu thủ tục thuần tuý ("Hai bên thống nhất ký kết hợp đồng
+  với các điều khoản sau:").
+- **Căn cứ để trống.** Test cấm mọi chữ "Luật", "Bộ luật", "Nghị định số", "Thông tư" xuất hiện trong khung:
+  app không chọn hộ người dùng căn cứ pháp lý nào.
+- **Lời nhắc hiện một lần trên hộp thoại, không chèn vào văn bản.** Nhắc rằng khung chỉ là nhãn mục, không thay
+  cho ý kiến pháp lý, và rằng bộ dựng chỉ tạo **một** khối chữ ký nên văn bản hai bên phải tự thêm khối ký của
+  bên còn lại. Có test khẳng định lời nhắc không lọt vào thân văn bản.

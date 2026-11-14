@@ -1117,6 +1117,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
             doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, ())
         nd30_writer.fill(doc, spec)
+        # Loại có hiệu lực pháp lý giữa các bên thì nhắc một lần, ở hộp thoại chứ không trong văn bản.
+        warning = nd30.template_warning(fields.get("type", "")) if not fields.get("body") else ""
+        if warning:
+            self.message(warning)
 
     def ask(self, text):
         """Hỏi Có/Không. Khi chạy tự động (ONEX_TOOLS_SILENT) thì coi như Có, để bước kiểm chạy được phần sửa."""

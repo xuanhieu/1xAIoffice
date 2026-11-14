@@ -198,12 +198,60 @@ class BodyTemplateTests(unittest.TestCase):
             with self.subTest(key):
                 self.assertIn("KHÔNG phải quy định", value["nguon"])
 
+    LEGAL_TYPES = ("hop_dong", "giay_uy_quyen", "ban_thoa_thuan", "ban_ghi_nho")
+
     def test_a_type_without_a_template_still_gets_the_old_placeholder(self):
-        """Hợp đồng, giấy uỷ quyền, bản thỏa thuận: không dựng sẵn điều khoản có hiệu lực pháp lý."""
-        for key in ("hop_dong", "giay_uy_quyen", "ban_thoa_thuan", "ban_ghi_nho"):
+        for key in ("cong_van", "chi_thi", "thong_cao", "du_an"):
             with self.subTest(key):
                 self.assertEqual(nd30.body_template(key), ["[Nội dung văn bản]"])
                 self.assertEqual(nd30.template_source(key), "")
+
+    def test_the_four_binding_types_are_labels_only_and_carry_no_clause(self):
+        """Khung của hợp đồng, bản ghi nhớ, bản thỏa thuận, giấy uỷ quyền chỉ được là NHÃN MỤC để điền.
+
+        Mỗi dòng mang nội dung phải kết thúc bằng chỗ trống, tức không có câu nào đứng một mình như một điều
+        khoản. Một điều khoản mẫu sai nằm sẵn trong bản đem đi ký còn tệ hơn một trang trắng.
+        """
+        allowed_without_blank = {
+            "Hai bên thống nhất ký kết hợp đồng với các điều khoản sau:",
+            "Hai bên cùng thống nhất ghi nhớ với các nội dung sau:",
+            "Hai bên cùng thống nhất thỏa thuận với các nội dung sau:",
+            "BÊN UỶ QUYỀN:", "BÊN ĐƯỢC UỶ QUYỀN:",
+        }
+        for key in self.LEGAL_TYPES:
+            for line in nd30.body_template(key):
+                with self.subTest(key=key, line=line):
+                    if line in allowed_without_blank or line.endswith(":"):
+                        continue
+                    self.assertIn("…", line, "dòng này đứng một mình như một điều khoản")
+
+    def test_the_four_binding_types_warn_once(self):
+        for key in self.LEGAL_TYPES:
+            with self.subTest(key):
+                warning = nd30.template_warning(key)
+                self.assertIn("không thay cho ý kiến pháp lý", warning)
+                self.assertIn("MỘT khối chữ ký", warning)
+
+    def test_no_other_type_warns(self):
+        for key in nd30.DATA["doc_types"]:
+            if key in self.LEGAL_TYPES:
+                continue
+            with self.subTest(key):
+                self.assertEqual(nd30.template_warning(key), "")
+
+    def test_the_warning_never_goes_into_the_document(self):
+        blocks = build(dict(BASE, type="hop_dong", body=[]))
+        self.assertNotIn("ý kiến pháp lý", " ".join(blocks["body"]))
+
+    def test_the_binding_templates_cite_no_law_of_their_own(self):
+        """Căn cứ phải để trống: app không được tự chọn hộ người ta căn cứ pháp lý nào."""
+        for key in self.LEGAL_TYPES:
+            for line in nd30.body_template(key):
+                with self.subTest(key=key, line=line):
+                    if line.startswith("Căn cứ"):
+                        self.assertEqual(line, "Căn cứ …………;")
+                    for word in ("Luật", "Bộ luật", "Nghị định số", "Thông tư"):
+                        self.assertNotIn(word, line)
 
     def test_every_template_names_a_type_that_exists(self):
         for key in nd30.TEMPLATES["mau"]:
