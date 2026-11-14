@@ -924,7 +924,41 @@ def cut_checks(desktop, prop, run, check):
     ctrl.select(cell("E5"))
     send(".uno:Paste")
     check("Cắt: Esc rồi dán thì ô nguồn không bị xoá", cell("A5").getString(), "bam esc")
+
+    # Tài liệu bị sửa giữa lúc cắt và lúc dán thì toạ độ vùng nguồn đã lệch; xoá theo toạ độ cũ là xoá nhầm ô
+    # của người ta. Khi đó phải cư xử như sao chép.
+    cell("A10").setString("can giu")
+    cell("A12").setString("se cat")
+    ctrl.select(cell("A12"))
+    send(".uno:Cut")
+    sheet.getRows().insertByIndex(0, 1)          # A10 xuống A11, A12 xuống A13
+    _time.sleep(0.6)
+    ctrl.select(cell("C20"))
+    send(".uno:Paste")
+    check("Cắt: chèn dòng rồi dán thì không xoá nhầm ô khác", cell("A11").getString(), "can giu")
+    check("Cắt: chèn dòng rồi dán thì ô nguồn đã dịch vẫn còn", cell("A13").getString(), "se cat")
+
+    # Thêm trang tính trong lúc còn chờ dán
+    cell("H1").setString("them trang")
+    ctrl.select(cell("H1"))
+    send(".uno:Cut")
+    doc.getSheets().insertNewByName("ThemVao", 1)
+    _time.sleep(1.2)
+    check("Cắt: thêm trang tính khi đang chờ dán thì app vẫn sống", doc.getSheets().getCount(), 2)
+
+    # Đóng tài liệu khi còn chờ dán. Bộ đếm giờ của viền chạy giữ một ScDocShell* trần; không buông đúng lúc
+    # thì nhịp kế tiếp gọi vào bộ nhớ đã chết và app sập — đã từng sập thật, báo cáo sự cố chỉ đúng
+    # ScModule::CutMarkHandler -> ScDocShell::PostPaint.
+    cell("N1").setString("dong giua chung")
+    ctrl.select(cell("N1"))
+    send(".uno:Cut")
     doc.close(True)
+    _time.sleep(4)                               # khoảng 26 nhịp trên một tài liệu đã đóng
+    try:
+        alive = desktop.getComponents().hasElements()
+    except Exception as exc:                      # noqa: BLE001 - app chết thì cầu nối UNO đứt
+        alive = f"app đã sập: {exc}"
+    check("Cắt: đóng tài liệu khi đang chờ dán thì app vẫn trả lời", alive, False)
 
 
 main()

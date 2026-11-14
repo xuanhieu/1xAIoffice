@@ -40,21 +40,22 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
  class ScDocument;
  class ScViewCfg;
  class ScDocCfg;
-@@ -101,6 +112,13 @@
-     bool                m_bIsInExecuteDrop:1;
+@@ -102,6 +113,14 @@
      bool                m_bIsInSharedDocLoading:1;
      bool                m_bIsInSharedDocSaving:1;
-+
+ 
 +    // 1xVnOffice: cắt kiểu Excel/WPS/Sheets. Lệnh Cut không xoá ô ngay nữa mà ghi nhớ vùng nguồn ở đây,
 +    // vẽ viền đứt quanh nó, và chỉ thật sự xoá khi người dùng dán. Bấm Esc là bỏ, dữ liệu còn nguyên.
 +    ScDocShell*         m_pPendingCutShell = nullptr;
 +    ScRange             m_aPendingCutRange;
 +    Timer               m_aCutMarkTimer;        // nhịp cho viền chạy
 +    tools::Long         m_nCutMarkPhase = 0;    // dịch bao nhiêu điểm ảnh quanh chu vi
- 
++    size_t              m_nPendingCutUndo = 0;  // số bước hoàn tác lúc cắt, để biết tài liệu có đổi giữa chừng
++
      // a way to find existing Dialogs for a given parent Window of the slot type
      std::map<sal_uInt16, std::vector<std::pair<std::shared_ptr<SfxDialogController>, weld::Window*>>> m_mapRefController;
-@@ -125,6 +143,7 @@
+ 
+@@ -125,6 +144,7 @@
                          // moved by the application
  
      DECL_DLLPRIVATE_LINK( IdleHandler, Timer*, void ); // Timer instead of idle
@@ -62,31 +63,45 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
      DECL_DLLPRIVATE_LINK( CalcFieldValueHdl, EditFieldInfo*, void );
  
      void                Execute( SfxRequest& rReq );
-@@ -153,6 +172,13 @@
+@@ -153,6 +173,15 @@
  
      void                SetInEditCommand( bool bNew )   { m_bIsInEditCommand = bNew; }
  
 +    /** Vùng vừa bị cắt mà chưa dán: giữ nguyên nội dung, có viền đứt, chờ dán hoặc chờ Esc. */
 +    SC_DLLPUBLIC void   SetPendingCut( ScDocShell* pShell, const ScRange& rRange );
 +    SC_DLLPUBLIC void   ClearPendingCut();
++    void                ForgetPendingCut();     // quên mà KHÔNG vẽ lại: dùng khi tài liệu đang đóng
 +    ScDocShell*         GetPendingCutShell() const      { return m_pPendingCutShell; }
 +    const ScRange&      GetPendingCutRange() const      { return m_aPendingCutRange; }
 +    tools::Long         GetCutMarkPhase() const         { return m_nCutMarkPhase; }
++    size_t              GetPendingCutUndoCount() const  { return m_nPendingCutUndo; }
 +
      void                SetInExecuteDrop( bool bNew )   { m_bIsInExecuteDrop = bNew; }
      bool                IsInExecuteDrop() const         { return m_bIsInExecuteDrop; }
  
 --- a/sc/source/ui/app/scmod.cxx
 +++ b/sc/source/ui/app/scmod.cxx
-@@ -111,6 +111,55 @@
-                                             ToolbarId::Objectbar_App);
- 
+@@ -113,6 +113,78 @@
      GetStaticInterface()->RegisterStatusBar(StatusBarId::CalcStatusBar);
-+}
-+
+ }
+ 
 +// 1xVnOffice: vùng đã cắt nhưng chưa dán.
 +// Lệnh Cut của bản gốc xoá ô ngay lập tức. Excel, WPS và Google Sheets thì giữ nguyên nội dung, vẽ viền đứt, và
 +// chỉ chuyển khi người dùng dán — ai quen ba phần mềm kia mà cắt xong đổi ý sẽ tưởng mình vừa mất dữ liệu.
++// 1xVnOffice: tài liệu còn đang mở không?
++// Bộ đếm giờ của viền chạy giữ một ScDocShell* trần. Đóng tài liệu trong lúc còn chờ dán thì con trỏ đó treo,
++// và nhịp kế tiếp gọi PostPaint vào bộ nhớ đã chết — app sập (đã dựng lại được, báo cáo sự cố chỉ đúng
++// ScModule::CutMarkHandler -> ScDocShell::PostPaint).
++// Nghe SfxHintId::Dying KHÔNG ăn thua: tín hiệu không tới kịp nhịp đầu tiên. Nên hỏi thẳng danh sách tài liệu
++// đang mở, vài phần tử, rẻ hơn nhiều so với một lần vẽ.
++static bool lcl_IsShellStillOpen( const ScDocShell* pShell )
++{
++    for ( SfxObjectShell* p = SfxObjectShell::GetFirst(); p; p = SfxObjectShell::GetNext( *p ) )
++        if ( p == static_cast<const SfxObjectShell*>( pShell ) )
++            return true;
++    return false;
++}
++
 +void ScModule::SetPendingCut( ScDocShell* pShell, const ScRange& rRange )
 +{
 +    ClearPendingCut();
@@ -95,6 +110,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +    m_nCutMarkPhase = 0;
 +    if (pShell)
 +    {
++        m_nPendingCutUndo = pShell->GetUndoManager() ? pShell->GetUndoManager()->GetUndoActionCount() : 0;
 +        pShell->PostPaint( rRange, PaintPartFlags::Grid );
 +        m_aCutMarkTimer.Start();                         // bắt đầu cho viền chạy
 +    }
@@ -104,11 +120,19 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +{
 +    if (!m_pPendingCutShell)
 +        return;
-+    m_aCutMarkTimer.Stop();
 +    ScDocShell* pShell = m_pPendingCutShell;
 +    ScRange aRange = m_aPendingCutRange;
++    ForgetPendingCut();
++    if ( lcl_IsShellStillOpen( pShell ) )
++        pShell->PostPaint( aRange, PaintPartFlags::Grid );   // xoá viền khỏi màn hình
++}
++
++void ScModule::ForgetPendingCut()
++{
++    if (!m_pPendingCutShell)
++        return;
++    m_aCutMarkTimer.Stop();
 +    m_pPendingCutShell = nullptr;
-+    pShell->PostPaint( aRange, PaintPartFlags::Grid );   // xoá viền đứt khỏi màn hình
 +}
 +
 +// Mỗi nhịp dịch nét đứt vài điểm ảnh quanh chu vi rồi xin vẽ lại ĐÚNG dải viền.
@@ -116,9 +140,9 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +// và cột phải — bốn dải mỏng, bất kể vùng rộng bao nhiêu.
 +IMPL_LINK_NOARG(ScModule, CutMarkHandler, Timer *, void)
 +{
-+    if (!m_pPendingCutShell)
++    if (!m_pPendingCutShell || !lcl_IsShellStillOpen( m_pPendingCutShell ))
 +    {
-+        m_aCutMarkTimer.Stop();
++        ForgetPendingCut();     // tài liệu đóng mất rồi: buông, và tuyệt đối không chạm vào nó nữa
 +        return;
 +    }
 +    m_nCutMarkPhase = (m_nCutMarkPhase + SC_CUTMARK_STEP) % SC_CUTMARK_PERIOD;
@@ -131,10 +155,12 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +    m_pPendingCutShell->PostPaint( ScRange( nCol1, nRow1, nTab1, nCol1, nRow2, nTab2 ), PaintPartFlags::Grid );
 +    m_pPendingCutShell->PostPaint( ScRange( nCol2, nRow1, nTab1, nCol2, nRow2, nTab2 ), PaintPartFlags::Grid );
 +    m_aCutMarkTimer.Start();
- }
- 
++}
++
  ScModule::ScModule( SfxObjectFactory* pFact ) :
-@@ -124,7 +173,8 @@
+     SfxModule("sc"_ostr, {pFact}),
+     m_aIdleTimer("sc ScModule IdleTimer"),
+@@ -124,7 +196,8 @@
      m_bIsInEditCommand( false ),
      m_bIsInExecuteDrop( false ),
      m_bIsInSharedDocLoading( false ),
@@ -144,17 +170,17 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
  {
      // The ResManager (DLL data) is not yet initialized in the ctor!
      SetName(u"StarCalc"_ustr); // for Basic
-@@ -145,6 +195,10 @@
-     m_aIdleTimer.SetTimeout(SC_IDLE_STEP);
+@@ -146,6 +219,10 @@
      m_aIdleTimer.SetInvokeHandler( LINK( this, ScModule, IdleHandler ) );
      m_aIdleTimer.Start();
-+
+ 
 +    // 1xVnOffice: nhịp cho viền chạy quanh vùng đã cắt; chỉ chạy khi có vùng đang chờ dán.
 +    m_aCutMarkTimer.SetTimeout( SC_CUTMARK_TICK_MS );
 +    m_aCutMarkTimer.SetInvokeHandler( LINK( this, ScModule, CutMarkHandler ) );
- 
++
      m_pMessagePool = new ScMessagePool;
      SetPool( m_pMessagePool.get() );
+ 
 --- a/sc/source/ui/view/viewfun3.cxx
 +++ b/sc/source/ui/view/viewfun3.cxx
 @@ -220,6 +220,16 @@
@@ -174,12 +200,18 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
          ScAddress aOldEnd( aRange.aEnd );       //  combined cells in this range?
          rDoc.ExtendMerge( aRange, true );
  
-@@ -1395,6 +1405,26 @@
+@@ -1391,12 +1401,37 @@
+         //! just check truly intersection !!!!!!!
+ 
+     ScDocFunc& rDocFunc = pDocSh->GetDocFunc();
++    // 1xVnOffice: đếm số bước hoàn tác TRƯỚC khi mở nhóm, để biết tài liệu có bị sửa giữa lúc cắt và lúc dán.
++    const size_t nUndoBeforePaste = pUndoMgr ? pUndoMgr->GetUndoActionCount() : 0;
+     if ( bRecord )
      {
          OUString aUndo = ScResId( pClipDoc->IsCutMode() ? STR_UNDO_MOVE : STR_UNDO_COPY );
          pUndoMgr->EnterListAction( aUndo, aUndo, 0, GetViewData().GetViewShell()->GetViewShellId() );
-+    }
-+
+     }
+ 
 +    // 1xVnOffice: đây là lúc vùng đã cắt thật sự biến mất. Xoá TRƯỚC khi ghi dữ liệu vào ô đích, và nằm trong
 +    // cùng nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu.
 +    // Vùng nguồn chồng lên vùng đích thì không xoá: phần chồng nhau vừa được ghi đè, xoá tiếp là mất dữ liệu.
@@ -189,8 +221,11 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +        {
 +            ScRange aCutRange = pScMod->GetPendingCutRange();
 +            ScRange aDestRange( nStartCol, nStartRow, nStartTab, nUndoEndCol, nUndoEndRow, nEndTab );
++            // Tài liệu bị sửa giữa lúc cắt và lúc dán (chèn dòng, xoá cột, gõ thêm…) thì toạ độ vùng nguồn đã
++            // lệch, xoá theo toạ độ cũ là xoá nhầm ô của người ta. Khi đó cư xử như sao chép: giữ nguyên nguồn.
++            const bool bUntouched = ( nUndoBeforePaste == pScMod->GetPendingCutUndoCount() );
 +            pScMod->ClearPendingCut();
-+            if ( !aCutRange.Intersects( aDestRange ) )
++            if ( bUntouched && !aCutRange.Intersects( aDestRange ) )
 +            {
 +                ScMarkData aCutMark( rDoc.GetSheetLimits() );
 +                aCutMark.SelectOneTable( aCutRange.aStart.Tab() );
@@ -198,9 +233,11 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
 +                rDocFunc.DeleteContents( aCutMark, InsertDeleteFlags::ALL, bRecord, true /*bApi*/ );
 +            }
 +        }
-     }
- 
++    }
++
      if (bClipOver)
+         if (lcl_SelHasAttrib( rDoc, nStartCol,nStartRow, nUndoEndCol,nUndoEndRow, aFilteredMark, HasAttrFlags::Overlapped ))
+         {       // "Cell merge not possible if cells already merged"
 --- a/sc/source/ui/view/cellsh3.cxx
 +++ b/sc/source/ui/view/cellsh3.cxx
 @@ -978,6 +978,9 @@

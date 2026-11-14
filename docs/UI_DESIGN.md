@@ -236,4 +236,17 @@ Mỗi nhịp **chỉ vẽ lại bốn dải viền** (hàng trên, hàng dưới
 nguyên một cột rồi vẽ lại cả cột 6 lần mỗi giây thì vừa chớp vừa tốn máy. Bộ đếm giờ chỉ chạy khi có vùng
 đang chờ dán, dừng ngay khi dán hoặc bấm Esc.
 
-Kiểm: `scripts/build-macos.sh tools`, phần `cut` — bảy bước gồm cắt, dán, Ctrl+Z một lần, và Esc rồi dán.
+**Ba cái bẫy của con trỏ `ScDocShell*` trần** (tìm ra khi rà lại, 14/11/2026):
+
+1. **Đóng tài liệu khi còn chờ dán làm sập app.** Bộ đếm giờ giữ con trỏ tài liệu; đóng tài liệu thì con trỏ
+   treo, nhịp kế tiếp gọi `PostPaint` vào bộ nhớ đã chết. Báo cáo sự cố của macOS chỉ đúng
+   `ScModule::CutMarkHandler -> ScDocShell::PostPaint`.
+   Nghe `SfxHintId::Dying` **không ăn thua** — tín hiệu không tới kịp nhịp đầu tiên. Cách chữa là hỏi thẳng
+   danh sách tài liệu đang mở (`SfxObjectShell::GetFirst/GetNext`) trước mỗi lần chạm vào tài liệu.
+2. **Tài liệu bị sửa giữa lúc cắt và lúc dán** (chèn dòng, xoá cột, gõ thêm) thì toạ độ vùng nguồn đã lệch,
+   xoá theo toạ độ cũ là xoá nhầm ô của người ta. Chữa bằng cách đếm số bước hoàn tác lúc cắt và so lại lúc
+   dán: khác nhau thì cư xử như sao chép, giữ nguyên nguồn.
+3. **Thêm hoặc bớt trang tính** khi còn chờ dán: cùng một lối chữa như trên.
+
+Kiểm: `scripts/build-macos.sh tools`, phần `cut` — mười một bước gồm cắt, dán, Ctrl+Z một lần, Esc rồi dán,
+chèn dòng rồi dán, thêm trang tính, và đóng tài liệu khi còn chờ dán.
