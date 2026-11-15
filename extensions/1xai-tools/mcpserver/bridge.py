@@ -5,7 +5,7 @@ Chạy trong tiến trình của máy chủ MCP, không trong tiến trình offi
 tài liệu người dùng đang mở.
 
 Công cụ ghi đi qua **hộp hỏi hiện ngay trong app**: người dùng thấy sẽ sửa gì rồi mới quyết, và mọi thay đổi gom
-trong một bước hoàn tác (Ctrl+Z một lần là trả lại như cũ). Biến ONEX_MCP_AUTO_APPLY=1 bỏ qua bước hỏi, chỉ dùng
+trong một bước hoàn tác (Cmd+Z một lần là trả lại như cũ). Biến ONEX_MCP_AUTO_APPLY=1 bỏ qua bước hỏi, chỉ dùng
 cho bài kiểm tự động.
 """
 import os
@@ -195,7 +195,7 @@ class OfficeBackend:
             else:
                 cursor = body.createTextCursorByRange(body.getEnd())
                 body.insertString(cursor, "\n" + text, False)
-        return "Đã chèn. Người dùng bấm Ctrl+Z một lần là trả lại như cũ."
+        return "Đã chèn. Người dùng bấm Cmd+Z một lần là trả lại như cũ."
 
     def doc_replace(self, doc, anchor, text):
         component = self._find(doc)
@@ -209,7 +209,7 @@ class OfficeBackend:
             return "Người dùng đã từ chối. Tài liệu không đổi."
         with _undo(component, "MCP: thay đoạn"):
             paragraphs[anchor].setString(text)
-        return "Đã thay. Người dùng bấm Ctrl+Z một lần là trả lại như cũ."
+        return "Đã thay. Người dùng bấm Cmd+Z một lần là trả lại như cũ."
 
     def vn_convert_legacy(self, doc, kind):
         convert = {"tcvn3": vntext.tcvn3_to_unicode, "vni": vntext.vni_to_unicode,
@@ -233,7 +233,7 @@ class OfficeBackend:
         with _undo(component, title):
             for para, new in changed:
                 para.setString(new)
-        return f"Đã đổi {len(changed)} đoạn. Người dùng bấm Ctrl+Z một lần là trả lại như cũ."
+        return f"Đã đổi {len(changed)} đoạn. Người dùng bấm Cmd+Z một lần là trả lại như cũ."
 
 
 class _undo:

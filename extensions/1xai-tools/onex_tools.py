@@ -55,7 +55,7 @@ TEXTS = {
         "check_ok": "Decree 30 check: nothing measurable is wrong.",
         "check_found": "Decree 30 check: {n} point(s) to look at.\n\n{list}",
         "check_offer": "\n\nSet the page back to the rules now (paper size, margins, default font)?",
-        "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Ctrl+Z undoes it.",
+        "check_fixed": "Page set to A4 with Decree 30 margins and {font}. Cmd+Z undoes it.",
         "check_writer_only": "Open the document in 1xDoc first: this command checks a text document.",
         "mcp_none": ("No MCP server is set up yet.\n\nWrite mcp_servers.json at:\n{path}\n\n"
                      "It takes the same shape as claude_desktop_config.json:\n{example}"),
@@ -84,10 +84,10 @@ TEXTS = {
         "rewrite_prompt": "How should it be rewritten? Leave empty for: clearer, keeping the meaning and the terms.",
         "rewrite_default": "clearer and easier to read, keeping the meaning, the terms and the tone",
         "rewrite_none": "Put the cursor in a paragraph, or select the text to rewrite.",
-        "rewrite_preview": "{preview}\n\nApply this change? Ctrl+Z undoes it in one step.",
+        "rewrite_preview": "{preview}\n\nApply this change? Cmd+Z undoes it in one step.",
         "rewrite_stale": "The text changed while the AI was working, so nothing was applied. Run the command again.",
         "rewrite_nochange": "The AI returned the same text; nothing to apply.",
-        "rewrite_done": "Applied. Ctrl+Z undoes it in one step.",
+        "rewrite_done": "Applied. Cmd+Z undoes it in one step.",
         "ai_question": "Ask about this document",
         "ai_prompt": "What do you want to know? The answer only reads the document; it changes nothing.",
         "ai_answer": "{text}\n\n— {provider}/{model}, sent {note}, {tokens} tokens.",
@@ -142,7 +142,7 @@ TEXTS = {
         "check_ok": "Kiểm thể thức NĐ30: không thấy điểm nào sai trong những thứ đo được.",
         "check_found": "Kiểm thể thức NĐ30: có {n} điểm cần xem lại.\n\n{list}",
         "check_offer": "\n\nSửa phần trang ngay bây giờ (khổ giấy, lề, phông mặc định)?",
-        "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Ctrl+Z để hoàn tác.",
+        "check_fixed": "Đã đặt trang A4, lề theo NĐ30 và phông {font}. Bấm Cmd+Z để hoàn tác.",
         "check_writer_only": "Hãy mở văn bản trong 1xDoc trước: lệnh này kiểm tài liệu văn bản.",
         "mcp_none": ("Chưa khai báo máy chủ MCP nào.\n\nTạo tệp mcp_servers.json tại:\n{path}\n\n"
                      "Cấu trúc giống claude_desktop_config.json nên chép thẳng từ Claude Desktop sang được:\n{example}"),
@@ -172,10 +172,10 @@ TEXTS = {
         "rewrite_prompt": "Viết lại theo hướng nào? Để trống thì: rõ ràng hơn, giữ nguyên ý và thuật ngữ.",
         "rewrite_default": "rõ ràng và dễ đọc hơn, giữ nguyên ý, thuật ngữ và giọng văn",
         "rewrite_none": "Hãy đặt con trỏ vào một đoạn, hoặc chọn phần chữ cần viết lại.",
-        "rewrite_preview": "{preview}\n\nÁp dụng thay đổi này? Bấm Ctrl+Z một lần là hoàn tác.",
+        "rewrite_preview": "{preview}\n\nÁp dụng thay đổi này? Bấm Cmd+Z một lần là hoàn tác.",
         "rewrite_stale": "Chữ đã bị sửa trong lúc AI đang chạy nên chưa áp gì cả. Hãy chạy lại lệnh.",
         "rewrite_nochange": "AI trả về đúng chữ cũ, không có gì để áp.",
-        "rewrite_done": "Đã áp dụng. Bấm Ctrl+Z một lần là hoàn tác.",
+        "rewrite_done": "Đã áp dụng. Bấm Cmd+Z một lần là hoàn tác.",
         "ai_question": "Hỏi về tài liệu này",
         "ai_prompt": "Bạn muốn biết điều gì? Câu trả lời chỉ đọc tài liệu, không sửa gì cả.",
         "ai_answer": "{text}\n\n— {provider}/{model}, đã gửi {note}, {tokens} token.",
@@ -428,8 +428,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         config = self._ai_ready()
         if config is None:
             return
-        found, problems = skills.discover(Path(__file__).resolve().parent / "skills",
-                                          Path(self._profile_file("skills")))
+        found, problems = skills.discover(Path(__file__).resolve().parent / "skills", user_skills_path())
         if problems:
             self.message(self.t["skill_broken"].format(n=len(problems), list="; ".join(problems)))
         app = "doc" if is_writer else "sheet"
@@ -725,7 +724,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             return ""
 
     def _apply_changes(self, doc, changes, title):
-        """Áp mọi thay đổi trong MỘT bước hoàn tác: Ctrl+Z một lần trả lại như cũ."""
+        """Áp mọi thay đổi trong MỘT bước hoàn tác: Cmd+Z một lần trả lại như cũ."""
         doc.UndoManager.enterUndoContext(title)
         try:
             for change in changes:
@@ -1360,9 +1359,16 @@ def _center_on(dialog, parent):
         pass
 
 
+def user_skills_path():
+    """Thư mục skill của người dùng, chung với máy chủ MCP (mcpserver/server.py); không mất khi xoá hồ sơ app."""
+    override = os.environ.get("ONEX_SKILLS_PATH")
+    return Path(override) if override else Path.home() / ".config" / "1xaioffice" / "skills"
+
+
 def guide_url(topic, lang):
-    """Địa chỉ bài hướng dẫn; bản tiếng Anh thêm ?lang=en."""
-    return GUIDE_BASE + (topic or "") + ("?lang=en" if lang == "en" else "")
+    """Địa chỉ bài hướng dẫn theo quy ước của 1xag.com: /office/<bài>, bản tiếng Anh /office/en/<bài>."""
+    path = ("en/" if lang == "en" else "") + (topic or "")
+    return (GUIDE_BASE + path).rstrip("/")
 
 
 # Thẻ trên dải "Bắt đầu tài liệu mới" của Start Center (bản vá 0004). Nhãn nằm ở GenericCommands.xcu.

@@ -52,7 +52,7 @@ def paired(name, path=None):
 
 
 def remember_pending(name, path=None):
-    """Ghi lại client vừa xin phép, để 1xAIoffice hỏi người dùng ở lần mở lệnh Công cụ AI (MCP) tới.
+    """Ghi lại client vừa xin phép, để 1xAIoffice hỏi người dùng ở lần mở lệnh Cho trợ lý AI dùng 1xAIoffice tới.
 
     Chỉ ghi tên client; không bao giờ ghi nội dung yêu cầu. Tệp hỏng thì dựng lại từ đầu thay vì chết.
     """
@@ -188,7 +188,7 @@ class Server:
         if not paired(self.client, self.clients_file):
             remember_pending(self.client, self.clients_file)
             raise Unpaired(f"“{self.client}” chưa được phép điều khiển 1xAIoffice. "
-                           "Mở 1xAIoffice, vào Tiếng Việt ▸ Công cụ AI (MCP) để cho phép.")
+                           "Mở 1xAIoffice, vào Tiếng Việt ▸ Cho trợ lý AI dùng 1xAIoffice (máy chủ MCP) để cho phép.")
 
 
 def user_skills_path():

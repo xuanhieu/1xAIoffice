@@ -618,7 +618,7 @@ def mcp_server_checks(desktop, prop, run, check):
         written = friend.call("doc.replace", {"doc": "d1", "anchor": 1, "text": "Đoạn đã được trợ lý sửa."})
         answer = written.get("result", written)["content"][0]["text"] if "result" in written else str(written)
         check("Máy chủ MCP: sửa được tài liệu khi đã được phép", answer.split("\n")[0][:160], "Đã thay. "
-              "Người dùng bấm Ctrl+Z một lần là trả lại như cũ.")
+              "Người dùng bấm Cmd+Z một lần là trả lại như cũ.")
         paragraphs = [p.getString() for p in doc.getText().createEnumeration()]
         check("Máy chủ MCP: đoạn đã đổi đúng", paragraphs[1], "Đoạn đã được trợ lý sửa.")
         doc.UndoManager.undo()
