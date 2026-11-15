@@ -17,13 +17,22 @@ trình con khi xong.
 """
 import json
 import os
+import ssl
 import subprocess
+import sys
 import threading
+import urllib.error
+import urllib.request
+from pathlib import Path
 
 PROTOCOL_VERSION = "2025-06-18"
 CLIENT_INFO = {"name": "1xVnOffice", "version": "0.1.0"}
 MAX_RESULT_CHARS = 20000      # chống máy chủ trả kết quả khổng lồ làm tốn token của người dùng
 DEFAULT_TIMEOUT = 30
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pythonpath"))
+from vn1x import mcphttp  # noqa: E402
 
 
 class McpError(RuntimeError):
@@ -172,13 +181,109 @@ class StdioServer:
         return _clip(text)
 
 
-def from_claude_desktop(config):
-    """Đọc cấu hình kiểu claude_desktop_config.json thành danh sách máy chủ stdio.
+class HttpServer(StdioServer):
+    """Máy chủ MCP ở xa, nối qua HTTP (chuẩn "Streamable HTTP").
 
-    Nhờ vậy người dùng chép thẳng cấu hình sẵn có vào 1xVnOffice. Mục nào không phải stdio thì bỏ qua.
+    Cùng giao diện với StdioServer (list_tools, call_tool, dùng được trong `with`), nên phần gọi công cụ ở trên
+    không cần biết máy chủ nằm ở đâu. Chỉ khác cách gửi: mỗi lời gọi là một POST, và câu trả lời có thể là một
+    khối JSON hoặc một chuỗi sự kiện.
+
+    Thẻ đăng nhập lấy từ kho bí mật của hệ điều hành ngay trước mỗi lần gọi; lớp này không giữ thẻ lâu và không
+    bao giờ ghi thẻ ra đâu.
+    """
+
+    def __init__(self, url, token="", timeout=DEFAULT_TIMEOUT, session_id=""):
+        self.url = url
+        self.token = token
+        self.timeout = timeout
+        self.session_id = session_id
+        self.next_id = 0
+        self.started = False
+
+    # StdioServer mở tiến trình con; ở đây không có gì để mở.
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def close(self):
+        return None
+
+    def _headers(self):
+        headers = {"Content-Type": "application/json", "Accept": mcphttp.ACCEPT,
+                   "MCP-Protocol-Version": mcphttp.PROTOCOL_VERSION, "User-Agent": mcphttp.USER_AGENT}
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        if self.session_id:
+            headers["Mcp-Session-Id"] = self.session_id
+        return headers
+
+    def _post(self, body):
+        data = json.dumps(body, ensure_ascii=False).encode("utf-8")
+        request = urllib.request.Request(self.url, data=data, headers=self._headers(), method="POST")
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout,
+                                        context=ssl.create_default_context()) as reply:
+                session = reply.headers.get("Mcp-Session-Id")
+                if session:
+                    self.session_id = session
+                return reply.status, reply.headers.get("Content-Type", ""), \
+                    reply.read().decode("utf-8", "replace"), reply.headers.get("WWW-Authenticate", "")
+        except urllib.error.HTTPError as exc:
+            return exc.code, exc.headers.get("Content-Type", ""), exc.read().decode("utf-8", "replace"), \
+                exc.headers.get("WWW-Authenticate", "")
+        except urllib.error.URLError as exc:
+            raise McpError(f"không nối được tới máy chủ MCP: {exc.reason}") from None
+
+    def _ensure_started(self):
+        if self.started:
+            return
+        self.next_id += 1
+        status, kind, raw, challenge = self._post(mcphttp.request_body(
+            "initialize", {"protocolVersion": mcphttp.PROTOCOL_VERSION, "capabilities": {},
+                           "clientInfo": {"name": "1xVnOffice", "version": "0.1"}}, self.next_id))
+        if status == 401:
+            raise Unauthorized(challenge, self.url)
+        if status >= 400:
+            raise McpError(f"máy chủ MCP trả lỗi {status}: {raw[:200]}")
+        mcphttp.result_or_raise(mcphttp.parse_reply(kind, raw))
+        # Thông báo "đã xong phần bắt tay"; không có id vì không chờ trả lời.
+        self._post(mcphttp.notification_body("notifications/initialized"))
+        self.started = True
+
+    def request(self, method, params=None):
+        self._ensure_started()
+        self.next_id += 1
+        status, kind, raw, challenge = self._post(mcphttp.request_body(method, params, self.next_id))
+        if status == 401:
+            raise Unauthorized(challenge, self.url)
+        if status >= 400:
+            raise McpError(f"máy chủ MCP trả lỗi {status}: {raw[:200]}")
+        return mcphttp.result_or_raise(mcphttp.parse_reply(kind, raw))
+
+
+class Unauthorized(McpError):
+    """Máy chủ đòi đăng nhập. Mang theo lời thách thức để lớp trên biết hỏi metadata ở đâu."""
+
+    def __init__(self, challenge, url):
+        self.challenge = mcphttp.parse_challenge(challenge)
+        self.url = url
+        super().__init__(f"máy chủ MCP {url} đòi đăng nhập")
+
+
+def from_claude_desktop(config):
+    """Đọc cấu hình kiểu claude_desktop_config.json thành danh sách máy chủ.
+
+    Nhờ vậy người dùng chép thẳng cấu hình sẵn có vào 1xVnOffice. Nhận cả máy chủ chạy bằng lệnh (stdio) lẫn máy
+    chủ ở xa khai bằng `url` (HTTP).
     """
     out = []
     for name, entry in (config.get("mcpServers") or {}).items():
+        url = entry.get("url")
+        if url and (entry.get("type") or "").lower() in ("http", "streamable-http", "sse", ""):
+            out.append({"id": name, "url": url, "transport": "http"})
+            continue
         command = entry.get("command")
         if not command:
             continue              # bản HTTP/SSE chưa hỗ trợ ở mốc này

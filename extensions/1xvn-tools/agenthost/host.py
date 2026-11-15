@@ -33,6 +33,7 @@ OPENAI_WIRE = ("openai", "ollama", "azure")
 MAX_TOOL_STEPS = 8          # bản thiết kế nói 12; hạ xuống cho bản đầu để vòng lặp hỏng không chạy lâu
 TOOL_LOOP_SECONDS = 120
 MAX_RETRIES = 2
+USER_AGENT = "1xVnOffice/0.1"      # xem vn1x/mcphttp.USER_AGENT: thiếu thì Cloudflare trả 403
 DEFAULT_TIMEOUT = 60
 
 ERRORS = {
@@ -245,9 +246,15 @@ def parse_answer(kind, data):
     return None, {}
 
 
+def _with_agent(headers):
+    """Thêm tên ứng dụng vào header. Thiếu nó thì máy chủ sau Cloudflare trả 403 cho urllib."""
+    return dict(headers, **{"User-Agent": USER_AGENT})
+
+
 def post(url, headers, body, timeout):
     """(mã HTTP, dữ liệu đã giải mã JSON hoặc chữ thô). Ném urllib.error.URLError khi không nối được."""
-    request = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers, method="POST")
+    request = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"),
+                                     headers=_with_agent(headers), method="POST")
     context = ssl.create_default_context()
     try:
         with urllib.request.urlopen(request, timeout=timeout, context=context) as response:
@@ -298,7 +305,8 @@ def parse_responses_stream(raw):
 
 def get_stream(url, headers, body, timeout):
     """(mã HTTP, toàn văn chuỗi sự kiện). Đọc hết rồi mới dựng câu trả lời: ở đây không cần hiện dần."""
-    request = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers, method="POST")
+    request = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"),
+                                     headers=_with_agent(headers), method="POST")
     try:
         with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as response:
             return response.status, response.read().decode("utf-8", "replace")
@@ -336,13 +344,59 @@ def run_tool(tools, call):
         return None, ERRORS["tool_unknown"].format(name=call["name"])
     server = wanted.get("server") or {}
     try:
-        with mcpclient.StdioServer(server.get("command", ""), server.get("args") or [],
-                                   env=server.get("env") or {}, cwd=server.get("cwd"),
-                                   timeout=server.get("timeout", mcpclient.DEFAULT_TIMEOUT)) as mcp:
+        with open_mcp(server) as mcp:
             text, _ = mcp.call_tool(call["name"], call.get("arguments") or {})
         return text, None
     except mcpclient.McpError as exc:
         return None, ERRORS["tool_failed"].format(name=call["name"], detail=str(exc))
+
+
+def open_mcp(server):
+    """Mở một máy chủ MCP, chạy bằng lệnh trên máy hay nối qua HTTP đều được.
+
+    Thẻ đăng nhập của máy chủ ở xa lấy từ kho bí mật ngay lúc này; không bao giờ đi qua yêu cầu gửi vào host.
+    """
+    import mcpclient                       # cùng thư mục với host.py; xem _add_own_dir ở cuối tệp
+    if server.get("transport") == "http" or server.get("url"):
+        import oauthflow
+        url = server["url"]
+        token = (oauthflow.read_bundle(oauthflow.mcp_secret_ref(url)) or {}).get("access_token", "")
+        return mcpclient.HttpServer(url, token=token,
+                                    timeout=server.get("timeout", mcpclient.DEFAULT_TIMEOUT))
+    return mcpclient.StdioServer(server.get("command", ""), server.get("args") or [],
+                                 env=server.get("env") or {}, cwd=server.get("cwd"),
+                                 timeout=server.get("timeout", mcpclient.DEFAULT_TIMEOUT))
+
+
+def mcp_list(request):
+    """Danh sách công cụ của một máy chủ MCP. Dùng cho máy chủ ở xa, để tài liệu không phải tự ra mạng."""
+    import mcpclient
+    server = request.get("server") or {}
+    try:
+        with open_mcp(server) as mcp:
+            return {"ok": True, "tools": mcp.list_tools()}
+    except mcpclient.Unauthorized as exc:
+        return {"ok": False, "code": "mcp_login", "error": str(exc), "url": exc.url,
+                "challenge": exc.challenge}
+    except mcpclient.McpError as exc:
+        return fail("tool_failed", name=server.get("id", "?"), detail=str(exc))
+
+
+def mcp_login(request):
+    """Đăng nhập vào một máy chủ MCP ở xa: tự dò cách đăng nhập, tự đăng ký ứng dụng, rồi mở trình duyệt."""
+    import oauthflow
+    url = (request.get("server") or {}).get("url") or request.get("url", "")
+    if not url:
+        return fail("config", detail="thiếu địa chỉ máy chủ MCP")
+    try:
+        config = oauthflow.discover_mcp_oauth(url, request.get("challenge"))
+        redirect_probe = "http://127.0.0.1/callback"      # chỉ để đăng ký; cổng thật chọn lúc mở trình duyệt
+        config["client_id"] = request.get("client_id") or oauthflow.register_client(config, redirect_probe)
+        state, _ = oauthflow.login_browser(config, oauthflow.mcp_secret_ref(url),
+                                           request.get("timeout", oauthflow.LOGIN_TIMEOUT))
+        return {"ok": True, "state": state, "client_id": config["client_id"]}
+    except (oauthflow.FlowError, ValueError) as exc:
+        return fail("login", detail=str(exc))
 
 
 def ask(request):
@@ -470,7 +524,7 @@ def _model_names(data):
 
 def get(url, headers, timeout):
     """(mã HTTP, dữ liệu) cho một yêu cầu GET."""
-    request = urllib.request.Request(url, headers=headers, method="GET")
+    request = urllib.request.Request(url, headers=_with_agent(headers), method="GET")
     try:
         with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as response:
             return response.status, json.loads(response.read().decode("utf-8"))
@@ -554,6 +608,10 @@ def main():
         result = ask(request)
     elif action == "models":
         result = list_models(request)
+    elif action == "mcp_list":
+        result = mcp_list(request)
+    elif action == "mcp_login":
+        result = mcp_login(request)
     elif action in ("login", "device_start", "device_poll", "logout", "status"):
         result = oauth_action(action, request)
     else:

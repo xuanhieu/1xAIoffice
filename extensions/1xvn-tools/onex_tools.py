@@ -60,6 +60,9 @@ TEXTS = {
                      "It takes the same shape as claude_desktop_config.json:\n{example}"),
         "mcp_ask": "{description}\n\nAllow this tool from now on?",
         "mcp_report": "MCP servers ({n}):\n\n{list}",
+        "mcp_login_ask": "“{id}” is a remote MCP server and asks you to sign in.\n\nSign in now? A browser window opens; nothing is sent until you agree there.",
+        "mcp_login_ok": "Signed in to “{id}”: {state}.",
+        "mcp_login_failed": "Could not sign in to “{id}”: {error}",
         "mcpsrv_off": ("The MCP server is off, so no assistant can read or change your documents.\n\n"
                        "Turn it on? You will still approve each assistant, and each change."),
         "mcpsrv_on": ("The MCP server is on ({pipe}).\n\nConfiguration for Claude Desktop / Cursor "
@@ -133,6 +136,9 @@ TEXTS = {
                      "Cấu trúc giống claude_desktop_config.json nên chép thẳng từ Claude Desktop sang được:\n{example}"),
         "mcp_ask": "{description}\n\nCho phép dùng công cụ này từ giờ?",
         "mcp_report": "Máy chủ MCP ({n}):\n\n{list}",
+        "mcp_login_ask": "“{id}” là máy chủ MCP ở xa và đang đòi đăng nhập.\n\nĐăng nhập bây giờ? Trình duyệt sẽ mở ra; chưa gửi gì đi cho tới khi bạn đồng ý ở đó.",
+        "mcp_login_ok": "Đã đăng nhập “{id}”: {state}.",
+        "mcp_login_failed": "Không đăng nhập được “{id}”: {error}",
         "mcpsrv_off": ("Máy chủ MCP đang TẮT, nên chưa trợ lý nào đọc hay sửa được tài liệu của bạn.\n\n"
                        "Bật lên? Bật rồi thì mỗi trợ lý vẫn phải được bạn cho phép, và mỗi lần sửa tài liệu "
                        "vẫn hỏi bạn."),
@@ -502,7 +508,13 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         return servers
 
     def _mcp_list(self, server):
-        """(danh sách công cụ, lỗi). Mở máy chủ, hỏi công cụ, rồi tắt ngay."""
+        """(danh sách công cụ, lỗi). Mở máy chủ, hỏi công cụ, rồi tắt ngay.
+
+        Máy chủ ở xa đi qua Agent Host, vì mọi kết nối mạng phải đi một đường và thẻ đăng nhập chỉ tiến trình
+        đó được chạm vào. Máy chủ chạy bằng lệnh trên máy thì mở thẳng như trước.
+        """
+        if server.get("transport") == "http" or server.get("url"):
+            return self._mcp_list_remote(server)
         import sys as _sys
         _sys.path.insert(0, str(Path(__file__).resolve().parent / "agenthost"))
         import mcpclient
@@ -512,6 +524,24 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                 return mcp.list_tools(), None
         except mcpclient.McpError as exc:
             return [], str(exc)
+
+    def _mcp_list_remote(self, server, after_login=False):
+        """Hỏi công cụ của một máy chủ MCP ở xa; máy chủ đòi đăng nhập thì mời người dùng đăng nhập rồi hỏi lại."""
+        result = self._agent_host({"action": "mcp_list", "server": server}, timeout=60)
+        if result.get("ok"):
+            return result.get("tools") or [], None
+        if result.get("code") != "mcp_login" or after_login:
+            return [], result.get("error", "?")
+        if not self.ask(self.t["mcp_login_ask"].format(id=server.get("id", "?"))):
+            return [], result.get("error", "?")
+        done = self._agent_host({"action": "mcp_login", "server": server,
+                                 "challenge": result.get("challenge"), "timeout": 300}, timeout=330)
+        if not done.get("ok"):
+            self.message(self.t["mcp_login_failed"].format(id=server.get("id", "?"),
+                                                           error=done.get("error", "?")))
+            return [], done.get("error", "?")
+        self.message(self.t["mcp_login_ok"].format(id=server.get("id", "?"), state=done.get("state", "")))
+        return self._mcp_list_remote(server, after_login=True)
 
     def _allowed_mcp_tools(self):
         """Công cụ MCP người dùng đã cho phép, kèm cách chạy máy chủ, để đưa cho Agent Host."""
@@ -534,8 +564,12 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                     store = mcpperm.remember(store, server["id"], tool, state)
                     mcpperm.save(path, store)
                 if state == mcpperm.ALLOW:
-                    out.append(dict(tool, server={"command": server["command"], "args": server.get("args") or [],
-                                                  "env": server.get("env") or {}, "cwd": server.get("cwd")}))
+                    if server.get("transport") == "http" or server.get("url"):
+                        where = {"transport": "http", "url": server["url"], "id": server.get("id", "")}
+                    else:
+                        where = {"command": server["command"], "args": server.get("args") or [],
+                                 "env": server.get("env") or {}, "cwd": server.get("cwd")}
+                    out.append(dict(tool, server=where))
         return out
 
     def _mcp_servers_quiet(self):

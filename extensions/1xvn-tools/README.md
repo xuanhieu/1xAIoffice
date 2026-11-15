@@ -105,15 +105,20 @@ Mọi kết nối mạng đi qua **1x Agent Host**, một tiến trình riêng (
 
 **Công cụ AI (MCP)...** (menu Tiếng Việt): cho mô hình dùng công cụ ngoài theo chuẩn MCP (Model Context Protocol), ví dụ một máy chủ tra cứu văn bản pháp luật của cơ quan bạn. Lệnh này **chỉ liệt kê**: nó mở từng máy chủ đã khai, hỏi danh sách công cụ và hiện tên, mô tả cùng trạng thái quyền của mỗi công cụ, không chạy công cụ nào.
 
-Khai máy chủ trong `mcp_servers.json` ở hồ sơ người dùng. Cấu trúc giống `claude_desktop_config.json` nên chép thẳng từ Claude Desktop sang được. Hiện chỉ hỗ trợ máy chủ chạy qua **stdio** (tiến trình con); bản nối qua HTTP kèm OAuth để sau:
+Khai máy chủ trong `mcp_servers.json` ở hồ sơ người dùng. Cấu trúc giống `claude_desktop_config.json` nên chép thẳng từ Claude Desktop sang được. Nhận cả **máy chủ chạy bằng lệnh trên máy** (stdio) lẫn **máy chủ ở xa qua HTTP**:
 
 ```json
 {
   "mcpServers": {
-    "giay-to": {"command": "python3", "args": ["/duong/dan/toi/may_chu_mcp.py"], "env": {}}
+    "giay-to": {"command": "python3", "args": ["/duong/dan/toi/may_chu_mcp.py"], "env": {}},
+    "cua-co-quan": {"type": "http", "url": "https://mcp.coquan.gov.vn/mcp"}
   }
 }
 ```
+
+**Máy chủ ở xa tự lo phần đăng nhập.** Lần đầu gọi tới, máy chủ trả 401 kèm chỉ dẫn; 1xVnOffice đi theo đúng chuẩn uỷ quyền của MCP để tự tìm đường: bản mô tả tài nguyên (RFC 9728) cho biết máy chủ uỷ quyền nào đứng sau, bản mô tả của máy chủ uỷ quyền cho đường đăng nhập và đường tự đăng ký ứng dụng (RFC 7591). Nhờ vậy bạn **không phải xin client_id** ở đâu cả — app tự đăng ký, rồi hỏi bạn một câu trước khi mở trình duyệt. Thẻ nằm trong kho bí mật của máy, một mục cho mỗi máy chủ.
+
+Lời gọi tới máy chủ ở xa đi qua tiến trình Agent Host như mọi kết nối mạng khác, nên tài liệu đang mở không bao giờ tự ra Internet, và thẻ đăng nhập chỉ tiến trình đó chạm vào.
 
 Ba nguyên tắc an toàn:
 

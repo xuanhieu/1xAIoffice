@@ -22,7 +22,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pythonpath"))
-from vn1x import oauth  # noqa: E402
+from vn1x import mcphttp, oauth  # noqa: E402
+
+USER_AGENT = mcphttp.USER_AGENT
 
 LOGIN_TIMEOUT = 300          # người dùng có 5 phút để đăng nhập xong trong trình duyệt
 DEVICE_POLL_TIMEOUT = 300
@@ -103,7 +105,8 @@ def forget(ref):
 
 def post_form(url, headers, body, timeout=HTTP_TIMEOUT):
     """(mã HTTP, dữ liệu JSON hoặc chữ thô) cho một yêu cầu dạng form."""
-    request = urllib.request.Request(url, data=body.encode("utf-8"), headers=headers, method="POST")
+    request = urllib.request.Request(url, data=body.encode("utf-8"),
+                                     headers=dict(headers, **{"User-Agent": USER_AGENT}), method="POST")
     try:
         with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as response:
             return response.status, _json_or_text(response.read())
@@ -182,6 +185,73 @@ class _Callback(BaseHTTPRequestHandler):
 
     def log_message(self, *args):                         # im lặng: không ghi đường dẫn (có mã uỷ quyền) ra nhật ký
         return
+
+
+def fetch_json(url, timeout=HTTP_TIMEOUT):
+    """Đọc một tệp JSON công khai (bản mô tả uỷ quyền). None nếu không có."""
+    try:
+        request = urllib.request.Request(url, method="GET",
+                                         headers={"Accept": "application/json", "User-Agent": USER_AGENT})
+        with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as reply:
+            return json.loads(reply.read().decode("utf-8", "replace"))
+    except (urllib.error.URLError, ValueError, OSError):
+        return None
+
+
+def discover_mcp_oauth(url, challenge=None, app_name="1xVnOffice"):
+    """Tự tìm cách đăng nhập của một máy chủ MCP ở xa, theo chuẩn uỷ quyền của MCP.
+
+    Đi đúng ba bước: lời thách thức 401 → bản mô tả tài nguyên (RFC 9728) → bản mô tả máy chủ uỷ quyền. Không
+    bước nào bắt người dùng khai tay địa chỉ hay client_id.
+    """
+    from vn1x import mcphttp
+    resource = None
+    for candidate in mcphttp.metadata_urls(url, challenge):
+        resource = fetch_json(candidate)
+        if resource:
+            break
+    if not resource:
+        raise FlowError(f"máy chủ MCP {url} đòi đăng nhập nhưng không chỉ ra cách đăng nhập")
+    server = None
+    for candidate in mcphttp.authorization_server_urls(resource):
+        server = fetch_json(candidate)
+        if server:
+            break
+    if not server:
+        raise FlowError("không đọc được bản mô tả của máy chủ uỷ quyền")
+    return mcphttp.oauth_config(url, resource, server, app_name)
+
+
+def register_client(config, redirect_uri):
+    """Tự đăng ký ứng dụng (RFC 7591) và trả về client_id. Ứng dụng trên máy là client công khai, không secret."""
+    from vn1x import mcphttp
+    url = config.get("registration_url")
+    if not url:
+        raise FlowError("máy chủ không cho tự đăng ký ứng dụng; cần quản trị viên cấp client_id")
+    body = json.dumps(mcphttp.registration_body(config.get("app_name") or "1xVnOffice", redirect_uri,
+                                                config.get("scopes")), ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(url, data=body, method="POST",
+                                     headers={"Content-Type": "application/json",
+                                              "Accept": "application/json", "User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT,
+                                    context=ssl.create_default_context()) as reply:
+            data = json.loads(reply.read().decode("utf-8", "replace"))
+    except urllib.error.HTTPError as exc:
+        raise FlowError(f"đăng ký ứng dụng bị từ chối ({exc.code}): "
+                        f"{exc.read().decode('utf-8', 'replace')[:200]}") from None
+    except (urllib.error.URLError, ValueError) as exc:
+        raise FlowError(f"không đăng ký được ứng dụng: {exc}") from None
+    client_id = (data or {}).get("client_id")
+    if not client_id:
+        raise FlowError("máy chủ đăng ký không trả về client_id")
+    return client_id
+
+
+def mcp_secret_ref(url):
+    """Tên mục trong kho bí mật cho thẻ của một máy chủ MCP; mỗi máy chủ một mục."""
+    host = url.split("://", 1)[-1].split("/", 1)[0]
+    return f"1xvnoffice/mcp/{host}"
 
 
 def host_id():
