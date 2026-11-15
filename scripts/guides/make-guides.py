@@ -17,9 +17,11 @@ from com.sun.star.beans import PropertyValue
 REPO = Path(__file__).resolve().parents[2]
 ABOUT = __import__("json").loads((REPO / "branding" / "about.json").read_text(encoding="utf-8"))
 UI = REPO / "docs" / "ui"
-SHOTS = {"start": "startcenter-{lang}-2026-11-13.png", "writer": "writer-theme-2026-11-13.png",
-         "calc": "calc-theme-2026-11-13.png", "impress": "impress-theme-2026-11-13.png"}
-INK, ACCENT, DOC, SHEET, SLIDE = 0x1C1D22, 0x4C7DFF, 0x3D7BFD, 0x1FA463, 0xF07A28
+# Ảnh app thật, chụp bằng scripts/guides/capture-shots.py (mỗi ảnh đúng một cửa sổ 1xAIoffice), bản vi và en.
+SHOTS = {k: f"guide-{k}-{{lang}}.png" for k in ("start", "writer", "nd30", "calc", "impress", "ribbon", "sidebar")}
+INK, ACCENT, DOC, SHEET, SLIDE, AI = 0x1C1D22, 0x4C7DFF, 0x3D7BFD, 0x1FA463, 0xF07A28, 0x8B6CFF
+MUTED = 0x5F6368
+SERIF, SANS = "Noto Serif", "Noto Sans"   # đi kèm app, đủ dấu tiếng Việt
 CENTER = 3
 
 NAMES = {
@@ -29,95 +31,119 @@ NAMES = {
 
 DOC_TEXT = {
     "en": {
+        "brand": "1xAIoffice",
         "title": "Welcome to 1xAIoffice – 1xDoc",
-        "intro": "1xAIoffice is a free office suite made for Vietnam: documents, spreadsheets and presentations that open "
-                 "and save Microsoft Office files, with Vietnamese tools built in. No ads, no tracking, and macros are "
-                 "blocked unless you trust them.",
+        "intro": "A free office suite made for Vietnam. Documents, spreadsheets and presentations that open and save "
+                 "Microsoft Office files, administrative documents laid out by Decree 30, Vietnamese tools built in, "
+                 "and an AI assistant on your own account, only when you ask for it.",
+        "callouts": [("Top bar", "New ▾ creates any kind of document; Window ▾ switches between open files."),
+                     ("Command tabs", "Home, Insert, Layout, References, Review, View: commands grouped by task."),
+                     ("AI tab", "Ask AI, rewrite, run a skill, Decree 30 documents and checks, in one place."),
+                     ("AI sidebar", "Open it from the right edge when you need it; it shows which AI is in use."),
+                     ("Status bar", "Pages, words, document language and zoom, always in view.")],
         "sections": [
-            ("The ribbon at a glance", [
-                "File – open, save, export to PDF, print and document properties.",
-                "Home – clipboard, font, paragraph and styles: everything you use most.",
-                "Insert – tables, pictures, charts, shapes, headers and page numbers.",
-                "Layout – page size, margins, orientation, columns and breaks.",
-                "References – table of contents, footnotes, captions and citations.",
-                "Review – spelling, comments and track changes.",
-                "View – zoom, page views, rulers and the navigator.",
+            ("Start in one click", "start", [
+                "The Start Center shows big cards: blank document, spreadsheet, presentation, and Decree 30 templates "
+                "(official letter, proposal, decision, minutes).",
+                "Recent documents are listed by Today, Yesterday, Within 7 days and Older, with location, date and "
+                "size. Double-click to open.",
+                "Click Document, Spreadsheet or Presentation on the left for that app's own page.",
+                "VI / EN in the top corner switches the interface language; the app restarts in a few seconds.",
             ]),
-            ("Administrative documents (Decree 30)", [
-                "Open the Vietnamese menu and choose New Administrative Document (Decree 30)…",
-                "Fill in the issuing organization, number, place, date, subject, body and signer, then press OK.",
-                "1xDoc lays the document out as Appendix I of Decree 30/2020/ND-CP requires: A4, margins, Times New "
-                "Roman, the national title, rules, the signature block and the recipients list.",
-                "Missing or wrong fields are flagged in the dialog, so nothing you typed is lost.",
-                "The tool helps with the layout; the issuer stays responsible for the content and legal validity.",
+            ("An AI assistant when you need it", "sidebar", [
+                "Use the AI tab, the AI sidebar, or right-click selected text: Ask AI, Rewrite, Run a skill.",
+                "Bring your own AI: the ChatGPT plan you already pay for, an API key (Groq, Gemini, OpenRouter, Mistral "
+                "and others have free tiers), or AI running on this computer so nothing leaves it.",
+                "AI Accounts lists free providers first and opens the page where you get a key.",
+                "Rewrites show a preview first and undo in one step (⌘Z). Asking never changes your document.",
             ]),
-            ("Vietnamese tools", [
-                "Convert TCVN3 (ABC) text to Unicode, in documents and spreadsheets.",
-                "Normalize Vietnamese Unicode so search, sorting and spell check work reliably.",
-                "Remove diacritics, for file names, codes and e-mail addresses.",
-                "Number to words and amount in words (VND), as menu commands and as the DOCSO and DOCTIEN functions in "
-                "1xSheet.",
+            ("Administrative documents (Decree 30)", "nd30", [
+                "28 document types from Appendix III of Decree 30/2020/ND-CP, with body templates and signature "
+                "blocks, including documents signed by two parties.",
+                "Fill in the dialog: issuing organization, number, place, date, subject, body and signer.",
+                "Check Decree 30 Format reviews any open document and fixes the page: A4, margins, font.",
+                "The tool helps with layout; the issuer stays responsible for content and legal validity.",
             ]),
-            ("Save and share", [
+            ("Vietnamese tools", "ribbon", [
+                "Convert TCVN3 (ABC), VNI and VIQR text to Unicode; normalize Vietnamese Unicode.",
+                "Remove diacritics for file names, codes and e-mail addresses.",
+                "Number to words and amount in words (VND); DOCSO and DOCTIEN functions in 1xSheet.",
+            ]),
+            ("Your work is saved for you", None, [
+                "Recovery data is saved every 2 minutes, and documents that already have a file name are saved "
+                "directly at the same pace.",
+                "A backup copy is kept each time you save. After a crash, 1xAIoffice offers to recover your work.",
+                "Change or turn this off in Tools ▸ Options ▸ Load/Save ▸ General.",
+            ]),
+            ("Save and share", None, [
                 "New documents are saved as .docx, so colleagues using Microsoft Word open them directly.",
                 "File ▸ Export as PDF creates a PDF for sending or publishing.",
-                "Agencies that must publish editable files in ODF can switch the default format in Options.",
             ]),
         ],
         "shortcuts_title": "Keyboard shortcuts",
-        "shortcuts": [("Ctrl+N", "New document"), ("Ctrl+O", "Open"), ("Ctrl+S", "Save"), ("Ctrl+P", "Print"),
-                      ("Ctrl+Z / Ctrl+Y", "Undo / Redo"), ("Ctrl+B / I / U", "Bold / Italic / Underline"),
-                      ("Ctrl+F", "Find"), ("Ctrl+H", "Find and replace"), ("Ctrl+Enter", "Page break"),
+        "shortcuts": [("⌘N", "New document"), ("⌘O", "Open"), ("⌘S", "Save"), ("⌘P", "Print"),
+                      ("⌘Z / ⌘⇧Z", "Undo / Redo"), ("⌘B / I / U", "Bold / Italic / Underline"),
+                      ("⌘F", "Find"), ("⌘⌥F", "Find and replace"), ("⌘↩", "Page break"),
                       ("F7", "Spelling and grammar")],
         "shortcuts_head": ("Shortcut", "Action"),
-        "footer": "On macOS use ⌘ instead of Ctrl. Tips and more guides: menu Help.",
-        "callouts": ["Start Center: open recent files or create a new document.",
-                     "The ribbon groups commands by task, like Microsoft Office and WPS."],
+        "footer": "On Windows use Ctrl instead of ⌘. Detailed guides: 1xag.com/office",
     },
     "vi": {
+        "brand": "1xAIoffice",
         "title": "Chào mừng đến với 1xAIoffice – 1xDoc",
-        "intro": "1xAIoffice là bộ văn phòng miễn phí làm cho người Việt: văn bản, bảng tính và trình chiếu mở và lưu "
-                 "được file Microsoft Office, có sẵn công cụ tiếng Việt. Không quảng cáo, không theo dõi, macro bị chặn "
-                 "trừ khi bạn tin cậy.",
+        "intro": "Bộ văn phòng miễn phí làm cho người Việt. Văn bản, bảng tính, trình chiếu mở và lưu được tệp "
+                 "Microsoft Office, văn bản hành chính trình bày theo Nghị định 30, công cụ tiếng Việt có sẵn, và trợ "
+                 "lý AI dùng tài khoản của chính bạn, chỉ xuất hiện khi bạn cần.",
+        "callouts": [("Thanh trên cùng", "Mới ▾ tạo mọi loại tài liệu; Cửa sổ ▾ chuyển nhanh giữa các tệp đang mở."),
+                     ("Các thẻ lệnh", "Trang đầu, Chèn, Bố cục, Tham chiếu, Xem lại, Xem: lệnh gom theo việc."),
+                     ("Thẻ AI", "Hỏi AI, viết lại, chạy skill, soạn và kiểm văn bản NĐ30, ở cùng một chỗ."),
+                     ("Thanh bên AI", "Mở ở mép phải khi cần; luôn cho biết đang dùng AI nào."),
+                     ("Thanh trạng thái", "Số trang, số chữ, ngôn ngữ văn bản và thu phóng, luôn trong tầm mắt.")],
         "sections": [
-            ("Ribbon trong một trang", [
-                "Tệp: mở, lưu, xuất PDF, in và thuộc tính tài liệu.",
-                "Trang đầu: bảng tạm, phông chữ, đoạn văn và kiểu, những lệnh dùng nhiều nhất.",
-                "Chèn: bảng, ảnh, biểu đồ, hình vẽ, đầu trang và số trang.",
-                "Bố cục: khổ giấy, lề, hướng trang, cột và ngắt trang.",
-                "Tham chiếu: mục lục, chú thích cuối trang, chú thích ảnh và trích dẫn.",
-                "Xem lại: chính tả, ghi chú và theo dõi thay đổi.",
-                "Xem: thu phóng, chế độ trang, thước và bộ điều hướng.",
+            ("Bắt đầu trong một cú bấm", "start", [
+                "Trang chủ có các thẻ lớn: văn bản, bảng tính, trình chiếu trống, và mẫu văn bản NĐ30 (công văn, tờ "
+                "trình, quyết định, biên bản).",
+                "Tài liệu gần đây xếp theo Hôm nay, Hôm qua, Trong 7 ngày, Cũ hơn, kèm vị trí, ngày sửa và dung lượng. "
+                "Nhấn đúp để mở.",
+                "Bấm Văn bản, Bảng tính hay Trình chiếu ở cột trái để vào trang riêng của ứng dụng đó.",
+                "Nút VI / EN ở góc trên đổi ngôn ngữ giao diện; app khởi động lại trong vài giây.",
             ]),
-            ("Văn bản hành chính theo Nghị định 30", [
-                "Mở menu Tiếng Việt, chọn Văn bản hành chính NĐ30 mới…",
-                "Nhập cơ quan ban hành, số, địa danh, ngày, trích yếu, nội dung và người ký rồi bấm OK.",
-                "1xDoc trình bày đúng Phụ lục I Nghị định 30/2020/NĐ-CP: khổ A4, lề, phông Times New Roman, Quốc hiệu, "
-                "Tiêu ngữ, đường kẻ, khối chữ ký và nơi nhận.",
-                "Ô thiếu hoặc sai được báo ngay trong hộp thoại, những gì bạn đã gõ không bị mất.",
-                "Công cụ chỉ hỗ trợ trình bày; nội dung và giá trị pháp lý do người ban hành chịu trách nhiệm.",
+            ("Trợ lý AI khi bạn cần", "sidebar", [
+                "Dùng thẻ AI, thanh bên AI, hoặc bôi đen rồi bấm chuột phải: Hỏi AI, Viết lại, Chạy skill.",
+                "Dùng AI của chính bạn: gói ChatGPT đang trả, khoá API (Groq, Gemini, OpenRouter, Mistral và nhiều hãng "
+                "khác có gói miễn phí), hoặc AI chạy ngay trong máy để không gửi gì ra ngoài.",
+                "Màn hình Tài khoản AI xếp hãng miễn phí lên đầu và mở sẵn trang lấy khoá cho bạn.",
+                "Viết lại luôn có bản xem trước và hoàn tác một bước (⌘Z). Chỉ hỏi thì tài liệu không bị đổi.",
             ]),
-            ("Công cụ tiếng Việt", [
-                "Chuyển mã TCVN3 (ABC) sang Unicode, trong cả văn bản lẫn bảng tính.",
-                "Chuẩn hoá Unicode tiếng Việt để tìm kiếm, sắp xếp và kiểm chính tả chạy đúng.",
-                "Bỏ dấu tiếng Việt, dùng cho tên tệp, mã số và địa chỉ thư.",
-                "Đọc số và đọc số tiền thành chữ, có ở menu và ở hai hàm DOCSO, DOCTIEN trong 1xSheet.",
+            ("Văn bản hành chính theo Nghị định 30", "nd30", [
+                "28 loại văn bản theo Phụ lục III Nghị định 30/2020/NĐ-CP, có khung nội dung mẫu và khối chữ ký, kể cả "
+                "loại hai bên cùng ký.",
+                "Điền hộp thoại: cơ quan ban hành, số, địa danh, ngày, trích yếu, nội dung và người ký.",
+                "Kiểm thể thức NĐ30 rà mọi văn bản đang mở và sửa phần trang: khổ A4, lề, phông chữ.",
+                "Công cụ hỗ trợ trình bày; nội dung và giá trị pháp lý do người ban hành chịu trách nhiệm.",
             ]),
-            ("Lưu và chia sẻ", [
+            ("Công cụ tiếng Việt", "ribbon", [
+                "Chuyển văn bản TCVN3 (ABC), VNI, VIQR sang Unicode; chuẩn hoá Unicode tiếng Việt.",
+                "Bỏ dấu tiếng Việt cho tên tệp, mã số và địa chỉ thư.",
+                "Đọc số và đọc số tiền thành chữ; hàm DOCSO, DOCTIEN trong 1xSheet.",
+            ]),
+            ("Việc của bạn luôn được lưu", None, [
+                "Dữ liệu khôi phục được lưu mỗi 2 phút, và văn bản đã có tên tệp được lưu thẳng theo cùng nhịp.",
+                "Mỗi lần lưu giữ thêm một bản sao lưu. Nếu app gặp sự cố, lần mở sau sẽ mời bạn khôi phục.",
+                "Đổi nhịp hoặc tắt trong Công cụ ▸ Tuỳ chọn ▸ Tải/Lưu ▸ Chung.",
+            ]),
+            ("Lưu và chia sẻ", None, [
                 "Văn bản mới được lưu dạng .docx, người dùng Microsoft Word mở được ngay.",
                 "Tệp ▸ Xuất ra PDF để gửi hoặc đăng tải.",
-                "Cơ quan phải đăng tài liệu sửa được ở dạng ODF có thể đổi định dạng mặc định trong Tuỳ chọn.",
             ]),
         ],
         "shortcuts_title": "Phím tắt",
-        "shortcuts": [("Ctrl+N", "Tạo văn bản mới"), ("Ctrl+O", "Mở"), ("Ctrl+S", "Lưu"), ("Ctrl+P", "In"),
-                      ("Ctrl+Z / Ctrl+Y", "Hoàn tác / Làm lại"), ("Ctrl+B / I / U", "Đậm / Nghiêng / Gạch chân"),
-                      ("Ctrl+F", "Tìm"), ("Ctrl+H", "Tìm và thay thế"), ("Ctrl+Enter", "Ngắt trang"),
+        "shortcuts": [("⌘N", "Tạo văn bản mới"), ("⌘O", "Mở"), ("⌘S", "Lưu"), ("⌘P", "In"),
+                      ("⌘Z / ⌘⇧Z", "Hoàn tác / Làm lại"), ("⌘B / I / U", "Đậm / Nghiêng / Gạch chân"),
+                      ("⌘F", "Tìm"), ("⌘⌥F", "Tìm và thay thế"), ("⌘↩", "Ngắt trang"),
                       ("F7", "Chính tả và ngữ pháp")],
         "shortcuts_head": ("Phím", "Việc"),
-        "footer": "Trên macOS dùng ⌘ thay cho Ctrl. Mẹo và hướng dẫn khác: menu Trợ giúp.",
-        "callouts": ["Trang chủ: mở tệp gần đây hoặc tạo tài liệu mới.",
-                     "Ribbon gom lệnh theo việc, giống Microsoft Office và WPS."],
+        "footer": "Trên Windows dùng Ctrl thay cho ⌘. Hướng dẫn chi tiết: 1xag.com/office",
     },
 }
 
@@ -137,7 +163,11 @@ SHEET_TEXT = {
                     "Select the table and use Insert ▸ Chart to chart it; the chart on the right is an example.",
                     "Files are saved as .xlsx by default so Excel users can open them. DOCSO and DOCTIEN are "
                     "1xAIoffice functions: Excel shows their last values but cannot recalculate them."],
-           "chart": "Amount by item"},
+           "chart": "Amount by item",
+           "ai_title": "AI in 1xSheet",
+           "ai": ["Open the AI sidebar on the right edge, or the AI tab: Ask AI about the sheet, run a skill.",
+                  "Use your own AI account: the ChatGPT plan you pay for, a free-tier API key, or AI on this computer.",
+                  "Asking never changes your cells. Your work is saved every 2 minutes."]},
     "vi": {"sheet": "Bắt đầu", "title": "Chào mừng đến với 1xAIoffice – 1xSheet",
            "intro": "Thử ngay tại đây: đổi số lượng hoặc đơn giá, mọi tổng, số tiền bằng chữ và biểu đồ tự cập nhật.",
            "head": ["Mã", "Mặt hàng", "SL", "Đơn giá (đồng)", "Thành tiền (đồng)", "Bằng chữ"],
@@ -153,13 +183,21 @@ SHEET_TEXT = {
                     "Chọn bảng rồi Chèn ▸ Biểu đồ để vẽ biểu đồ; biểu đồ bên phải là ví dụ.",
                     "Tệp được lưu dạng .xlsx để người dùng Excel mở được. DOCSO và DOCTIEN là hàm của 1xAIoffice: "
                     "Excel hiện giá trị đã tính nhưng không tính lại được."],
-           "chart": "Thành tiền theo mặt hàng"},
+           "chart": "Thành tiền theo mặt hàng",
+           "ai_title": "AI trong 1xSheet",
+           "ai": ["Mở thanh bên AI ở mép phải, hoặc thẻ AI: hỏi AI về bảng tính, chạy skill.",
+                  "Dùng tài khoản AI của chính bạn: gói ChatGPT đang trả, khoá API có gói miễn phí, hoặc AI trong máy.",
+                  "Chỉ hỏi thì ô dữ liệu không bị đổi. Việc của bạn được lưu mỗi 2 phút."]},
 }
 
 SLIDE_TEXT = {
     "en": [
         ("Welcome to 1xAIoffice – 1xSlide", "Presentations that open in PowerPoint, made in Vietnam. Press F5 to play."),
+        ("Start in one click", None, "start"),
         ("The workspace", None, "impress"),
+        ("An AI assistant when you need it", ["Open the AI sidebar on the right edge or the AI tab: Ask AI, run a skill.",
+                                              "Use your own AI: your ChatGPT plan, a free-tier API key, or AI on this computer.",
+                                              "Nothing changes until you accept it; everything is saved every 2 minutes."]),
         ("Build your slides", ["Home ▸ New Slide adds a slide; right-click a thumbnail to duplicate or delete it.",
                                "Drag thumbnails on the left to reorder.",
                                "Pick a layout in the sidebar: title, title and content, two columns…"]),
@@ -175,7 +213,11 @@ SLIDE_TEXT = {
     ],
     "vi": [
         ("Chào mừng đến với 1xAIoffice – 1xSlide", "Bài trình chiếu mở được bằng PowerPoint, làm tại Việt Nam. Bấm F5 để trình chiếu."),
+        ("Bắt đầu trong một cú bấm", None, "start"),
         ("Màn hình làm việc", None, "impress"),
+        ("Trợ lý AI khi bạn cần", ["Mở thanh bên AI ở mép phải hoặc thẻ AI: hỏi AI, chạy skill.",
+                                   "Dùng AI của bạn: gói ChatGPT, khoá API có gói miễn phí, hoặc AI ngay trong máy.",
+                                   "Không gì thay đổi cho tới khi bạn đồng ý; mọi thứ được lưu mỗi 2 phút."]),
         ("Dựng các slide", ["Trang đầu ▸ Slide mới để thêm slide; bấm chuột phải vào ảnh thu nhỏ để nhân bản hoặc xoá.",
                             "Kéo ảnh thu nhỏ ở cột trái để đổi thứ tự.",
                             "Chọn bố cục ở thanh bên: tiêu đề, tiêu đề và nội dung, hai cột…"]),
@@ -245,34 +287,75 @@ def fit(graphic, width_mm100):
 
 
 # ---------------------------------------------------------------- 1xDoc
+def gradient(start, end, angle=0):
+    g = uno.createUnoStruct("com.sun.star.awt.Gradient")
+    g.Style = uno.Enum("com.sun.star.awt.GradientStyle", "LINEAR")
+    g.StartColor, g.EndColor, g.Angle = start, end, angle
+    g.StartIntensity = g.EndIntensity = 100
+    return g
+
+
 def make_doc(office, lang, out):
+    """Kiểu tài liệu chào mừng của WPS: trang bìa nền chuyển màu xanh nhạt, ảnh app lớn kèm chú thích đánh số, rồi
+    mỗi tính năng một mục có tiêu đề màu, đoạn giải thích và ảnh thật. Phông Noto (đi kèm app, đủ dấu tiếng Việt)."""
     t = DOC_TEXT[lang]
     doc = office.new("swriter")
     text = doc.Text
-    page = doc.StyleFamilies.getByName("PageStyles").getByName("Standard")
-    page.Width, page.Height = 21000, 29700
-    page.LeftMargin = page.RightMargin = 2000
-    page.TopMargin = page.BottomMargin = 1800
-    width = page.Width - page.LeftMargin - page.RightMargin
+    pages = doc.StyleFamilies.getByName("PageStyles")
+    for name in ("Standard", "First Page"):
+        page = pages.getByName(name)
+        page.Width, page.Height = 21000, 29700
+        page.LeftMargin = page.RightMargin = 2000
+        page.TopMargin = page.BottomMargin = 1800
+    cover = pages.getByName("First Page")
+    cover.FillStyle = uno.Enum("com.sun.star.drawing.FillStyle", "GRADIENT")
+    cover.FillGradient = gradient(0xDCE7FF, 0xFFFFFF)            # xanh nhạt trên, trắng dưới, như bìa WPS
+    cover.FollowStyle = "Standard"
+    width = 21000 - 4000
     paras = doc.StyleFamilies.getByName("ParagraphStyles")
-    for name, color in (("Title", INK), ("Heading 1", DOC)):
-        paras.getByName(name).CharColor = color
+    paras.getByName("Standard").CharFontName = SANS
+    paras.getByName("Text body").CharFontName = SANS
+    paras.getByName("Text body").CharHeight = 10.5
+    paras.getByName("Text body").ParaBottomMargin = 180
+    for name, size, color in (("Title", 26, INK), ("Heading 1", 17, DOC), ("Heading 2", 13, INK)):
+        st = paras.getByName(name)
+        st.CharFontName, st.CharHeight, st.CharColor = SERIF, size, color
+    paras.getByName("Heading 1").ParaTopMargin = 500
     cur = text.createTextCursor()
     first = [True]
 
-    def para(s, style="Text body", center=False, color=None):
+    def para(s, style="Text body", center=False, color=None, size=None, bold=False):
         if not first[0]:
             text.insertControlCharacter(cur, 0, False)
         first[0] = False
         cur.ParaStyleName = style
+        cur.ParaLeftMargin = cur.ParaFirstLineIndent = 0     # mỗi đoạn mới bắt đầu không thụt
         cur.ParaAdjust = CENTER if center else 0
-        if color is not None:
-            cur.CharColor = color
+        for prop_name, value in (("CharColor", color), ("CharHeight", size)):
+            if value is not None:
+                setattr(cur, prop_name, value)
+        if bold:
+            cur.CharWeight = 150.0
         text.insertString(cur, s, False)
-        if color is not None:
-            cur.setPropertyToDefault("CharColor")
+        for prop_name in ("CharColor", "CharHeight", "CharWeight"):
+            cur.setPropertyToDefault(prop_name)
 
-    def image(path, caption, width_mm100=None):
+    def rich(term, rest, number=None):
+        """Một dòng "① Thuật ngữ: giải thích" với thuật ngữ in đậm."""
+        para("", "Text body")
+        cur.ParaLeftMargin, cur.ParaFirstLineIndent = 700, -700
+        if number is not None:
+            cur.CharColor, cur.CharWeight = ACCENT, 150.0
+            text.insertString(cur, f"{number}\t", False)
+        cur.CharColor, cur.CharWeight = INK, 150.0
+        text.insertString(cur, term + ": ", False)
+        cur.setPropertyToDefault("CharColor")
+        cur.setPropertyToDefault("CharWeight")
+        text.insertString(cur, rest, False)
+
+    def image(path, width_mm100=None):
+        if not Path(path).is_file():
+            return
         para("", center=True)
         g = office.graphic(path)
         obj = doc.createInstance("com.sun.star.text.TextGraphicObject")
@@ -280,39 +363,28 @@ def make_doc(office, lang, out):
         obj.AnchorType = uno.Enum("com.sun.star.text.TextContentAnchorType", "AS_CHARACTER")
         obj.Size = fit(g, width_mm100 or width)
         text.insertTextContent(cur, obj, False)
-        para(caption, "Caption" if paras.hasByName("Caption") else "Text body", center=True)
 
-    para("1xAIoffice", "Subtitle", center=True, color=ACCENT)
-    para(t["title"], "Title", center=True)
-    para(t["intro"], center=True)
-    image(shot("start", lang), "① " + t["callouts"][0])
-    image(shot("writer", lang), "② " + t["callouts"][1])
-    # Bullets are drawn by hand: applying the "List Bullet" style over UNO aborts upstream 26.8 on macOS.
-    for heading, items in t["sections"]:
-        para(heading, "Heading 1")
+    def bullets(items):
         for item in items:
-            para("•\t" + item)
-            cur.ParaLeftMargin, cur.ParaFirstLineIndent = 700, -500
-    cur.ParaLeftMargin = cur.ParaFirstLineIndent = 0
-    about = ABOUT[lang]
-    para(about["title"], "Heading 1")
-    para(about["tagline"])
-    para(about["who_title"] + ": " + " ".join(about["who"]))
-    para(about["mission_title"] + ": " + about["mission"])
-    para(about["vision_title"] + ": " + about["vision"])
-    for key in ("available", "roadmap", "different"):
-        para(about[key + "_title"], "Heading 2")
-        for item in about[key]:
-            para("•\t" + item)
-            cur.ParaLeftMargin, cur.ParaFirstLineIndent = 700, -500
-        cur.ParaLeftMargin = cur.ParaFirstLineIndent = 0
-    d = ABOUT["donate"]
-    para(about["support_title"], "Heading 2")
-    para(about["support"])
-    # Mã VietQR tĩnh, sinh bởi scripts/brand/make-brand.py và kiểm bằng scripts/check-vietqr.sh.
-    image(REPO / "branding" / "out" / "vietqr.svg", f'{d["bank"]} · {d["account"]} · {d["holder"]}', 4000)
-    para(f'{about["support_link"]}: {d["url_" + lang]}', center=True)
-    para(about["footer"])
+            para("•\t" + item)          # vẽ dấu đầu dòng bằng tay: gán kiểu List Bullet qua UNO làm 26.8 ngã trên macOS
+            cur.ParaLeftMargin, cur.ParaFirstLineIndent = 600, -400
+
+    # --- trang bìa
+    para(t["brand"], "Subtitle", center=True, color=ACCENT, bold=True)
+    cur.PageDescName = "First Page"
+    para(t["title"], "Title", center=True)
+    para(t["intro"], center=True, color=MUTED)
+    image(shot("writer", lang))
+    for i, (term, rest) in enumerate(t["callouts"]):
+        rich(term, rest, "①②③④⑤⑥"[i])
+    # --- từng tính năng
+    for n, (heading, pic, items) in enumerate(t["sections"]):
+        para(heading, "Heading 1")
+        if n == 0:
+            cur.BreakType = uno.Enum("com.sun.star.style.BreakType", "PAGE_BEFORE")
+        bullets(items)
+        if pic:
+            image(shot(pic, lang), int(width * (0.55 if pic == "sidebar" else 0.95)))
     para(t["shortcuts_title"], "Heading 1")
     rows = [t["shortcuts_head"]] + t["shortcuts"]
     table = doc.createInstance("com.sun.star.text.TextTable")
@@ -323,15 +395,34 @@ def make_doc(office, lang, out):
         for c, v in enumerate((a, b)):
             cell = table.getCellByPosition(c, r)
             cell.setString(v)
+            tc = cell.Text.createTextCursor()
+            tc.gotoEnd(True)
+            tc.CharFontName = SANS
             if r == 0:
                 cell.BackColor = DOC
-                tc = cell.Text.createTextCursor()
-                tc.gotoEnd(True)
                 tc.CharColor, tc.CharWeight = 0xFFFFFF, 150.0
+            elif r % 2 == 0:
+                cell.BackColor = 0xF1F5FF
     end = text.createTextCursor()
     end.gotoEnd(False)
     cur = end
-    para(t["footer"], center=True, color=0x6B6E78)
+    # --- giới thiệu và ủng hộ (từ branding/about.json, cùng nguồn với README)
+    about = ABOUT[lang]
+    para(about["title"], "Heading 1")
+    para(about["tagline"])
+    para(about["mission_title"] + ": " + about["mission"])
+    para(about["vision_title"] + ": " + about["vision"])
+    for key in ("available", "different"):
+        para(about[key + "_title"], "Heading 2")
+        bullets(about[key])
+    d = ABOUT["donate"]
+    para(about["support_title"], "Heading 2")
+    para(about["support"])
+    # Mã VietQR tĩnh, sinh bởi scripts/brand/make-brand.py và kiểm bằng scripts/check-vietqr.sh.
+    image(REPO / "branding" / "out" / "vietqr.svg", 4000)
+    para(f'{d["bank"]} · {d["account"]} · {d["holder"]}', center=True)
+    para(f'{about["support_link"]}: {d["url_" + lang]}', center=True)
+    para(t["footer"], center=True, color=MUTED)
     name = NAMES[lang]["doc"]
     store(doc, out / f"{name}.docx", "MS Word 2007 XML")
     store(doc, out / f"{name}.pdf", "writer_pdf_Export")
@@ -348,9 +439,14 @@ def make_sheet(office, lang, out):
     sheets.getByIndex(0).Name = t["sheet"]
     cell = sheet.getCellRangeByName
     cell("A1").String = t["title"]
-    cell("A1").CharHeight, cell("A1").CharWeight, cell("A1").CharColor = 20, 150.0, INK
+    cell("A1").CharHeight, cell("A1").CharWeight, cell("A1").CharColor = 22, 150.0, INK
+    cell("A1").CharFontName = SERIF
     cell("A2").String = t["intro"]
-    cell("A2").CharColor = 0x6B6E78
+    cell("A2").CharColor = MUTED
+    band = cell("A1:F2")                    # dải tiêu đề nền xanh lá nhạt, như trang chào của WPS Sheets
+    band.CellBackColor = 0xE3F5EA
+    sheet.Rows.getByIndex(0).Height = 1300
+    sheet.Rows.getByIndex(1).Height = 700
     top = 4  # header row (1-based)
     for c, h in enumerate(t["head"]):
         x = sheet.getCellByPosition(c, top - 1)
@@ -393,10 +489,14 @@ def make_sheet(office, lang, out):
     cell(f"A{tip_row}").String = t["tips_title"]
     cell(f"A{tip_row}").CharWeight, cell(f"A{tip_row}").CharHeight = 150.0, 13
     for i, tip in enumerate(t["tips"]):
-        cell(f"A{tip_row + 1 + i}").String = f"{i + 1}. {tip}"
+        r = tip_row + 1 + i
+        cell(f"A{r}").String = f"{i + 1}. {tip}"
+        line = cell(f"A{r}:F{r}")               # gộp cả hàng và cho xuống dòng: mẹo dài không bị cắt chữ
+        line.merge(True)
+        line.IsTextWrapped = True
     # Chart next to the tips.
     rect = uno.createUnoStruct("com.sun.star.awt.Rectangle")
-    rect.X, rect.Y, rect.Width, rect.Height = 1000, sheet.Rows.getByIndex(tip_row + 8).Position.Y, 16000, 8000
+    rect.X, rect.Y, rect.Width, rect.Height = 1000, sheet.Rows.getByIndex(tip_row + 7).Position.Y, 20000, 6200
     chart_range = uno.createUnoStruct("com.sun.star.table.CellRangeAddress")
     chart_range.Sheet, chart_range.StartColumn, chart_range.EndColumn = 0, 4, 4
     chart_range.StartRow, chart_range.EndRow = top - 1, last - 1
@@ -406,6 +506,29 @@ def make_sheet(office, lang, out):
     chart.Title.String = t["chart"]
     chart.HasLegend = False
     chart.getData().setRowDescriptions(tuple(r[1] for r in t["rows"]))  # item names as categories
+    # Mục AI: tiêu đề màu, ba dòng giải thích, ảnh app thật bên dưới.
+    ai_row = tip_row + 8 + 18                # dưới đáy biểu đồ (cao 6,2 cm), không bị biểu đồ che
+    sheet.Rows.getByIndex(ai_row - 1).IsStartOfNewPage = True   # khi in: mục AI và ảnh nằm trọn trang 2
+    cell(f"A{ai_row}").String = t["ai_title"]
+    cell(f"A{ai_row}").CharWeight, cell(f"A{ai_row}").CharHeight, cell(f"A{ai_row}").CharColor = 150.0, 15, AI
+    cell(f"A{ai_row}").CharFontName = SERIF
+    for i, line in enumerate(t["ai"]):
+        cell(f"A{ai_row + 1 + i}").String = "•  " + line
+    pic_path = shot("calc", lang)
+    if pic_path.is_file():
+        g = office.graphic(pic_path)
+        pic = doc.createInstance("com.sun.star.drawing.GraphicObjectShape")
+        sheet.DrawPage.add(pic)
+        pic.Graphic = g
+        pic.Size = fit(g, 22000)                # vừa trang ngang A4, cả mục AI nằm gọn một trang
+        pos = uno.createUnoStruct("com.sun.star.awt.Point")
+        pos.X, pos.Y = 1000, sheet.Rows.getByIndex(ai_row + 4).Position.Y
+        pic.Position = pos
+    # In: khổ ngang, co vừa một trang theo bề ngang (cột Bằng chữ không bị tách sang trang riêng).
+    page = doc.StyleFamilies.getByName("PageStyles").getByName(sheet.PageStyle)
+    page.IsLandscape = True
+    page.Width, page.Height = max(page.Width, page.Height), min(page.Width, page.Height)
+    page.ScaleToPagesX, page.ScaleToPagesY = 1, 0
     doc.CurrentController.freezeAtPosition(0, top)
     store(doc, out / f"{NAMES[lang]['sheet']}.xlsx", "Calc MS Excel 2007 XML")
     thumbnail(doc, out, f"{NAMES[lang]['sheet']}.xlsx", "calc_png_Export", 256, 362)
@@ -418,8 +541,8 @@ def make_slide(office, lang, out):
     pages = doc.DrawPages
     master = doc.MasterPages.getByIndex(0)
     bg = doc.createInstance("com.sun.star.drawing.Background")
-    bg.FillStyle = uno.Enum("com.sun.star.drawing.FillStyle", "SOLID")
-    bg.FillColor = 0xF7F8FB
+    bg.FillStyle = uno.Enum("com.sun.star.drawing.FillStyle", "GRADIENT")
+    bg.FillGradient = gradient(0xFFF1E6, 0xFFFFFF)     # cam nhạt (màu 1xSlide) sang trắng
     master.Background = bg
     W, H = pages.getByIndex(0).Width, pages.getByIndex(0).Height
     for i, spec in enumerate(slides):
