@@ -3,7 +3,7 @@
   "links": {
     "site": "https://xuanhieu.org",
     "hub": "https://1xag.com",
-    "repo": "https://github.com/xuanhieu/1xvnoffice"
+    "repo": "https://github.com/xuanhieu/1xAIoffice"
   },
   "en": {
     "title": "About 1xAIoffice",
@@ -39,7 +39,7 @@
       "Private by default: nothing is sent anywhere unless you turn it on.",
       "Open: the code is public under the MPL-2.0 license."
     ],
-    "footer": "Questions and feedback: https://github.com/xuanhieu/1xvnoffice/issues",
+    "footer": "Questions and feedback: https://github.com/xuanhieu/1xAIoffice/issues",
     "support_title": "Support the author",
     "support": "1xAIoffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.",
     "support_link": "Donation page"
@@ -78,7 +78,7 @@
       "Riêng tư mặc định: không gửi gì ra ngoài trừ khi bạn bật.",
       "Mở: mã nguồn công khai theo giấy phép MPL-2.0."
     ],
-    "footer": "Hỏi đáp và góp ý: https://github.com/xuanhieu/1xvnoffice/issues",
+    "footer": "Hỏi đáp và góp ý: https://github.com/xuanhieu/1xAIoffice/issues",
     "support_title": "Ủng hộ tác giả",
     "support": "1xAIoffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.",
     "support_link": "Trang ủng hộ"

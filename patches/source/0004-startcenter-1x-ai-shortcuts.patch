@@ -1,7 +1,7 @@
 Subject: Start Center: mục "1x AI" với Văn bản NĐ30, Tài khoản AI, Mở CSV an toàn
 Why: Mở app lên là Start Center, nhưng không có lối nào tới mẫu văn bản NĐ30 hay chỗ gắn tài
  khoản AI: người dùng không biết app có những thứ đó. Thêm một mục ngay dưới danh sách "New",
- nút gọi thẳng lệnh của extension 1xvn-tools qua chính khung Start Center (lệnh biết là chưa có
+ nút gọi thẳng lệnh của extension 1xai-tools qua chính khung Start Center (lệnh biết là chưa có
  tài liệu: NĐ30 mở Writer ngay trong cửa sổ đó). Nhãn lấy từ bảng mô tả lệnh (GenericCommands.xcu
  của extension) nên theo ngôn ngữ giao diện; extension vắng mặt thì nút tự ẩn. Icon là icon màu
  của thẻ AI trong icon theme "1x". Nhãn tiêu đề "1x AI" được miễn kiểm orphan-label trong
@@ -164,7 +164,7 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
      mxDrawAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
      mxCalcAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
      mxDBAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
-+    // Nhãn lấy từ bảng mô tả lệnh (GenericCommands.xcu của extension 1xvn-tools), nên theo đúng ngôn ngữ giao diện.
++    // Nhãn lấy từ bảng mô tả lệnh (GenericCommands.xcu của extension 1xai-tools), nên theo đúng ngôn ngữ giao diện.
 +    for (auto& [pButton, aCommand] : { std::pair(mxOnexNd30Button.get(), u"vnd.1x.tools:Nd30Document"_ustr),
 +                                       std::pair(mxOnexAiButton.get(), u"vnd.1x.tools:AiAccounts"_ustr),
 +                                       std::pair(mxOnexCsvButton.get(), u"vnd.1x.tools:OpenCsvSafely"_ustr) })

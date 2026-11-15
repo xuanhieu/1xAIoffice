@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Nhãn của lệnh 1xvn-tools trong bảng mô tả lệnh của lõi. Lõi tra nhãn ở đây cho MỌI chỗ lệnh xuất hiện:
+<!-- Nhãn của lệnh 1xai-tools trong bảng mô tả lệnh của lõi. Lõi tra nhãn ở đây cho MỌI chỗ lệnh xuất hiện:
      nút trên thẻ AI của ribbon (Label), menu và menu chuột phải (PopupLabel), chú thích khi rê chuột (TooltipLabel).
      Thiếu bảng này thì nút trên ribbon trống trơn, vì lõi bỏ qua nhãn ghi trong tệp .ui khi nút gắn với một lệnh. -->
 <oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema"

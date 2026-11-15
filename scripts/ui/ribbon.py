@@ -209,7 +209,7 @@ def move_addons_to_home(root):
 # Chức năng của mình phải tự lộ ra: người dùng tìm theo thẻ trên ribbon, không đọc hướng dẫn. Nên có một thẻ riêng
 # đứng ngay sau Trang chủ, nút lớn có chữ, thay vì vài icon nhỏ dồn cuối thẻ Home như trước.
 T = "vnd.1x.tools:"
-AI_TAB = {   # (nhóm, nút lớn?, lệnh). Nhãn lấy từ extensions/1xvn-tools/GenericCommands.xcu, theo ngôn ngữ giao diện.
+AI_TAB = {   # (nhóm, nút lớn?, lệnh). Nhãn lấy từ extensions/1xai-tools/GenericCommands.xcu, theo ngôn ngữ giao diện.
     "swriter": [
         ("Trợ lý AI", True, ["AiAsk", "AiRewrite", "AiSkill"]),
         ("Văn bản NĐ30", True, ["Nd30Document", "Nd30Check"]),

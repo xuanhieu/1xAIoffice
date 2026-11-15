@@ -211,8 +211,17 @@ step_guides() {
 step_extensions() {
   # Package extensions/* and install them as bundled extensions of the app (unpacked, so no user action is needed).
   local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
+  # Start from an empty dist/: a renamed extension would otherwise leave its old .oxt there and get reinstalled.
+  rm -f "$ONEX_WORK"/dist/*.oxt
   python3 "$REPO_ROOT/scripts/build-extensions.py" --out "$ONEX_WORK/dist"
-  local oxt name dest
+  local oxt name dest old
+  # Folder names an extension used before it was renamed; two copies with one identifier must never load together.
+  for old in 1xvn-tools; do
+    if [ -d "$app/Contents/Resources/extensions/$old" ]; then
+      rm -rf "$app/Contents/Resources/extensions/$old"
+      info "Gỡ extension tên cũ: $old"
+    fi
+  done
   for oxt in "$ONEX_WORK"/dist/*.oxt; do
     name="$(basename "$oxt" .oxt)"
     dest="$app/Contents/Resources/extensions/$name"
@@ -249,7 +258,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn
     ONEX_MCP_SERVER_PATH="$LOG_DIR/ai/mcp_server.json" ONEX_MCP_CLIENTS_PATH="$LOG_DIR/ai/mcp_clients.json" \
     ONEX_SKILL_NAME="kiem-chinh-ta-tieng-viet" ONEX_SKILL_QUESTION="Rà giúp tôi lỗi chính tả." \
     ONEX_ACCOUNT_ANSWERS_PATH="$LOG_DIR/ai/account_answers.json" ONEX_SECRET_STORE_FOR_TEST="$LOG_DIR/ai/secrets.json" ONEX_OAUTH_STORE_FOR_TEST="$LOG_DIR/ai/tokens.json" \
-    "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xvn-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
+    "$app/Contents/Resources/python" "$REPO_ROOT/extensions/1xai-tools/tests/runtime_check.py" "$pipe" "$part" || rc=$?
   sleep 2; kill -9 "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
   # A crashed office leaves its pipe socket behind and blocks the next session with the same name.
@@ -259,7 +268,7 @@ run_tools_check() {  # run_tools_check <app> writer|calc|nd30|nd30check|xlsxwarn
 }
 
 step_tools() {
-  # Call the 1xvn-tools commands on real Writer and Calc documents, each in its own headless office.
+  # Call the 1xai-tools commands on real Writer and Calc documents, each in its own headless office.
   local app; app="$(app_path)"; [ -n "$app" ] || die "Không thấy .app trong instdir."
   local rc=0
   run_tools_check "$app" writer || rc=1

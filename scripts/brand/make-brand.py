@@ -243,7 +243,7 @@ SIDEBAR_DECKS = {f"sfx2/res/symphony/sidebar-{k}-large.svg": v for k, v in {
     "template": "document_multiple", "functions": "math_formula", "elements": "math_symbols",
     "transition": "slide_transition", "animation": "data_histogram", "a11y": "accessibility"}.items()}
 
-# Icon cho lệnh của extension 1xvn-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
+# Icon cho lệnh của extension 1xai-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
 ADDON_ICONS = {"AiAccounts": "key", "AiAsk": "sparkle", "AiRewrite": "text_edit_style", "McpTools": "plug_connected",
                "McpServer": "server", "AiSkill": "hat_graduation", "Nd30Document": "document_ribbon",
                "Nd30Check": "document_checkmark", "NumberToWords": "number_symbol_square", "MoneyToWords": "money",
@@ -263,7 +263,7 @@ def addon_fill(cmd, size):
 
 
 def addon_icons(fluent_dir, out_dir):
-    """Ghi icon 16px và 26px cho từng lệnh của extension vào extensions/1xvn-tools/icons/."""
+    """Ghi icon 16px và 26px cho từng lệnh của extension vào extensions/1xai-tools/icons/."""
     import re
     out_dir.mkdir(parents=True, exist_ok=True)
     for cmd, name in ADDON_ICONS.items():
@@ -377,7 +377,7 @@ def main():
     (REPO / "config" / "1x-theme.xcd").write_text(theme_xcd(), encoding="utf-8")
     icon_theme_zip(OUT / "images_1x.zip", a.fluent)
     if a.fluent:
-        addon_icons(a.fluent, REPO / "extensions" / "1xvn-tools" / "icons")
+        addon_icons(a.fluent, REPO / "extensions" / "1xai-tools" / "icons")
     if a.no_png:
         return
     with tempfile.TemporaryDirectory() as tmp:

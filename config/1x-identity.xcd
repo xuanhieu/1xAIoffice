@@ -7,16 +7,16 @@
   <dependency file="main"/>
   <oor:component-data oor:package="org.openoffice.Office" oor:name="Common">
     <node oor:name="Menus">
-      <prop oor:name="SendFeedbackURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xvnoffice/issues</value></prop>
+      <prop oor:name="SendFeedbackURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xAIoffice/issues</value></prop>
       <prop oor:name="QA_URL" oor:op="fuse"><value>https://1xag.com</value></prop>
       <prop oor:name="DocumentationURL" oor:op="fuse"><value>https://1xag.com</value></prop>
-      <prop oor:name="GetInvolvedURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xvnoffice</value></prop>
+      <prop oor:name="GetInvolvedURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xAIoffice</value></prop>
       <prop oor:name="DonationURL" oor:op="fuse"><value>https://1xag.com/?donate</value></prop>
-      <prop oor:name="ReleaseNotesURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xvnoffice/releases</value></prop>
+      <prop oor:name="ReleaseNotesURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xAIoffice/releases</value></prop>
       <prop oor:name="CreditsURL" oor:op="fuse"><value>https://xuanhieu.org</value></prop>
       <prop oor:name="HyphenationMissingURL" oor:op="fuse"><value>https://1xag.com</value></prop>
       <prop oor:name="InstallJavaURL" oor:op="fuse"><value>https://1xag.com</value></prop>
-      <prop oor:name="VolunteerURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xvnoffice</value></prop>
+      <prop oor:name="VolunteerURL" oor:op="fuse"><value>https://github.com/xuanhieu/1xAIoffice</value></prop>
       <prop oor:name="PrivacyPolicyURL" oor:op="fuse"><value>https://1xag.com</value></prop>
       <prop oor:name="ExtensionsURL" oor:op="fuse"><value>https://1xag.com</value></prop>
     </node>

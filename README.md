@@ -100,7 +100,7 @@ The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSli
 | `patches/` | Bản vá nguồn (càng ít càng tốt), theo thứ tự trong `series` |
 | `l10n/` | Bản dịch tiếng Việt |
 | `scripts/` | Tải nguồn, build, sinh logo và hướng dẫn, kiểm tra repo |
-| `extensions/` | Công cụ tiếng Việt (`1xvn-tools`) |
+| `extensions/` | Công cụ tiếng Việt (`1xai-tools`) |
 | `docs/` | Hướng dẫn build và tài liệu kỹ thuật |
 
 Build trên macOS: [docs/BUILD.md](docs/BUILD.md).

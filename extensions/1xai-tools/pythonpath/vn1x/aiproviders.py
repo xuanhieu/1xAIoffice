@@ -20,35 +20,53 @@ khác; người dùng dán client_id của chính họ (hoặc của cơ quan) v
 OPENAI_WIRE = ("openai", "azure", "ollama")
 
 PRESETS = [
+    # ----- miễn phí (có hạn mức), khoá API, hình dạng OpenAI -----
+    # Gói miễn phí đổi theo từng hãng và từng thời điểm; app chỉ nói "có gói miễn phí", không hứa con số.
+    {"id": "huggingface", "key_url": "https://huggingface.co/settings/tokens", "free": True,
+     "label": "Hugging Face", "wire": "openai", "base_url": "https://router.huggingface.co/v1", "auth": "key",
+     "models": [], "can_list_models": True,
+     "note": "Mã truy cập (token) tạo ở huggingface.co, mỗi tháng có một ít lượt miễn phí."},
+    {"id": "nvidia", "key_url": "https://build.nvidia.com/settings/api-keys", "free": True,
+     "label": "NVIDIA (build.nvidia.com)", "wire": "openai", "base_url": "https://integrate.api.nvidia.com/v1",
+     "auth": "key", "models": [], "can_list_models": True,
+     "note": "Khoá tạo ở build.nvidia.com, có lượt dùng thử miễn phí."},
+    {"id": "sambanova", "key_url": "https://cloud.sambanova.ai/apis", "free": True,
+     "label": "SambaNova", "wire": "openai", "base_url": "https://api.sambanova.ai/v1", "auth": "key",
+     "models": [], "can_list_models": True, "note": "Khoá tạo ở cloud.sambanova.ai, có gói miễn phí."},
+    {"id": "github", "key_url": "https://github.com/settings/personal-access-tokens", "free": True,
+     "label": "GitHub Models", "wire": "openai", "base_url": "https://models.github.ai/inference", "auth": "key",
+     "models": ["openai/gpt-4.1-mini"], "can_list_models": False,
+     "note": "Dùng mã truy cập GitHub có quyền models:read; miễn phí với hạn mức theo tài khoản."},
+
     # ----- khoá API, hình dạng OpenAI -----
-    {"id": "openai", "label": "OpenAI", "wire": "openai", "base_url": "https://api.openai.com/v1",
+    {"id": "openai", "key_url": "https://platform.openai.com/api-keys", "label": "OpenAI", "wire": "openai", "base_url": "https://api.openai.com/v1",
      "auth": "key", "models": [], "can_list_models": True,
      "note": "Khoá API lấy ở platform.openai.com."},
-    {"id": "openrouter", "label": "OpenRouter (nhiều hãng qua một khoá)", "wire": "openai",
+    {"id": "openrouter", "key_url": "https://openrouter.ai/settings/keys", "free": True, "label": "OpenRouter (nhiều hãng qua một khoá)", "wire": "openai",
      "base_url": "https://openrouter.ai/api/v1", "auth": "key", "models": [], "can_list_models": True,
      "note": "Một khoá dùng được mô hình của nhiều hãng."},
-    {"id": "groq", "label": "Groq", "wire": "openai", "base_url": "https://api.groq.com/openai/v1",
+    {"id": "groq", "key_url": "https://console.groq.com/keys", "free": True, "label": "Groq", "wire": "openai", "base_url": "https://api.groq.com/openai/v1",
      "auth": "key", "models": [], "can_list_models": True, "note": "Khoá API lấy ở console.groq.com."},
-    {"id": "deepseek", "label": "DeepSeek", "wire": "openai", "base_url": "https://api.deepseek.com/v1",
+    {"id": "deepseek", "key_url": "https://platform.deepseek.com/api_keys", "label": "DeepSeek", "wire": "openai", "base_url": "https://api.deepseek.com/v1",
      "auth": "key", "models": [], "can_list_models": True, "note": "Khoá API lấy ở platform.deepseek.com."},
-    {"id": "mistral", "label": "Mistral", "wire": "openai", "base_url": "https://api.mistral.ai/v1",
+    {"id": "mistral", "key_url": "https://console.mistral.ai/api-keys", "free": True, "label": "Mistral", "wire": "openai", "base_url": "https://api.mistral.ai/v1",
      "auth": "key", "models": [], "can_list_models": True, "note": "Khoá API lấy ở console.mistral.ai."},
-    {"id": "xai", "label": "xAI (Grok)", "wire": "openai", "base_url": "https://api.x.ai/v1",
+    {"id": "xai", "key_url": "https://console.x.ai", "label": "xAI (Grok)", "wire": "openai", "base_url": "https://api.x.ai/v1",
      "auth": "key", "models": [], "can_list_models": True, "note": "Khoá API lấy ở console.x.ai."},
-    {"id": "together", "label": "Together AI", "wire": "openai", "base_url": "https://api.together.xyz/v1",
+    {"id": "together", "key_url": "https://api.together.ai/settings/api-keys", "label": "Together AI", "wire": "openai", "base_url": "https://api.together.xyz/v1",
      "auth": "key", "models": [], "can_list_models": True, "note": "Khoá API lấy ở api.together.ai."},
-    {"id": "fireworks", "label": "Fireworks AI", "wire": "openai",
+    {"id": "fireworks", "key_url": "https://fireworks.ai/account/api-keys", "label": "Fireworks AI", "wire": "openai",
      "base_url": "https://api.fireworks.ai/inference/v1", "auth": "key", "models": [], "can_list_models": True,
      "note": "Khoá API lấy ở fireworks.ai."},
-    {"id": "cerebras", "label": "Cerebras", "wire": "openai", "base_url": "https://api.cerebras.ai/v1",
+    {"id": "cerebras", "key_url": "https://cloud.cerebras.ai", "free": True, "label": "Cerebras", "wire": "openai", "base_url": "https://api.cerebras.ai/v1",
      "auth": "key", "models": [], "can_list_models": True, "note": "Khoá API lấy ở cloud.cerebras.ai."},
 
     # ----- khoá API, hình dạng riêng -----
-    {"id": "anthropic", "label": "Anthropic (Claude)", "wire": "anthropic",
+    {"id": "anthropic", "key_url": "https://console.anthropic.com/settings/keys", "label": "Anthropic (Claude)", "wire": "anthropic",
      "base_url": "https://api.anthropic.com/v1", "auth": "key",
      "models": ["claude-opus-5", "claude-sonnet-5-5", "claude-haiku-5-5"], "can_list_models": True,
      "note": "Khoá API lấy ở console.anthropic.com."},
-    {"id": "gemini", "label": "Google Gemini (khoá API)", "wire": "gemini",
+    {"id": "gemini", "key_url": "https://aistudio.google.com/apikey", "free": True, "label": "Google Gemini (khoá API)", "wire": "gemini",
      "base_url": "https://generativelanguage.googleapis.com/v1beta", "auth": "key", "models": [],
      "can_list_models": True, "note": "Khoá API lấy ở aistudio.google.com."},
 
@@ -134,7 +152,7 @@ def get(preset_id):
 def summary(preset):
     """Một dòng mô tả cho hộp chọn."""
     how = {"key": "khoá API", "oauth": "đăng nhập", "none": "chạy trên máy"}[preset["auth"]]
-    return f"{preset['label']} — {how}"
+    return f"{display_label(preset)} — {how}"
 
 
 def secret_ref(preset_id):
@@ -189,3 +207,15 @@ def fill(preset, values):
             raise ValueError("còn thiếu: client_id")
         entry["oauth"] = config
     return entry
+
+
+def free_first(presets=None):
+    """Danh mục để người dùng chọn: hãng có gói miễn phí lên đầu, giữ nguyên thứ tự trong từng nhóm."""
+    items = list(PRESETS if presets is None else presets)
+    return [p for p in items if p.get("free")] + [p for p in items if not p.get("free")]
+
+
+def display_label(preset):
+    """Tên hiện trong danh mục; hãng có gói miễn phí được ghi rõ để người mới chọn không mất tiền."""
+    return preset["label"] + (" — có gói miễn phí" if preset.get("free") else "")
+

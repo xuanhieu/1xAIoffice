@@ -18,7 +18,7 @@ ET.register_namespace("menu", NS)
 T = "vnd.1x.tools:"
 
 # (ứng dụng, tệp menu, lệnh đứng ngay trước chỗ chèn hoặc None để chèn lên đầu, các mục)
-# Mục là lệnh, hoặc None cho vạch ngăn. Nhãn lõi tự lấy từ extensions/1xvn-tools/GenericCommands.xcu (PopupLabel).
+# Mục là lệnh, hoặc None cho vạch ngăn. Nhãn lõi tự lấy từ extensions/1xai-tools/GenericCommands.xcu (PopupLabel).
 MENUS = [
     ("swriter", "text.xml", ".uno:NoBreak", [
         T + "AiAsk",

@@ -5,3 +5,5 @@ __pycache__/
 /work/
 *.tar.xz
 *.part
+# Salekit (playbook, đề xuất, mẫu tiếp cận khách) là tài liệu nội bộ; kho này công khai nên chỉ giữ trên máy.
+docs/sales/

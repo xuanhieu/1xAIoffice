@@ -33,8 +33,8 @@ EXPECTED = [
     ("/org.openoffice.Office.Common/Misc", "ShowDonation", False),
     ("/org.openoffice.Office.Impress/Misc/NewDoc", "AutoPilot", False),
     ("/org.openoffice.Office.Common/Menus", "CreditsURL", "https://xuanhieu.org"),
-    ("/org.openoffice.Office.Common/Menus", "ReleaseNotesURL", "https://github.com/xuanhieu/1xvnoffice/releases"),
-    ("/org.openoffice.Office.Common/Menus", "SendFeedbackURL", "https://github.com/xuanhieu/1xvnoffice/issues"),
+    ("/org.openoffice.Office.Common/Menus", "ReleaseNotesURL", "https://github.com/xuanhieu/1xAIoffice/releases"),
+    ("/org.openoffice.Office.Common/Menus", "SendFeedbackURL", "https://github.com/xuanhieu/1xAIoffice/issues"),
     ("/org.openoffice.Office.Common/Help/StartCenter", "InfoURL", "https://1xag.com"),
     ("/org.openoffice.Office.Common/Menus", "DonationURL", "https://1xag.com/?donate"),
 ]

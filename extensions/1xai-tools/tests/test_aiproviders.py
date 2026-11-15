@@ -140,3 +140,26 @@ class ChatGptPlanTests(unittest.TestCase):
     def test_it_does_not_pretend_to_list_models(self):
         """Luồng này không có đường hỏi danh sách mô hình, nên app phải để người dùng tự gõ tên."""
         self.assertFalse(self.preset()["can_list_models"])
+
+
+class FreeProviderTests(unittest.TestCase):
+    """Người mới phải gắn được AI mà không trả tiền: hãng có gói miễn phí lên đầu, kèm trang lấy khoá."""
+
+    def test_free_providers_come_first(self):
+        ordered = aiproviders.free_first()
+        flags = [bool(p.get("free")) for p in ordered]
+        self.assertEqual(flags, sorted(flags, reverse=True))
+        self.assertEqual(len(ordered), len(aiproviders.PRESETS))
+
+    def test_every_free_provider_says_where_to_get_a_key(self):
+        for preset in aiproviders.PRESETS:
+            if preset.get("free"):
+                self.assertTrue(preset.get("key_url", "").startswith("https://"), preset["id"])
+                self.assertEqual(preset["auth"], "key", preset["id"])
+
+    def test_the_catalogue_line_says_free(self):
+        self.assertIn("miễn phí", aiproviders.summary(aiproviders.BY_ID["groq"]))
+        self.assertNotIn("miễn phí", aiproviders.summary(aiproviders.BY_ID["openai"]))
+
+    def test_groq_opens_the_page_the_owner_named(self):
+        self.assertEqual(aiproviders.BY_ID["groq"]["key_url"], "https://console.groq.com/keys")

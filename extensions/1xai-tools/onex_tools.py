@@ -94,6 +94,8 @@ TEXTS = {
                          "Example (the key itself stays in the system keychain, never in this file):\n{example}"),
         "ai_no_account": ("No AI account is connected yet.\n\nConnect one now? You can use the ChatGPT plan you already "
                           "pay for, an API key, or an AI server on this computer."),
+        "acct_open_key_page": "{label} needs an API key.\n\nOpen the page where you create one ({url}) in your browser now? Sign in there, create a key, copy it, then come back here to paste it.",
+        "acct_open_failed": "Could not open the browser. Open this address yourself: {url}",
         "acct_title": "AI accounts",
         "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
         "acct_pick": "Type the number or the name of the provider to add (empty to close):",
@@ -173,6 +175,8 @@ TEXTS = {
                          "Ví dụ (khoá API nằm trong kho bí mật của hệ điều hành, không bao giờ ghi vào tệp này):\n{example}"),
         "ai_no_account": ("Chưa gắn tài khoản AI nào.\n\nGắn ngay bây giờ? Bạn có thể dùng gói ChatGPT đang trả, "
                           "một khoá API, hoặc máy chủ AI chạy trong máy."),
+        "acct_open_key_page": "{label} cần một khoá API.\n\nMở trang tạo khoá ({url}) trong trình duyệt ngay bây giờ? Bạn đăng nhập ở đó, tạo khoá, chép lại, rồi quay về đây dán vào.",
+        "acct_open_failed": "Không mở được trình duyệt. Bạn tự mở địa chỉ này: {url}",
         "acct_title": "Tài khoản AI",
         "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
         "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
@@ -829,8 +833,8 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         current = "\n".join(
             f"- {p.get('id')} ({aiconfig.auth_mode(p)}, {', '.join(p.get('models') or []) or 'chưa chọn mô hình'})"
             for p in config.get("providers") or []) or "(chưa có)"
-        catalogue = "\n".join(f"{i}. {aiproviders.summary(preset)}"
-                               for i, preset in enumerate(aiproviders.PRESETS, 1))
+        ordered = aiproviders.free_first()      # hãng có gói miễn phí lên đầu, để người mới không phải trả tiền
+        catalogue = "\n".join(f"{i}. {aiproviders.summary(preset)}" for i, preset in enumerate(ordered, 1))
         wanted = self._scripted("preset")
         if not wanted:
             self.message(self.t["acct_overview"].format(current=current, catalogue=catalogue))
@@ -838,8 +842,8 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         if not wanted:
             return None
         wanted = wanted.strip()
-        if wanted.isdigit() and 1 <= int(wanted) <= len(aiproviders.PRESETS):
-            return aiproviders.PRESETS[int(wanted) - 1]
+        if wanted.isdigit() and 1 <= int(wanted) <= len(ordered):
+            return ordered[int(wanted) - 1]
         preset = aiproviders.BY_ID.get(wanted)
         if preset is None:
             self.message(self.t["acct_unknown"].format(name=wanted))
@@ -864,6 +868,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
     def _take_api_key(self, preset, ref):
         """Nhận khoá API và đưa thẳng vào kho bí mật của máy. Không ghi ra tệp, không hiện lại."""
         key = self._scripted("secret")
+        if key is None and preset.get("key_url") and self.ask(
+                self.t["acct_open_key_page"].format(label=preset["label"], url=preset["key_url"])):
+            # Người dùng tự đăng nhập và tự tạo khoá trên trang của hãng; app chỉ mở trang, không đụng vào đó.
+            self._open_url(preset["key_url"])
         if key is None:
             key = self._ask_text(self.t["acct_title"],
                                  self.t["acct_key"].format(label=preset["label"], ref=ref), secret=True)
@@ -873,6 +881,16 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             self.message(self.t["acct_key_failed"])
             return False
         return True
+
+    def _open_url(self, url):
+        """Mở trang trong trình duyệt mặc định của máy (thường là Chrome), ở một thẻ mới."""
+        try:
+            shell = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.system.SystemShellExecute", self.ctx)
+            shell.execute(url, "", 1)        # 1 = URIS_ONLY: chỉ mở địa chỉ, không chạy tệp
+            return True
+        except Exception:                   # noqa: BLE001 - không mở được thì người dùng vẫn tự gõ địa chỉ
+            self.message(self.t["acct_open_failed"].format(url=url))
+            return False
 
     def _take_client_secret(self, preset, entry):
         """Nhận client secret của ứng dụng OAuth và cất vào kho bí mật. Google đòi nó cả với ứng dụng Desktop."""

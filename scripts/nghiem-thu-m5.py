@@ -36,7 +36,7 @@ def connect(pipe):
 def main():
     pipe, answer_file = sys.argv[1], sys.argv[2]
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                    "extensions", "1xvn-tools", "pythonpath"))
+                                    "extensions", "1xai-tools", "pythonpath"))
     from vn1x import nd30, nd30_check, nd30_check_writer, nd30_writer
 
     ctx = connect(pipe)

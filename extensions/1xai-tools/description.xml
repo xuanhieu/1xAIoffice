@@ -6,7 +6,7 @@
     <name lang="en-US">1xAIoffice Vietnamese tools</name>
     <name lang="vi">Công cụ tiếng Việt 1xAIoffice</name>
   </display-name>
-  <publisher><name xlink:href="https://github.com/xuanhieu/1xvnoffice" lang="en-US">1xAIoffice</name></publisher>
+  <publisher><name xlink:href="https://github.com/xuanhieu/1xAIoffice" lang="en-US">1xAIoffice</name></publisher>
   <extension-description>
     <src xlink:href="description/en-US.txt" lang="en-US"/>
     <src xlink:href="description/vi.txt" lang="vi"/>

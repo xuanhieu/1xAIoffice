@@ -1,4 +1,4 @@
-# 1xvn-tools: công cụ tiếng Việt
+# 1xai-tools: công cụ tiếng Việt
 
 Extension đi kèm 1xAIoffice (MPL-2.0). Menu **Vietnamese / Tiếng Việt** và thanh lệnh trên thẻ **Extension / Tiện ích** của ribbon, trong Writer và Calc.
 
@@ -25,7 +25,7 @@ Số quá 18 chữ số phần nguyên, hay tham số "Lẻ" khác "lẻ"/"linh"
 
 Mỗi lệnh là một bước hoàn tác. Chữ đã là Unicode không bao giờ được đem đi chuyển mã TCVN3 nếu người dùng không chọn, vì các chữ như "ã", "à" trùng vị trí byte với TCVN3.
 
-- Logic: `pythonpath/vn1x/` (thuần Python), test: `tests/test_*.py` (`python3 -m unittest discover -s extensions/1xvn-tools/tests`).
+- Logic: `pythonpath/vn1x/` (thuần Python), test: `tests/test_*.py` (`python3 -m unittest discover -s extensions/1xai-tools/tests`).
 - Lệnh UNO: `onex_tools.py` (ProtocolHandler `vnd.1x.tools:` và add-in `org.onexvn.tools.SheetFunctions`), menu: `Addons.xcu`, mô tả hàm: `CalcAddIns.xcu`.
 - Kiểu UNO của hàm bảng tính: `idl/org/onexvn/tools/XVnSheetFunctions.idl`, biên dịch sẵn thành `types/onexvn-tools.rdb` bằng `tools/build_rdb.sh <instdir>` (cần SDK của bản build; CI không có nên file `.rdb` được commit).
 - Bảng TCVN3: sinh bằng `tools/gen_tcvn3.py` từ bảng TCVN 5712:1993 của glibc (`data/sources/glibc-TCVN5712-1.charmap`, SHA-256 `e0249dfd…99a7`). Không dùng `iconv` của macOS vì bộ chuyển TCVN của nó trả byte NUL cho chữ ASCII.

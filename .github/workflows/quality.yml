@@ -17,7 +17,7 @@ jobs:
       - name: Repository checks
         run: python3 scripts/check-repo.py
       - name: Extension logic tests
-        run: python3 -m unittest discover -s extensions/1xvn-tools/tests -p 'test_*.py' -v
+        run: python3 -m unittest discover -s extensions/1xai-tools/tests -p 'test_*.py' -v
       - name: Vietnamese logic coverage
         run: python3 scripts/coverage-vi.py --min 90
       - name: Brand and QR tests

@@ -1,5 +1,5 @@
 Nghị định 30/2020/NĐ-CP ngày 05/3/2020 của Chính phủ về công tác văn thư
-Trích hai phần mà 1xAIoffice dựa vào, để dữ liệu trong extensions/1xvn-tools/data/nd30.json kiểm chứng được.
+Trích hai phần mà 1xAIoffice dựa vào, để dữ liệu trong extensions/1xai-tools/data/nd30.json kiểm chứng được.
 
 Lấy ngày 15/11/2026 từ bản PDF phụ lục do VCCI đăng tải:
   https://vanban.vcci.com.vn/hm_content/uploads/van-ban/ND_30-2020-ND-CP_Phu_luc.pdf

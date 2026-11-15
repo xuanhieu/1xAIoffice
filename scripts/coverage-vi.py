@@ -14,8 +14,8 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PYTHONPATH = ROOT / "extensions" / "1xvn-tools" / "pythonpath"
-TESTS = ROOT / "extensions" / "1xvn-tools" / "tests"
+PYTHONPATH = ROOT / "extensions" / "1xai-tools" / "pythonpath"
+TESTS = ROOT / "extensions" / "1xai-tools" / "tests"
 # Module thuần Python, đo được ở đây. Những module còn lại trong vn1x cần UNO.
 PURE = ["numwords.py", "vntext.py", "vnname.py", "nd30.py", "nd30_check.py", "csvsafe.py", "guides.py",
         "doctools.py", "skills.py", "oauth.py", "aiproviders.py", "mcpresources.py", "mcphttp.py", "aiconfig.py", "aicontext.py", "changeset.py"]
