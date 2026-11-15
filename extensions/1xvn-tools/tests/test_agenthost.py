@@ -365,3 +365,68 @@ class ActionTests(unittest.TestCase):
         out = host.oauth_action("status", {"provider": {"secret_ref": "khong-co-that"}})
         self.assertTrue(out["ok"])
         self.assertIn("chưa đăng nhập", out["state"])
+
+
+class ResponsesWireTests(unittest.TestCase):
+    """Hình dạng Responses API, dùng cho luồng "dùng gói ChatGPT"."""
+
+    def build(self, **extra):
+        provider = dict({"type": "responses"}, **extra)
+        return host.build_request(provider, "gpt-x", [{"role": "system", "content": "Hệ thống"},
+                                                      {"role": "user", "content": "Xin chào"}],
+                                  500, "the-truy-cap", None, "oauth")
+
+    def test_it_posts_to_the_responses_endpoint_with_a_bearer(self):
+        url, headers, _ = self.build()
+        self.assertEqual(url, "https://api.openai.com/v1/responses")
+        self.assertEqual(headers["Authorization"], "Bearer the-truy-cap")
+
+    def test_the_two_flags_openai_requires_are_set(self):
+        """Tài liệu bắt buộc store=false và stream=true cho luồng này; thiếu là bị từ chối."""
+        _, _, body = self.build()
+        self.assertIs(body["store"], False)
+        self.assertIs(body["stream"], True)
+
+    def test_the_system_message_becomes_instructions(self):
+        _, _, body = self.build()
+        self.assertEqual(body["instructions"], "Hệ thống")
+        self.assertEqual([m["role"] for m in body["input"]], ["user"])
+
+
+class ResponsesStreamTests(unittest.TestCase):
+    """Đọc chuỗi sự kiện: chỉ coi là xong khi thấy response.completed."""
+
+    def events(self, *rows):
+        return "\n".join("data: " + json.dumps(row) for row in rows)
+
+    def test_the_pieces_are_joined_in_order(self):
+        raw = self.events({"type": "response.output_text.delta", "delta": "Kính "},
+                          {"type": "response.output_text.delta", "delta": "gửi"},
+                          {"type": "response.completed",
+                           "response": {"usage": {"input_tokens": 7, "output_tokens": 2}}})
+        text, usage, error = host.parse_responses_stream(raw)
+        self.assertEqual(text, "Kính gửi")
+        self.assertEqual(usage, {"input": 7, "output": 2})
+        self.assertIsNone(error)
+
+    def test_a_stream_that_stops_early_is_a_failure_not_a_short_answer(self):
+        """Nửa câu trả lời mà coi là xong thì người dùng nhận về văn bản cụt mà không biết."""
+        raw = self.events({"type": "response.output_text.delta", "delta": "nửa chừng"})
+        text, _, error = host.parse_responses_stream(raw)
+        self.assertIsNone(text)
+        self.assertIn("dừng giữa chừng", error)
+
+    def test_running_out_of_plan_allowance_is_named(self):
+        raw = self.events({"type": "response.failed",
+                           "response": {"error": {"code": "subscription_sharing_usage_limit_exceeded"}}})
+        _, _, error = host.parse_responses_stream(raw)
+        self.assertEqual(error, "subscription_sharing_usage_limit_exceeded")
+
+    def test_junk_lines_do_not_crash_the_reader(self):
+        raw = "ping\ndata: khong-phai-json\ndata: [DONE]\n" + self.events(
+            {"type": "response.output_text.delta", "delta": "A"}, {"type": "response.completed"})
+        text, _, error = host.parse_responses_stream(raw)
+        self.assertEqual((text, error), ("A", None))
+
+    def test_the_plan_limit_turns_into_a_message_a_person_can_act_on(self):
+        self.assertIn("hết lượt", host.ERRORS["plan_limit"])

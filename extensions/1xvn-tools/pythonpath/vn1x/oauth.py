@@ -81,11 +81,31 @@ def parse_redirect(url, expected_state):
     return code
 
 
+DYNAMIC_CLIENT = "dynamic_agent_client"
+
+
+def issued_client_id(url):
+    """client_id mà máy chủ cấp cho lần đăng ký đầu, đọc từ địa chỉ gọi về. Rỗng nghĩa là lần này không cấp.
+
+    Luồng "dùng gói ChatGPT" của OpenAI cho ứng dụng mã nguồn mở tự đăng ký: lần đầu gửi
+    client_id=dynamic_agent_client, và chính lần gọi về mang theo client_id thật để lưu lại dùng về sau.
+    """
+    got = (parse_qs(urlparse(url).query).get("client_id") or [""])[0]
+    return "" if got == DYNAMIC_CLIENT else got
+
+
+def registration_params(host_id, app_name):
+    """Tham số thêm cho lần đăng ký đầu: máy nào, và ứng dụng tên gì hiện trên màn hình cho phép."""
+    return {"ext_agent_host_id": host_id, "agent_name_hint": app_name}
+
+
 def token_request(config, code, verifier, redirect_uri):
     """(url, headers, thân yêu cầu dạng form) để đổi mã lấy thẻ."""
     _required(config, "token_url", "client_id")
     form = {"grant_type": "authorization_code", "code": code, "redirect_uri": redirect_uri,
             "client_id": config["client_id"], "code_verifier": verifier}
+    if config.get("resource"):
+        form["resource"] = config["resource"]
     return _form_request(config, form)
 
 
@@ -94,8 +114,10 @@ def refresh_request(config, refresh_token):
     _required(config, "token_url", "client_id")
     if not refresh_token:
         raise OAuthError("không có refresh token; cần đăng nhập lại")
-    return _form_request(config, {"grant_type": "refresh_token", "refresh_token": refresh_token,
-                                  "client_id": config["client_id"]})
+    form = {"grant_type": "refresh_token", "refresh_token": refresh_token, "client_id": config["client_id"]}
+    if config.get("resource"):
+        form["resource"] = config["resource"]
+    return _form_request(config, form)        # cố ý KHÔNG gửi scope: gửi lại là thu hẹp quyền đã được cấp
 
 
 def device_start_request(config):

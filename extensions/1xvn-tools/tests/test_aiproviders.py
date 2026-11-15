@@ -17,8 +17,10 @@ class CatalogueTests(unittest.TestCase):
                 self.assertIn(preset["auth"], aiconfig.AUTH_MODES)
                 self.assertTrue(preset["label"] and preset["note"])
                 if preset["auth"] == "oauth":
-                    self.assertIn("client_id", preset.get("needs") or [],
-                                  "mục OAuth phải hỏi client_id của chính người dùng")
+                    dynamic = (preset.get("oauth") or {}).get("dynamic_client")
+                    self.assertTrue(dynamic or "client_id" in (preset.get("needs") or []),
+                                    "mục OAuth phải hỏi client_id của người dùng, trừ khi nhà cung cấp cho "
+                                    "ứng dụng tự đăng ký")
 
     def test_ids_are_unique(self):
         ids = [preset["id"] for preset in aiproviders.PRESETS]
@@ -98,3 +100,43 @@ class FillTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ChatGptPlanTests(unittest.TestCase):
+    """Mục "dùng gói ChatGPT": tự đăng ký, không hỏi khoá, không hỏi client_id."""
+
+    def preset(self):
+        return aiproviders.get("chatgpt")
+
+    def test_it_asks_the_user_for_nothing(self):
+        """Đó là điểm của cả tính năng: người dùng chỉ bấm đăng nhập."""
+        self.assertEqual(self.preset().get("needs") or [], [])
+        entry = aiproviders.fill(self.preset(), {})
+        self.assertEqual(aiconfig.problems({"providers": [dict(entry, models=["gpt-x"])]}), [])
+
+    def test_the_first_login_uses_the_registration_client_id(self):
+        from vn1x import oauth
+        entry = aiproviders.fill(self.preset(), {})
+        self.assertEqual(entry["oauth"]["client_id"], oauth.DYNAMIC_CLIENT)
+        self.assertTrue(entry["oauth"]["dynamic_client"])
+
+    def test_it_asks_for_the_scope_that_spends_the_plan(self):
+        scopes = self.preset()["oauth"]["scopes"]
+        self.assertIn("chatgpt.tokens.use.direct", scopes)
+        self.assertIn("offline_access", scopes)          # để tự gia hạn, khỏi bắt đăng nhập lại mỗi giờ
+
+    def test_the_callback_path_is_the_one_openai_requires(self):
+        self.assertEqual(self.preset()["oauth"]["redirect_path"], "/auth/callback")
+
+    def test_it_carries_no_client_secret_anywhere(self):
+        entry = aiproviders.fill(self.preset(), {})
+        self.assertNotIn("client_secret", entry["oauth"])
+        self.assertNotIn("client_secret_ref", entry["oauth"])
+
+    def test_it_speaks_the_responses_api(self):
+        self.assertEqual(self.preset()["wire"], "responses")
+        self.assertEqual(aiproviders.fill(self.preset(), {})["base_url"], "https://api.openai.com/v1")
+
+    def test_it_does_not_pretend_to_list_models(self):
+        """Luồng này không có đường hỏi danh sách mô hình, nên app phải để người dùng tự gõ tên."""
+        self.assertFalse(self.preset()["can_list_models"])

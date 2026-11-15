@@ -881,6 +881,9 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         if not result.get("ok"):
             self.message(self.t["acct_login_failed"].format(error=result.get("error", "?")))
             return False
+        # Nhà cung cấp cấp client_id cho riêng máy này ở lần đăng nhập đầu; giữ lại để lần sau khỏi đăng ký lại.
+        if result.get("issued_client_id"):
+            entry["oauth"]["client_id"] = result["issued_client_id"]
         self.message(self.t["acct_login_ok"].format(state=result.get("state", "")))
         return True
 

@@ -53,6 +53,24 @@ PRESETS = [
      "can_list_models": True, "note": "Khoá API lấy ở aistudio.google.com."},
 
     # ----- đăng nhập OAuth -----
+    # Dùng chính gói ChatGPT người dùng đang trả, không cần khoá API và không phát sinh hoá đơn theo token.
+    # OpenAI mở đường tự đăng ký cho ứng dụng mã nguồn mở chạy trên máy: lần đầu gửi client_id dựng sẵn, máy chủ
+    # cấp lại client_id thật ngay trong lần gọi về. Vì vậy mục này KHÔNG hỏi người dùng client_id.
+    # Tài liệu: https://developers.openai.com/siwc/token-sharing-open-source
+    {"id": "chatgpt", "label": "ChatGPT (dùng gói Plus/Pro bạn đang trả)", "wire": "responses",
+     "base_url": "https://api.openai.com/v1", "auth": "oauth", "models": [], "can_list_models": False,
+     "oauth": {"authorize_url": "https://auth.openai.com/api/accounts/authorize",
+               "token_url": "https://auth.openai.com/api/accounts/oauth/token",
+               "resource": "https://api.openai.com/v1",
+               "redirect_path": "/auth/callback",
+               "dynamic_client": True,
+               "app_name": "1xVnOffice",
+               "scopes": ["openid", "profile", "email", "offline_access",
+                          "chatgpt.tokens.use.direct", "resource.invoke"]},
+     "needs": [],
+     "note": "Dùng lượt của gói ChatGPT Plus hoặc Pro bạn đang trả, không cần khoá API. Lượt dùng cho ứng dụng "
+             "ngoài bị giới hạn riêng và nằm chung hạn mức tuần của gói."},
+
     {"id": "vertex", "label": "Google Cloud Vertex AI (đăng nhập Google)", "wire": "gemini",
      "base_url": "", "auth": "oauth", "models": [], "can_list_models": False,
      "model_path": "publishers/google/models",
@@ -94,6 +112,11 @@ PRESETS = [
      "base_url": "http://127.0.0.1:8000/v1", "auth": "none", "models": [], "can_list_models": True,
      "needs": ["base_url"], "note": "Máy chủ trong mạng cơ quan nói được hình dạng OpenAI."},
 ]
+
+def oauth_module():
+    from . import oauth                 # nạp muộn: aiproviders là dữ liệu thuần, không muốn kéo theo gì sớm
+    return oauth
+
 
 BY_ID = {preset["id"]: preset for preset in PRESETS}
 
@@ -160,6 +183,9 @@ def fill(preset, values):
                 config[field] = config[field].replace("{tenant}", values["tenant"])
         if values.get("scopes"):
             config["scopes"] = list(values["scopes"])
-        config["client_id"] = values["client_id"]
+        config["client_id"] = values.get("client_id") or (oauth_module().DYNAMIC_CLIENT
+                                                           if config.get("dynamic_client") else "")
+        if not config["client_id"]:
+            raise ValueError("còn thiếu: client_id")
         entry["oauth"] = config
     return entry

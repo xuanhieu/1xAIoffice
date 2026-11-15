@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 
 FILENAME = "providers.json"
-KINDS = ("openai", "anthropic", "gemini", "ollama", "azure")
+KINDS = ("openai", "anthropic", "gemini", "ollama", "azure", "responses")
 AUTH_MODES = ("key", "oauth", "none")
 DEFAULT_ROLE = "soan_thao"
 EMPTY = {"providers": [], "roles": {}, "limits": {"max_output_tokens": 2000, "max_requests_per_day": 300}}

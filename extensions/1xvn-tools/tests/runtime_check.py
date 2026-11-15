@@ -799,6 +799,18 @@ def accounts_checks(desktop, prop, run, check):
         def do_POST(self):
             self.rfile.read(int(self.headers.get("Content-Length", 0)))
             seen.append(self.headers.get("Authorization", ""))
+            if self.path.endswith("/responses"):
+                # Luồng "dùng gói ChatGPT": Responses API trả về chuỗi sự kiện, không phải một khối JSON.
+                rows = [{"type": "response.output_text.delta", "delta": answer},
+                        {"type": "response.completed",
+                         "response": {"usage": {"input_tokens": 3, "output_tokens": 4}}}]
+                raw = "\n".join("data: " + _json.dumps(row) for row in rows).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
             self._send({"choices": [{"message": {"content": answer}}],
                         "usage": {"prompt_tokens": 1, "completion_tokens": 1}})
 
@@ -916,6 +928,34 @@ def accounts_checks(desktop, prop, run, check):
                   seen[0], "Bearer the-cua-thiet-bi")
         check("Hỏi AI bằng tài khoản đã đăng nhập: không sửa tài liệu",
               doc.getText().getString(), "TỜ TRÌNH")
+
+        # 5. Luồng "dùng gói ChatGPT": hình dạng Responses API, trả lời tới theo chuỗi sự kiện.
+        tokens = stored(tokens_path)
+        tokens["1xvnoffice/chatgpt"] = {"access_token": "the-cua-goi-chatgpt", "token_type": "Bearer",
+                                        "expires_at": 99999999999}
+        with open(tokens_path, "w", encoding="utf-8") as handle:
+            _json.dump(tokens, handle, ensure_ascii=False)
+        config["providers"].append({"id": "chatgpt", "type": "responses", "auth": "oauth",
+                                    "base_url": ai_url.rsplit("/v1", 1)[0],
+                                    "secret_ref": "1xvnoffice/chatgpt", "models": ["gpt-x"],
+                                    "oauth": {"authorize_url": login_url + "/auth",
+                                              "token_url": login_url + "/token",
+                                              "client_id": "oaiapp_da_cap",
+                                              "resource": "https://api.openai.com/v1"}})
+        config["roles"] = {"soan_thao": "chatgpt/gpt-x"}
+        with open(config_path, "w", encoding="utf-8") as handle:
+            _json.dump(config, handle, ensure_ascii=False)
+        seen.clear()
+        run(doc, "AiAsk")
+        check("Dùng gói ChatGPT: có gọi nhà cung cấp", len(seen), 1)
+        if seen:
+            check("Dùng gói ChatGPT: gửi thẻ của gói dạng Bearer", seen[0], "Bearer the-cua-goi-chatgpt")
+        shown = ""
+        warn = os.environ.get("ONEX_TOOLS_WARN_OUT")
+        if warn and os.path.exists(warn):
+            with open(warn, encoding="utf-8") as handle:
+                shown = handle.read()
+        check("Dùng gói ChatGPT: ghép được câu trả lời từ chuỗi sự kiện", answer in shown, True)
         doc.close(True)
     finally:
         for server in (ai, login):

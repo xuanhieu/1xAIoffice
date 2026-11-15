@@ -184,3 +184,91 @@ class ClientSecretTests(unittest.TestCase):
         with self.assertRaises(oauthflow.FlowError) as caught:
             oauthflow.with_client_secret({"client_secret_ref": "khong-co-that"})
         self.assertIn("Tài khoản AI", str(caught.exception))
+
+
+class DynamicRegistrationTests(unittest.TestCase):
+    """Đăng ký động kiểu "Sign in with ChatGPT": lần đầu gửi client_id dựng sẵn, máy chủ cấp lại client_id thật."""
+
+    class Provider(BaseHTTPRequestHandler):
+        def do_POST(self):
+            form = parse_qs(self.rfile.read(int(self.headers.get("Content-Length", 0))).decode())
+            self.server.exchanges.append(form)
+            body = json.dumps({"access_token": "the-cua-goi", "refresh_token": "r",
+                               "expires_in": 3600}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            return
+
+    def setUp(self):
+        self.server = HTTPServer(("127.0.0.1", 0), self.Provider)
+        self.server.exchanges = []
+        threading.Thread(target=self.server.serve_forever, daemon=True).start()
+        base = f"http://127.0.0.1:{self.server.server_port}"
+        self.config = {"authorize_url": base + "/auth", "token_url": base + "/token",
+                       "client_id": oauth.DYNAMIC_CLIENT, "dynamic_client": True,
+                       "redirect_path": "/auth/callback", "app_name": "1xVnOffice",
+                       "resource": "https://api.openai.com/v1", "scopes": ["openid"]}
+        store = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        store.write("{}")
+        store.close()
+        os.environ["ONEX_OAUTH_STORE_FOR_TEST"] = store.name
+        ids = tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False)
+        ids.close()
+        os.unlink(ids.name)
+        os.environ["ONEX_HOST_ID_PATH"] = ids.name
+        self.addCleanup(os.environ.pop, "ONEX_OAUTH_STORE_FOR_TEST", None)
+        self.addCleanup(os.environ.pop, "ONEX_HOST_ID_PATH", None)
+        self.addCleanup(os.unlink, store.name)
+        self.addCleanup(self.server.server_close)
+        self.addCleanup(self.server.shutdown)
+        self.seen_url = []
+
+    def browser(self, issued="oaiapp_da_cap"):
+        def open_it(url):
+            self.seen_url.append(url)
+            query = parse_qs(urlparse(url).query)
+            back = query["redirect_uri"][0] + f"?code=ma&state={query['state'][0]}"
+            if issued:
+                back += f"&client_id={issued}"
+            threading.Thread(target=lambda: urllib.request.urlopen(back, timeout=5).read(), daemon=True).start()
+            return True
+        return open_it
+
+    def test_the_first_login_registers_and_keeps_the_issued_id(self):
+        oauthflow.webbrowser.open = self.browser()
+        state, issued = oauthflow.login_browser(self.config, "test/chatgpt", timeout=10)
+        self.assertEqual(issued, "oaiapp_da_cap")
+        self.assertNotIn("the-cua-goi", state)
+        self.assertEqual(self.server.exchanges[0]["client_id"], ["oaiapp_da_cap"],
+                         "phải đổi mã bằng client_id vừa được cấp, không phải mã dựng sẵn")
+
+    def test_the_authorize_url_names_this_machine_and_this_app(self):
+        oauthflow.webbrowser.open = self.browser()
+        oauthflow.login_browser(self.config, "test/chatgpt", timeout=10)
+        query = parse_qs(urlparse(self.seen_url[0]).query)
+        self.assertEqual(query["agent_name_hint"], ["1xVnOffice"])
+        self.assertTrue(query["ext_agent_host_id"][0])
+        self.assertEqual(query["resource"], ["https://api.openai.com/v1"])
+        self.assertTrue(query["redirect_uri"][0].endswith("/auth/callback"))
+
+    def test_the_machine_id_stays_the_same_between_logins(self):
+        first = oauthflow.host_id()
+        self.assertEqual(first, oauthflow.host_id())
+        self.assertNotIn(first, "")
+
+    def test_a_registration_that_hands_back_no_id_is_refused(self):
+        """Không có client_id thì lần sau không đăng nhập lại được; dừng còn hơn lưu một đăng ký hỏng."""
+        oauthflow.webbrowser.open = self.browser(issued="")
+        with self.assertRaises(oauthflow.FlowError) as caught:
+            oauthflow.login_browser(self.config, "test/chatgpt", timeout=10)
+        self.assertIn("đăng ký chưa xong", str(caught.exception))
+
+    def test_the_exchange_carries_the_resource_the_api_needs(self):
+        oauthflow.webbrowser.open = self.browser()
+        oauthflow.login_browser(self.config, "test/chatgpt", timeout=10)
+        self.assertEqual(self.server.exchanges[0]["resource"], ["https://api.openai.com/v1"])

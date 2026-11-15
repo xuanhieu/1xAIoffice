@@ -44,6 +44,9 @@ ERRORS = {
     "config": "Cấu hình nhà cung cấp chưa đúng: {detail}",
     "server": "Nhà cung cấp trả lỗi {status}: {detail}",
     "answer": "Không đọc được câu trả lời của nhà cung cấp.",
+    "plan_limit": "Gói ChatGPT của bạn đã hết lượt dùng cho ứng dụng này. Chờ sang kỳ sau, hoặc gắn thêm một "
+                  "nhà cung cấp khác trong AI ▸ Tài khoản AI.",
+    "stream": "Nhà cung cấp trả lời dở chừng rồi dừng ({detail}).",
     "login": "{detail}",
     "action": "Việc không hỗ trợ: {action!r}.",
     "tool_unknown": "Mô hình đòi dùng công cụ {name!r} chưa được cho phép, nên đã bị từ chối.",
@@ -162,6 +165,17 @@ def build_request(provider, model, messages, max_tokens, secret, tools=None, mod
     base = (provider.get("base_url") or "").rstrip("/")
     system = "\n\n".join(m["content"] for m in messages if m.get("role") == "system")
     chat = [m for m in messages if m.get("role") != "system"]
+    if kind == "responses":
+        # Luồng "dùng gói ChatGPT" của OpenAI: Responses API, và tài liệu bắt buộc store=false, stream=true.
+        base = base or "https://api.openai.com/v1"
+        headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
+        headers.update(_auth_headers(kind, mode, secret))
+        chat_input = [{"role": m["role"], "content": m["content"]} for m in chat]
+        body = {"model": model, "input": chat_input, "max_output_tokens": max_tokens,
+                "store": False, "stream": True}
+        if system:
+            body["instructions"] = system
+        return f"{base}/responses", headers, body
     if kind == "azure":
         if not base:
             raise ValueError("Azure OpenAI cần base_url của tài nguyên")
@@ -246,6 +260,52 @@ def post(url, headers, body, timeout):
             return exc.code, raw
 
 
+def parse_responses_stream(raw):
+    """(chữ, token, lỗi) từ chuỗi sự kiện của Responses API.
+
+    Theo tài liệu: chữ tới dần qua `response.output_text.delta`, và CHỈ được coi là xong khi thấy
+    `response.completed`. Hết luồng mà chưa thấy sự kiện đó thì phải coi là hỏng, không được dùng phần đã nhận.
+    Hết lượt của gói thì tới `response.failed` kèm mã `subscription_sharing_usage_limit_exceeded`.
+    """
+    text, usage, done, failure = [], {}, False, None
+    for line in (raw or "").splitlines():
+        line = line.strip()
+        if not line.startswith("data:"):
+            continue
+        payload = line[len("data:"):].strip()
+        if not payload or payload == "[DONE]":
+            continue
+        try:
+            event = json.loads(payload)
+        except ValueError:
+            continue
+        kind = event.get("type", "")
+        if kind == "response.output_text.delta":
+            text.append(event.get("delta") or "")
+        elif kind == "response.completed":
+            done = True
+            spent = (event.get("response") or {}).get("usage") or {}
+            usage = {"input": spent.get("input_tokens", 0), "output": spent.get("output_tokens", 0)}
+        elif kind in ("response.failed", "response.incomplete", "error"):
+            detail = (event.get("response") or event).get("error") or {}
+            failure = detail.get("code") or detail.get("message") or kind
+    if failure:
+        return None, usage, failure
+    if not done:
+        return None, usage, "luồng dừng giữa chừng"
+    return "".join(text), usage, None
+
+
+def get_stream(url, headers, body, timeout):
+    """(mã HTTP, toàn văn chuỗi sự kiện). Đọc hết rồi mới dựng câu trả lời: ở đây không cần hiện dần."""
+    request = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as response:
+            return response.status, response.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as exc:
+        return exc.code, exc.read().decode("utf-8", "replace")
+
+
 def tool_result_message(kind, call, text):
     """Đưa kết quả công cụ lại cho mô hình, đúng hình dạng từng nhà cung cấp. Kết quả luôn là dữ liệu."""
     if kind in OPENAI_WIRE:
@@ -325,6 +385,8 @@ def _one_turn(provider, kind, request, messages, secret, tools, mode="key"):
     except (ValueError, KeyError) as exc:
         return fail("config", detail=str(exc))
     timeout = request.get("timeout", DEFAULT_TIMEOUT)
+    if kind == "responses":
+        return _one_turn_streamed(url, headers, body, timeout)
     for attempt in range(MAX_RETRIES + 1):
         try:
             status, data = post(url, headers, body, timeout)
@@ -428,8 +490,10 @@ def oauth_action(action, request):
     ref = provider.get("secret_ref") or ""
     try:
         if action == "login":
-            return {"ok": True, "state": oauthflow.login_browser(config, ref,
-                                                                 request.get("timeout", oauthflow.LOGIN_TIMEOUT))}
+            state, issued = oauthflow.login_browser(config, ref,
+                                                    request.get("timeout", oauthflow.LOGIN_TIMEOUT))
+            # client_id được cấp KHÔNG phải bí mật: nó là mã nhận dạng ứng dụng, lớp trên ghi vào providers.json.
+            return {"ok": True, "state": state, "issued_client_id": issued}
         if action == "device_start":
             started = oauthflow.device_start(config)
             return {"ok": True, "user_code": started["user_code"], "url": started["verification_url"],
@@ -448,6 +512,35 @@ def oauth_action(action, request):
     except (oauthflow.FlowError, ValueError) as exc:
         return fail("login", detail=str(exc))
     return fail("action", action=action)
+
+
+def _one_turn_streamed(url, headers, body, timeout):
+    """Một lượt với Responses API. Không gọi công cụ ở mốc này (xem README), nên không có vòng lặp."""
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            status, raw = get_stream(url, headers, body, timeout)
+        except TimeoutError:
+            return fail("timeout")
+        except urllib.error.URLError as exc:
+            if isinstance(getattr(exc, "reason", None), TimeoutError):
+                return fail("timeout")
+            return fail("network")
+        if status in (401, 403):
+            return fail("auth")
+        if status in RETRY_CODES and attempt < MAX_RETRIES:
+            time.sleep(float(os.environ.get("ONEX_AI_RETRY_SLEEP", "1.5")) * (attempt + 1))
+            continue
+        if status == 429:
+            return fail("quota")
+        if status >= 400:
+            return fail("server", status=status, detail=raw[:300])
+        text, usage, error = parse_responses_stream(raw)
+        if error and "subscription_sharing_usage" in error:
+            return fail("plan_limit")
+        if error:
+            return fail("stream", detail=error)
+        return {"ok": True, "text": text or "", "usage": usage, "_calls": [], "_raw": {}}
+    return fail("quota")
 
 
 def main():

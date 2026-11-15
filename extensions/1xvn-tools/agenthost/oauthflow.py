@@ -9,6 +9,7 @@ hiện ra trong danh sách tiến trình và không nằm trên đĩa dưới d�
 """
 import json
 import os
+import secrets
 import ssl
 import subprocess
 import sys
@@ -18,6 +19,7 @@ import urllib.error
 import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pythonpath"))
 from vn1x import oauth  # noqa: E402
@@ -182,14 +184,42 @@ class _Callback(BaseHTTPRequestHandler):
         return
 
 
+def host_id():
+    """Mã định danh ổn định của MÁY này, để nhà cung cấp nhận ra cùng một máy ở các lần đăng nhập sau.
+
+    Không phải bí mật và không nói gì về người dùng: chỉ là một chuỗi ngẫu nhiên sinh một lần rồi giữ lại.
+    """
+    path = Path(os.environ.get("ONEX_HOST_ID_PATH")
+                or Path.home() / ".config" / "1xvnoffice" / "host-id")
+    try:
+        existing = path.read_text(encoding="utf-8").strip()
+        if existing:
+            return existing
+    except OSError:
+        pass
+    fresh = secrets.token_hex(16)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(fresh + "\n", encoding="utf-8")
+    except OSError:
+        pass
+    return fresh
+
+
 def login_browser(config, ref, timeout=LOGIN_TIMEOUT):
-    """Đăng nhập bằng mã uỷ quyền + PKCE. Trả về mô tả đã che của gói thẻ."""
+    """Đăng nhập bằng mã uỷ quyền + PKCE. Trả về (mô tả đã che của gói thẻ, client_id được cấp hoặc "")."""
     verifier, challenge = oauth.pkce_pair()
     state = oauth.state_token()
     server = HTTPServer(("127.0.0.1", 0), _Callback)
     server.callback_url = None
     server.timeout = 1
-    redirect_uri = f"http://127.0.0.1:{server.server_port}/callback"
+    redirect_uri = f"http://127.0.0.1:{server.server_port}{config.get('redirect_path') or '/callback'}"
+    extra = dict(config.get("extra_auth_params") or {})
+    if config.get("dynamic_client") and config.get("client_id") == oauth.DYNAMIC_CLIENT:
+        extra.update(oauth.registration_params(host_id(), config.get("app_name") or "1xVnOffice"))
+    if config.get("resource"):
+        extra["resource"] = config["resource"]
+    config = dict(config, extra_auth_params=extra)
     url = oauth.authorize_url(config, redirect_uri, challenge, state)
     thread = threading.Thread(target=_serve_until, args=(server, timeout), daemon=True)
     thread.start()
@@ -202,10 +232,15 @@ def login_browser(config, ref, timeout=LOGIN_TIMEOUT):
     if not callback:
         raise FlowError(f"chờ quá {timeout} giây mà chưa thấy đăng nhập xong")
     code = oauth.parse_redirect(callback, state)
+    issued = oauth.issued_client_id(callback)
+    if issued:
+        config = dict(config, client_id=issued)      # lần đăng ký đầu: dùng ngay client_id vừa được cấp
+    elif config.get("client_id") == oauth.DYNAMIC_CLIENT:
+        raise FlowError("đăng ký chưa xong: nhà cung cấp không cấp client_id nào trong lần gọi về")
     config = with_client_secret(config)
     tokens = _exchange(config, *oauth.token_request(config, code, verifier, redirect_uri))
     write_bundle(ref, tokens)
-    return oauth.redacted(tokens)
+    return oauth.redacted(tokens), issued
 
 
 def _serve_until(server, timeout):

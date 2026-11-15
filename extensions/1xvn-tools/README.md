@@ -69,12 +69,17 @@ Ba cách gắn tài khoản:
 | Cách | Dùng cho | Chỗ cất bí mật |
 |---|---|---|
 | **Khoá API** | OpenAI, Anthropic, Gemini, OpenRouter, Groq, DeepSeek, Mistral, xAI, Together, Fireworks, Cerebras, Azure OpenAI | Keychain, mục `1xvnoffice/<id>` |
+| **Dùng gói ChatGPT bạn đang trả** | ChatGPT Plus hoặc Pro — không cần khoá API, không có hoá đơn theo token | Keychain, dạng gói thẻ |
 | **Đăng nhập OAuth** | Google Cloud Vertex AI, Azure OpenAI qua Entra ID, cổng AI nội bộ của cơ quan có SSO (OIDC) | Keychain, cùng mục, dạng gói thẻ |
 | **Không cần gì** | Ollama, LM Studio, vLLM chạy ngay trên máy | — |
 
 Khoá gõ vào hộp **che chữ** và đi thẳng vào Keychain qua đầu vào chuẩn của lệnh `security`, nên không hiện trên màn hình, không nằm trong tham số dòng lệnh và không bao giờ nằm trong `providers.json` — tệp đó chỉ giữ *tên mục* `secret_ref`. Muốn tự lưu khoá bằng tay thì vẫn dùng lệnh `security` ở trên.
 
 Đăng nhập OAuth dùng **mã uỷ quyền + PKCE**, không cần client secret: 1xVnOffice mở trình duyệt của bạn và nhận mã trả về ở một cổng loopback `127.0.0.1` dựng tạm rồi đóng ngay. Máy không mở được trình duyệt, hoặc bạn muốn đăng nhập trên điện thoại, thì chọn **mã thiết bị**: app hiện một đường dẫn và một mã ngắn. Thẻ truy cập tự gia hạn bằng refresh token khi còn 2 phút là hết hạn; hết hạn mà không gia hạn được thì app nói rõ phải đăng nhập lại chứ không im lặng hỏng.
+
+**Dùng gói ChatGPT đang có** là mục đáng chú ý nhất với người đã trả tiền ChatGPT Plus hoặc Pro: chọn mục đó, bấm đăng nhập, xong. Không khoá API, không hoá đơn theo token. OpenAI mở đường **tự đăng ký** cho ứng dụng mã nguồn mở chạy trên máy, nên 1xVnOffice không phải xin client_id trước và bạn cũng không phải dán gì cả — lần đăng nhập đầu, máy chủ cấp client_id riêng cho máy bạn và app giữ lại để dùng về sau.
+
+Ba điều cần biết trước khi chọn mục này. Lượt dùng cho ứng dụng ngoài **bị giới hạn riêng** và nằm chung hạn mức tuần của gói, không phải phần dành sẵn; hết lượt thì app nói rõ. Luồng này đi qua **Responses API** nên ở bản hiện tại **chưa gọi được công cụ MCP** — cần công cụ thì dùng mục khoá API. Và đây là đường của **OpenAI**: Anthropic cấm dùng thẻ đăng nhập của gói thuê bao trong ứng dụng ngoài, nên với Claude vẫn phải là khoá API.
 
 1xVnOffice **không nhúng client_id của ai cả.** `client_id` gắn với một ứng dụng đã đăng ký, và cơ quan thường tự đăng ký ứng dụng nội bộ của mình, nên bạn dán client_id của chính bạn (ứng dụng loại Desktop trong Google Cloud, ứng dụng trong Entra ID của cơ quan, hoặc client_id quản trị viên cấp cho cổng AI nội bộ).
 
