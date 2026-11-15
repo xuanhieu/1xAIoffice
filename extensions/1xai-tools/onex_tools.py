@@ -16,6 +16,7 @@ from com.sun.star.lang import XInitialization, XServiceInfo
 from com.sun.star.document import XDocumentEventListener
 from com.sun.star.task import XJob
 from com.sun.star.bridge import XInstanceProvider
+from com.sun.star.awt import XActionListener
 
 import datetime
 import json
@@ -99,6 +100,9 @@ TEXTS = {
         "cancel": "Cancel",
         "panel_no_ai": "No AI account yet. Open AI Accounts below; free providers come first.",
         "panel_ai": "AI in use: {name}",
+        "yes": "Yes",
+        "no": "No",
+        "guide": "Guide \u2197",
         "acct_title": "AI accounts",
         "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
         "acct_pick": "Type the number or the name of the provider to add (empty to close):",
@@ -183,6 +187,9 @@ TEXTS = {
         "cancel": "Huỷ",
         "panel_no_ai": "Chưa gắn tài khoản AI. Bấm Tài khoản AI bên dưới; hãng miễn phí nằm đầu.",
         "panel_ai": "Đang dùng: {name}",
+        "yes": "Có",
+        "no": "Không",
+        "guide": "Hướng dẫn \u2197",
         "acct_title": "Tài khoản AI",
         "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
         "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
@@ -250,6 +257,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         pass
 
     def dispatch(self, url, args):
+        self.topic = GUIDE_TOPICS.get(url.Path, "")      # mọi hộp thoại của lệnh này dẫn tới đúng bài hướng dẫn
         if url.Path == "OpenCsvSafely":
             self.t = TEXTS[_ui_lang(self.ctx)]
             self.cmd_OpenCsvSafely()
@@ -1084,6 +1092,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         dialog.setModel(model)
         dialog.createPeer(smgr.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx),
                           self.frame.getContainerWindow())
+        _center_on(dialog, self.frame.getContainerWindow())
         try:
             return dialog.getControl("q").getText().strip() if dialog.execute() == 1 else None
         finally:
@@ -1227,13 +1236,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         """
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
             return os.environ.get("ONEX_TOOLS_CHECK_FIX") == "1"
-        from com.sun.star.awt.MessageBoxType import QUERYBOX
-        toolkit = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx)
-        buttons = 3 | (0x40000 if default_yes else 0)   # BUTTONS_YES_NO, DEFAULT_BUTTON_YES
-        box = toolkit.createMessageBox(self.frame.getContainerWindow(), QUERYBOX, buttons, self.t["title"], text)
-        answer = box.execute()
-        box.dispose()
-        return answer == 2   # com.sun.star.awt.MessageBoxResults.YES
+        return self._notice(text, question=True, default_yes=default_yes)
 
     def message(self, text):
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
@@ -1242,10 +1245,91 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                 with open(out, "a", encoding="utf-8") as handle:
                     handle.write(text + "\n")
             return
-        from com.sun.star.awt.MessageBoxType import INFOBOX
-        toolkit = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx)
-        box = toolkit.createMessageBox(self.frame.getContainerWindow(), INFOBOX, 1, self.t["title"], text)
-        box.execute()
+        self._notice(text)
+
+    def _notice(self, text, question=False, default_yes=False):
+        """Hộp thoại chung của 1xAIoffice: biểu tượng, nội dung trong khung màu, nút Hướng dẫn mở bài chi tiết.
+
+        Chủ dự án (15/11/2026): hộp thoại không được làm người dùng bối rối; hiện ra phải kèm ghi chú rõ, màu sắc và
+        đường tới bài hướng dẫn. Nội dung dài thì cuộn, không tràn, không cắt chữ.
+        """
+        smgr = self.ctx.ServiceManager
+        lines = sum(1 + len(line) // 62 for line in text.split("\n"))
+        body_h = min(max(lines * 10 + 8, 34), 230)
+        model = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", self.ctx)
+        model.Width, model.Height, model.Title = 330, body_h + 40, self.t["title"]
+        icon = model.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
+        icon.PositionX, icon.PositionY, icon.Width, icon.Height = 8, 8, 22, 22
+        icon.Label, icon.Align, icon.TextColor = ("?" if question else "i"), 1, 0xFFFFFF
+        icon.VerticalAlign = uno.Enum("com.sun.star.style.VerticalAlignment", "MIDDLE")
+        icon.BackgroundColor = 0x8B6CFF if question else 0x3D7BFD
+        icon.FontHeight, icon.FontWeight = 14.0, 150.0
+        model.insertByName("icon", icon)
+        body = model.createInstance("com.sun.star.awt.UnoControlEditModel")
+        body.PositionX, body.PositionY, body.Width, body.Height = 36, 8, 286, body_h
+        body.MultiLine, body.ReadOnly, body.Text, body.Border = True, True, text, 0
+        body.VScroll = lines * 10 + 8 > 230
+        body.BackgroundColor, body.TextColor = 0x23262E, 0xE6E8EE    # khung màu dịu, chữ dễ đọc
+        model.insertByName("body", body)
+        buttons = [("yes", self.t["yes"], 1), ("no", self.t["no"], 2)] if question else [("ok", "OK", 1)]
+        x = model.Width - 8
+        for name, label, kind in reversed(buttons):
+            b = model.createInstance("com.sun.star.awt.UnoControlButtonModel")
+            b.Width, b.Height = 56, 14
+            x -= b.Width
+            b.PositionX, b.PositionY, b.Label, b.PushButtonType = x, body_h + 18, label, kind
+            b.DefaultButton = (name == "yes" and default_yes) or (name == "no" and not default_yes) or name == "ok"
+            model.insertByName(name, b)
+            x -= 6
+        guide = model.createInstance("com.sun.star.awt.UnoControlButtonModel")
+        guide.PositionX, guide.PositionY, guide.Width, guide.Height = 36, body_h + 18, 90, 14
+        guide.Label = self.t["guide"]
+        model.insertByName("guide", guide)
+        dialog = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialog", self.ctx)
+        dialog.setModel(model)
+        url = guide_url(getattr(self, "topic", ""), "vi" if self.t is TEXTS["vi"] else "en")
+
+        class OpenGuide(unohelper.Base, XActionListener):
+            def actionPerformed(inner, event):        # noqa: N805 - lớp trong, `inner` là chính listener
+                self._open_url(url)
+
+            def disposing(inner, event):              # noqa: N805
+                pass
+
+        dialog.getControl("guide").addActionListener(OpenGuide())
+        parent = self.frame.getContainerWindow()
+        dialog.createPeer(smgr.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx), parent)
+        _center_on(dialog, parent)      # giữa cửa sổ tài liệu, không bật ra góc màn hình
+        try:
+            return dialog.execute() == 1
+        finally:
+            dialog.dispose()
+
+# Bài hướng dẫn chi tiết của từng lệnh trên 1xag.com/office/<chủ đề> (chủ dự án chốt 15/11/2026). Mọi hộp thoại có
+# nút "Hướng dẫn" mở đúng bài của lệnh đang chạy; lệnh không có bài riêng mở trang chung.
+GUIDE_BASE = "https://1xag.com/office/"
+GUIDE_TOPICS = {"AiAsk": "ai", "AiRewrite": "ai", "AiSkill": "skill", "AiAccounts": "tai-khoan-ai",
+                "McpTools": "mcp", "McpServer": "mcp", "Nd30Document": "nd30", "Nd30Gallery": "nd30",
+                "Nd30Check": "kiem-the-thuc", "NewCongVan": "nd30", "NewToTrinh": "nd30", "NewQuyetDinh": "nd30",
+                "NewBienBan": "nd30", "OpenCsvSafely": "csv", "ConvertTCVN3": "tieng-viet", "ConvertVNI": "tieng-viet",
+                "ConvertVIQR": "tieng-viet", "NormalizeUnicode": "tieng-viet", "RemoveDiacritics": "tieng-viet",
+                "ToneStyleOld": "tieng-viet", "ToneStyleNew": "tieng-viet", "NumberToWords": "doc-so",
+                "MoneyToWords": "doc-so"}
+
+
+def _center_on(dialog, parent):
+    """Đặt hộp thoại giữa cửa sổ cha (toạ độ màn hình)."""
+    try:
+        pp, dp = parent.getPosSize(), dialog.getPosSize()
+        dialog.setPosSize(pp.X + max((pp.Width - dp.Width) // 2, 0), pp.Y + max((pp.Height - dp.Height) // 3, 0),
+                          0, 0, 3)            # 3 = POS: chỉ đổi vị trí
+    except Exception:  # noqa: BLE001 - không đặt được thì để hệ điều hành tự đặt
+        pass
+
+
+def guide_url(topic, lang):
+    """Địa chỉ bài hướng dẫn; bản tiếng Anh thêm ?lang=en."""
+    return GUIDE_BASE + (topic or "") + ("?lang=en" if lang == "en" else "")
 
 
 # Thẻ trên dải "Bắt đầu tài liệu mới" của Start Center (bản vá 0004). Nhãn nằm ở GenericCommands.xcu.
@@ -1568,6 +1652,8 @@ PANEL_ROWS = [("status", "text"), ("AiAsk", "btn"), ("AiRewrite", "btn"), ("AiSk
               ("Nd30Document", "btn"), ("Nd30Check", "btn"), ("sep2", "line"), ("McpTools", "btn"),
               ("AiAccounts", "btn")]
 PANEL_WRITER_ONLY = {"AiRewrite", "Nd30Document", "Nd30Check", "sep1"}
+AI_SOFT_BG = 0x2E2A48     # tím nhạt trên nền than chì: nhóm AI, khác nút thường
+AI_SOFT_FG = 0xE4DCFF
 
 try:
     from com.sun.star.ui import XUIElementFactory, XUIElement, XToolPanel, XSidebarPanel
@@ -1609,7 +1695,14 @@ if XUIElementFactory is not None:
                 if not self.writer and name in PANEL_WRITER_ONLY:
                     control.setVisible(False)
                 elif kind == "btn":
-                    control.getModel().Label = _command_label(ctx, self.module, "vnd.1x.tools:" + name) or name
+                    model = control.getModel()
+                    model.Label = _command_label(ctx, self.module, "vnd.1x.tools:" + name) or name
+                    # Tông tím nhạt của nhóm AI (branding/tokens.json "ai"), để nút AI khác hẳn nút thường xung
+                    # quanh; chữ xuống dòng thay vì bị cắt khi thanh bên hẹp.
+                    model.BackgroundColor, model.TextColor, model.MultiLine = AI_SOFT_BG, AI_SOFT_FG, True
+                elif kind == "text":
+                    control.getModel().TextColor = AI_SOFT_FG
+                    control.getModel().MultiLine = True
             self.refresh()
             self.window.setVisible(True)
             self.height = 0
@@ -1634,6 +1727,8 @@ if XUIElementFactory is not None:
                 if control is None or (not self.writer and name in PANEL_WRITER_ONLY):
                     continue
                 h = {"text": 64, "line": 10, "btn": 30}[kind]
+                if kind == "btn" and len(control.getModel().Label) * 8 > width - 2 * pad - 16:
+                    h = 46                      # nhãn dài: hai dòng, không cắt chữ
                 control.setPosSize(pad, y, max(width - 2 * pad, 120), h, 15)
                 y += h + (4 if kind == "btn" else 2)
             return y + pad

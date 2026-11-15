@@ -120,4 +120,25 @@
       </node>
     </node>
   </oor:component-data>
+
+  <!-- Tự lưu để không mất việc khi app hay máy gặp sự cố (chủ dự án yêu cầu 15/11/2026). Ba lớp:
+       1. Thông tin khôi phục mỗi 2 phút (mặc định của bản gốc là 10).
+       2. Lưu thẳng tài liệu đã có tên tệp cùng nhịp đó (UserAutoSaveEnabled; bản gốc tắt).
+       3. Giữ một bản sao lưu mỗi lần lưu (CreateBackup).
+       Người dùng tắt hoặc đổi nhịp trong Công cụ > Tuỳ chọn > Tải/Lưu > Chung. 2 phút chứ không 1, để bảng tính lớn
+       không bị khựng mỗi phút. -->
+  <oor:component-data oor:package="org.openoffice.Office" oor:name="Recovery">
+    <node oor:name="AutoSave">
+      <prop oor:name="Enabled" oor:op="fuse"><value>true</value></prop>
+      <prop oor:name="UserAutoSaveEnabled" oor:op="fuse"><value>true</value></prop>
+      <prop oor:name="TimeIntervall" oor:op="fuse"><value>2</value></prop>
+    </node>
+  </oor:component-data>
+  <oor:component-data oor:package="org.openoffice.Office" oor:name="Common">
+    <node oor:name="Save">
+      <node oor:name="Document">
+        <prop oor:name="CreateBackup" oor:op="fuse"><value>true</value></prop>
+      </node>
+    </node>
+  </oor:component-data>
 </oor:data>

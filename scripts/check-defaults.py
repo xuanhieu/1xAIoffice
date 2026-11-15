@@ -15,7 +15,12 @@ EXPECTED = [
     ("/org.openoffice.Office.Linguistic/General", "UILocale", "en-US"),
     # Giao diện tiếng Anh nhưng VĂN BẢN mặc định là tiếng Việt, và phông theo Nghị định 30.
     ("/org.openoffice.Office.Linguistic/General", "DefaultLocale", "vi-VN"),
-    ("/org.openoffice.Office.Writer/DefaultFont", "StandardHeight", 459),   # 1/100 mm: 13pt
+    ("/org.openoffice.Office.Writer/DefaultFont", "StandardHeight", 459),
+    # Tự lưu: khôi phục mỗi 2 phút, lưu thẳng tài liệu có tên tệp, giữ bản sao lưu.
+    ("/org.openoffice.Office.Recovery/AutoSave", "Enabled", True),
+    ("/org.openoffice.Office.Recovery/AutoSave", "UserAutoSaveEnabled", True),
+    ("/org.openoffice.Office.Recovery/AutoSave", "TimeIntervall", 2),
+    ("/org.openoffice.Office.Common/Save/Document", "CreateBackup", True),   # 1/100 mm: 13pt
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.text.TextDocument", "ooSetupFactoryDefaultFilter", "MS Word 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.sheet.SpreadsheetDocument", "ooSetupFactoryDefaultFilter", "Calc MS Excel 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.presentation.PresentationDocument", "ooSetupFactoryDefaultFilter", "Impress MS PowerPoint 2007 XML"),
