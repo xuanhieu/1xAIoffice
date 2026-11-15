@@ -213,6 +213,16 @@ def fluent_icons(fluent_dir):
             text = re.sub(r'<svg ', f'<svg fill="{ICON_FG}" ', text, count=1)
             text = re.sub(r'width="\d+" height="\d+"', f'width="{size}" height="{size}"', text, count=1)
             out[pattern.format(cmd)] = text
+    # Icon của dải thẻ thanh bên (Sidebar.xcu trỏ thẳng tới các tệp này, không qua tên lệnh). Bản gốc là icon
+    # màu kiểu cũ, nằm ngay mép phải nên rất dễ thấy lệch tông với phần còn lại.
+    for path, name in SIDEBAR_DECKS.items():
+        src = next((Path(fluent_dir) / f"{name}_{sz}_regular.svg" for sz in (24, 20)
+                    if (Path(fluent_dir) / f"{name}_{sz}_regular.svg").is_file()), None)
+        if src is None:
+            missing.append(path)
+            continue
+        text = re.sub(r'<svg ', f'<svg fill="{ICON_FG}" ', src.read_text(encoding="utf-8"), count=1)
+        out[path] = re.sub(r'width="\d+" height="\d+"', 'width="24" height="24"', text, count=1)
     # Lệnh của extension cũng vào theme, để nút trên thẻ AI và mục chuột phải có icon. framework
     # (CommandImageResolver.cxx) đổi "vnd.1x.tools:AiAsk" thành phần đường dẫn viết thường: "aiask".
     for cmd, name in ADDON_ICONS.items():
@@ -228,6 +238,11 @@ def fluent_icons(fluent_dir):
     return out, sorted(set(missing))
 
 
+SIDEBAR_DECKS = {f"sfx2/res/symphony/sidebar-{k}-large.svg": v for k, v in {
+    "property": "options", "style": "text_font_size", "gallery": "image_multiple", "navigator": "compass_northwest",
+    "template": "document_multiple", "functions": "math_formula", "elements": "math_symbols",
+    "transition": "slide_transition", "animation": "data_histogram", "a11y": "accessibility"}.items()}
+
 # Icon cho lệnh của extension 1xvn-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
 ADDON_ICONS = {"AiAccounts": "key", "AiAsk": "sparkle", "AiRewrite": "text_edit_style", "McpTools": "plug_connected",
                "McpServer": "server", "AiSkill": "hat_graduation", "Nd30Document": "document_ribbon",
@@ -240,7 +255,7 @@ ADDON_ICONS = {"AiAccounts": "key", "AiAsk": "sparkle", "AiRewrite": "text_edit_
 # Nút LỚN trên thẻ AI tô màu theo nhóm (màu lấy từ branding/tokens.json), để mắt nhận ra nhóm ngay như cách WPS
 # làm điểm nhấn; nút nhỏ và menu giữ đơn sắc. Lệnh không có trong bảng dùng ICON_FG.
 ADDON_GROUP = {"AiAsk": "ai", "AiRewrite": "ai", "AiSkill": "ai", "Nd30Document": "pdf", "Nd30Check": "pdf",
-               "McpTools": "sheet", "McpServer": "sheet", "AiAccounts": "sheet"}
+               "McpTools": "doc", "McpServer": "doc", "AiAccounts": "doc", "OpenCsvSafely": "sheet"}
 
 
 def addon_fill(cmd, size):

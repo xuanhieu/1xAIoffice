@@ -1,78 +1,888 @@
 {
   "_about": "Lệnh UNO (không có .uno:, viết thường) -> tên icon Fluent UI System Icons (MIT, Microsoft), theo thứ tự ưu tiên. scripts/brand/make-brand.py --fluent <thư mục icons> lấy tên đầu tiên có thật và báo lệnh không có icon. Lệnh không có trong bảng dùng icon colibre_dark.",
-  "paste": ["clipboard_paste"], "cut": ["cut"], "copy": ["copy"], "formatpaintbrush": ["paint_brush"],
-  "undo": ["arrow_undo"], "redo": ["arrow_redo"], "save": ["save"], "saveas": ["save_edit", "save"],
-  "open": ["folder_open"], "adddirect": ["document_add"], "newdoc": ["document_add"], "print": ["print"],
-  "printdefault": ["print"], "printpreview": ["document_search", "print"], "exportdirecttopdf": ["document_pdf"],
-  "exporttopdf": ["document_pdf"], "sendmail": ["mail"], "closedoc": ["dismiss"], "setdocumentproperties": ["document_settings", "info"],
-  "bold": ["text_bold"], "italic": ["text_italic"], "underline": ["text_underline"], "strikeout": ["text_strikethrough"],
-  "superscript": ["text_superscript"], "subscript": ["text_subscript"], "shadowed": ["text_effects"],
-  "grow": ["text_font_size", "font_increase"], "shrink": ["font_decrease"], "color": ["text_color"],
-  "fontcolor": ["text_color"], "charbackcolor": ["highlight"], "backcolor": ["highlight"],
-  "setdefault": ["text_clear_formatting"], "resetattributes": ["text_clear_formatting"],
-  "changecasetoupper": ["text_case_uppercase"], "changecasetolower": ["text_case_lowercase"],
-  "changecasetotitlecase": ["text_case_title"], "fontdialog": ["text_font"], "charmapcontrol": ["math_symbols", "symbols"],
-  "defaultbullet": ["text_bullet_list_ltr"], "defaultnumbering": ["text_number_list_ltr"],
-  "setoutline": ["text_bullet_list_tree"], "incrementindent": ["text_indent_increase_ltr"],
-  "decrementindent": ["text_indent_decrease_ltr"], "leftpara": ["text_align_left"], "centerpara": ["text_align_center"],
-  "rightpara": ["text_align_right"], "justifypara": ["text_align_justify"], "alignleft": ["text_align_left"],
-  "alignhorizontalcenter": ["text_align_center"], "alignright": ["text_align_right"], "alignblock": ["text_align_justify"],
-  "linespacing": ["text_line_spacing"], "paraspaceincrease": ["text_paragraph_spacing", "text_line_spacing"],
-  "paraspacedecrease": ["text_paragraph_spacing", "text_line_spacing"], "paragraphdialog": ["text_paragraph"],
-  "controlcodes": ["text_paragraph"], "paralefttoright": ["text_paragraph_direction_right"],
-  "pararighttoleft": ["text_paragraph_direction_left"], "setborderstyle": ["border_all"], "borderdialog": ["border_all"],
-  "searchdialog": ["search"], "selectall": ["select_all_on"], "selectobject": ["cursor"], "sidebar": ["panel_right"],
-  "insertpagebreak": ["document_page_break"], "insertbreak": ["document_page_break"], "insertcolumnbreak": ["column_triple_edit", "document_page_break"],
-  "inserttable": ["table_add"], "tabledialog": ["table_settings", "table"], "insertgraphic": ["image_add", "image"],
-  "insertobjectchart": ["chart_multiple", "data_bar_vertical"], "drawchart": ["chart_multiple"],
-  "insertframe": ["square_add", "rectangle_landscape"], "inserttextframe": ["textbox"], "text": ["textbox"],
-  "drawtext": ["textbox"], "fontworkgalleryfloater": ["text_effects"], "basicshapes": ["shapes"],
-  "line": ["line"], "linetoolbox": ["line"], "connectortoolbox": ["flowchart"], "insertsymbol": ["math_symbols"],
-  "hyperlinkdialog": ["link"], "insertbookmark": ["bookmark_add", "bookmark"], "insertreferencefield": ["link_square", "link"],
-  "insertannotation": ["comment_add"], "deleteallnotes": ["comment_dismiss", "comment_off"], "showannotations": ["comment_multiple", "comment"],
-  "insertfootnote": ["text_footnote"], "insertendnote": ["text_footnote"], "insertcaptiondialog": ["image_alt_text", "text_caption"],
-  "insertmultiindex": ["text_bullet_list_square", "book_open"], "updatecurindex": ["arrow_sync"], "updateall": ["arrow_sync"],
-  "insertpagenumberfield": ["number_symbol_square", "number_symbol"], "pagenumberwizard": ["number_symbol_square", "number_symbol"],
-  "insertcurrentdate": ["calendar_ltr"], "insertcurrenttime": ["clock"], "insertdatefield": ["calendar_ltr"],
-  "inserttimefield": ["clock"], "insertfieldctrl": ["braces"], "insertheaderfootermenu": ["document_header_footer"],
-  "editheaderandfooter": ["document_header_footer"], "inserttitlepage": ["document_header"], "titlepagedialog": ["document_header"],
-  "insertavmedia": ["video_clip"], "insertobject": ["cube_add", "cube"], "insertqrcode": ["qr_code"],
-  "pageformatdialog": ["document_settings"], "pagedialog": ["document_settings"], "pagemargin": ["document_margins"],
-  "orientation": ["document_landscape"], "pagesize": ["document_one_page"], "pagecolumntype": ["text_column_two"],
-  "formatcolumns": ["text_column_two"], "hyphenate": ["text_hanging"], "textwrap": ["text_wrap"], "wrapoff": ["text_wrap_off", "text_wrap"],
-  "wrapon": ["text_wrap"], "wrapthrough": ["text_wrap"], "wrapideal": ["text_wrap"], "wrapleft": ["text_wrap"], "wrapright": ["text_wrap"],
-  "bringtofront": ["arrow_up_square", "position_to_front"], "sendtoback": ["arrow_down_square", "position_to_back"],
-  "objectforwardone": ["position_forward"], "objectbackone": ["position_backward"], "objectalign": ["align_center_horizontal"],
-  "objectalignleft": ["align_left"], "aligncenter": ["align_center_horizontal"], "objectalignright": ["align_right"],
-  "alignup": ["align_top"], "alignmiddle": ["align_center_vertical"], "aligndown": ["align_bottom"],
-  "flipvertical": ["flip_vertical"], "fliphorizontal": ["flip_horizontal"], "togglerotateobjectmode": ["arrow_rotate_clockwise"],
-  "toggleobjectrotatemode": ["arrow_rotate_clockwise"], "rotateright": ["arrow_rotate_clockwise"], "formatgroup": ["group"],
-  "formatungroup": ["group_dismiss", "group"], "crop": ["crop"], "compressgraphic": ["arrow_minimize"], "originalsize": ["arrow_maximize"],
-  "spelldialog": ["text_proofing_tools"], "spellingandgrammardialog": ["text_proofing_tools"], "spellonline": ["text_grammar_check", "text_proofing_tools"],
-  "thesaurusdialog": ["book_search", "book_open"], "wordcountdialog": ["text_word_count", "number_symbol"],
-  "trackchanges": ["document_edit"], "showtrackedchanges": ["eye_tracking", "eye"], "acceptalltrackedchanges": ["checkmark_circle"],
-  "rejectalltrackedchanges": ["dismiss_circle"], "acceptchanges": ["document_checkmark", "checkmark"], "comparedocuments": ["document_copy"],
-  "protect": ["lock_closed"], "translate": ["translate"], "setlanguageallmenu": ["local_language"],
-  "zoom": ["zoom_in"], "zoompage": ["page_fit"], "zoompagewidth": ["arrow_fit"], "zoom100percent": ["zoom_fit"],
-  "fullscreen": ["full_screen_maximize"], "ruler": ["ruler"], "gridvisible": ["grid"], "navigator": ["navigation"],
-  "statusbarvisible": ["status"], "outlinemode": ["text_bullet_list_tree"], "normalmultipanegui": ["slide_layout"],
-  "datafilterautofilter": ["filter"], "sortascending": ["text_sort_ascending", "arrow_sort_up"], "sortdescending": ["text_sort_descending", "arrow_sort_down"],
-  "datasort": ["arrow_sort"], "tablesort": ["arrow_sort"], "autosum": ["auto_sum", "math_formula"], "functiondialog": ["math_formula"],
-  "insertrowsbefore": ["table_insert_row"], "insertrowsafter": ["table_insert_row"], "insertcolumnsbefore": ["table_insert_column"],
-  "insertcolumnsafter": ["table_insert_column"], "deleterows": ["table_delete_row"], "deletecolumns": ["table_delete_column"],
-  "togglemergecells": ["table_cells_merge"], "mergecells": ["table_cells_merge"], "splitcell": ["table_cells_split"],
-  "freezepanes": ["table_freeze_row"], "wraptext": ["text_wrap"], "numberformatcurrency": ["currency_dollar_euro", "money"],
-  "numberformatpercent": ["data_usage"], "numberformatdecimal": ["number_symbol"], "numberformatincdecimals": ["decimal_arrow_left"],
-  "numberformatdecdecimals": ["decimal_arrow_right"], "conditionalformatmenu": ["table_simple_include", "data_bar_vertical"],
-  "insertslide": ["slide_add"], "duplicateslide": ["slide_multiple"], "deleteslide": ["slide_hide"], "hideslide": ["slide_hide"],
-  "showslide": ["slide_text"], "presentation": ["play"], "presentationcurrentslide": ["play_circle", "play"],
-  "presentationlayout": ["slide_layout"], "assignlayout": ["slide_layout"], "slidesetup": ["slide_size"],
-  "notesmode": ["notepad"], "handoutmode": ["document_bullet_list"], "slidemasterpage": ["slide_settings", "slide_layout"],
-  "insertmasterpage": ["slide_add"], "changetheme": ["color"], "colorsettings": ["color"], "gallery": ["image_multiple"],
-  "fillshadow": ["square_shadow", "shadow"], "formatarea": ["paint_bucket"], "fillstyle": ["paint_bucket"], "formatline": ["line_style"],
-  "linestyle": ["line_style"], "xlinestyle": ["line_style"], "xlinecolor": ["pen"], "transformdialog": ["resize"],
-  "insertenvelope": ["mail"], "mailmergewizard": ["mail_multiple"], "signature": ["signature"], "signpdf": ["signature"],
-  "extensionmanager": ["puzzle_piece"], "optionstreedialog": ["settings"], "helpindex": ["question_circle"],
-  "documentation": ["book_question_mark"], "macrodialog": ["code"], "runmacro": ["code"], "basicideappear": ["code"],
-  "redactdoc": ["eye_off"], "ruby": ["text_annotation_toggle", "text_effects"]
+  "paste": [
+    "clipboard_paste"
+  ],
+  "cut": [
+    "cut"
+  ],
+  "copy": [
+    "copy"
+  ],
+  "formatpaintbrush": [
+    "paint_brush"
+  ],
+  "undo": [
+    "arrow_undo"
+  ],
+  "redo": [
+    "arrow_redo"
+  ],
+  "save": [
+    "save"
+  ],
+  "saveas": [
+    "save_edit",
+    "save"
+  ],
+  "open": [
+    "folder_open"
+  ],
+  "adddirect": [
+    "document_add"
+  ],
+  "newdoc": [
+    "document_add"
+  ],
+  "print": [
+    "print"
+  ],
+  "printdefault": [
+    "print"
+  ],
+  "printpreview": [
+    "document_search",
+    "print"
+  ],
+  "exportdirecttopdf": [
+    "document_pdf"
+  ],
+  "exporttopdf": [
+    "document_pdf"
+  ],
+  "sendmail": [
+    "mail"
+  ],
+  "closedoc": [
+    "dismiss"
+  ],
+  "setdocumentproperties": [
+    "document_settings",
+    "info"
+  ],
+  "bold": [
+    "text_bold"
+  ],
+  "italic": [
+    "text_italic"
+  ],
+  "underline": [
+    "text_underline"
+  ],
+  "strikeout": [
+    "text_strikethrough"
+  ],
+  "superscript": [
+    "text_superscript"
+  ],
+  "subscript": [
+    "text_subscript"
+  ],
+  "shadowed": [
+    "text_effects"
+  ],
+  "grow": [
+    "text_font_size",
+    "font_increase"
+  ],
+  "shrink": [
+    "font_decrease"
+  ],
+  "color": [
+    "text_color"
+  ],
+  "fontcolor": [
+    "text_color"
+  ],
+  "charbackcolor": [
+    "highlight"
+  ],
+  "backcolor": [
+    "highlight"
+  ],
+  "setdefault": [
+    "text_clear_formatting"
+  ],
+  "resetattributes": [
+    "text_clear_formatting"
+  ],
+  "changecasetoupper": [
+    "text_case_uppercase"
+  ],
+  "changecasetolower": [
+    "text_case_lowercase"
+  ],
+  "changecasetotitlecase": [
+    "text_case_title"
+  ],
+  "fontdialog": [
+    "text_font"
+  ],
+  "charmapcontrol": [
+    "math_symbols",
+    "symbols"
+  ],
+  "defaultbullet": [
+    "text_bullet_list_ltr"
+  ],
+  "defaultnumbering": [
+    "text_number_list_ltr"
+  ],
+  "setoutline": [
+    "text_bullet_list_tree"
+  ],
+  "incrementindent": [
+    "text_indent_increase_ltr"
+  ],
+  "decrementindent": [
+    "text_indent_decrease_ltr"
+  ],
+  "leftpara": [
+    "text_align_left"
+  ],
+  "centerpara": [
+    "text_align_center"
+  ],
+  "rightpara": [
+    "text_align_right"
+  ],
+  "justifypara": [
+    "text_align_justify"
+  ],
+  "alignleft": [
+    "text_align_left"
+  ],
+  "alignhorizontalcenter": [
+    "text_align_center"
+  ],
+  "alignright": [
+    "text_align_right"
+  ],
+  "alignblock": [
+    "text_align_justify"
+  ],
+  "linespacing": [
+    "text_line_spacing"
+  ],
+  "paraspaceincrease": [
+    "text_paragraph_spacing",
+    "text_line_spacing"
+  ],
+  "paraspacedecrease": [
+    "text_paragraph_spacing",
+    "text_line_spacing"
+  ],
+  "paragraphdialog": [
+    "text_paragraph"
+  ],
+  "controlcodes": [
+    "text_paragraph"
+  ],
+  "paralefttoright": [
+    "text_paragraph_direction_right"
+  ],
+  "pararighttoleft": [
+    "text_paragraph_direction_left"
+  ],
+  "setborderstyle": [
+    "border_all"
+  ],
+  "borderdialog": [
+    "border_all"
+  ],
+  "searchdialog": [
+    "search"
+  ],
+  "selectall": [
+    "select_all_on"
+  ],
+  "selectobject": [
+    "cursor"
+  ],
+  "sidebar": [
+    "panel_right"
+  ],
+  "insertpagebreak": [
+    "document_page_break"
+  ],
+  "insertbreak": [
+    "document_page_break"
+  ],
+  "insertcolumnbreak": [
+    "column_triple_edit",
+    "document_page_break"
+  ],
+  "inserttable": [
+    "table_add"
+  ],
+  "tabledialog": [
+    "table_settings",
+    "table"
+  ],
+  "insertgraphic": [
+    "image_add",
+    "image"
+  ],
+  "insertobjectchart": [
+    "chart_multiple",
+    "data_bar_vertical"
+  ],
+  "drawchart": [
+    "chart_multiple"
+  ],
+  "insertframe": [
+    "square_add",
+    "rectangle_landscape"
+  ],
+  "inserttextframe": [
+    "textbox"
+  ],
+  "text": [
+    "textbox"
+  ],
+  "drawtext": [
+    "textbox"
+  ],
+  "fontworkgalleryfloater": [
+    "text_effects"
+  ],
+  "basicshapes": [
+    "shapes"
+  ],
+  "line": [
+    "line"
+  ],
+  "linetoolbox": [
+    "line"
+  ],
+  "connectortoolbox": [
+    "flowchart"
+  ],
+  "insertsymbol": [
+    "math_symbols"
+  ],
+  "hyperlinkdialog": [
+    "link"
+  ],
+  "insertbookmark": [
+    "bookmark_add",
+    "bookmark"
+  ],
+  "insertreferencefield": [
+    "link_square",
+    "link"
+  ],
+  "insertannotation": [
+    "comment_add"
+  ],
+  "deleteallnotes": [
+    "comment_dismiss",
+    "comment_off"
+  ],
+  "showannotations": [
+    "comment_multiple",
+    "comment"
+  ],
+  "insertfootnote": [
+    "text_footnote"
+  ],
+  "insertendnote": [
+    "text_footnote"
+  ],
+  "insertcaptiondialog": [
+    "image_alt_text",
+    "text_caption"
+  ],
+  "insertmultiindex": [
+    "text_bullet_list_square",
+    "book_open"
+  ],
+  "updatecurindex": [
+    "arrow_sync"
+  ],
+  "updateall": [
+    "arrow_sync"
+  ],
+  "insertpagenumberfield": [
+    "number_symbol_square",
+    "number_symbol"
+  ],
+  "pagenumberwizard": [
+    "number_symbol_square",
+    "number_symbol"
+  ],
+  "insertcurrentdate": [
+    "calendar_ltr"
+  ],
+  "insertcurrenttime": [
+    "clock"
+  ],
+  "insertdatefield": [
+    "calendar_ltr"
+  ],
+  "inserttimefield": [
+    "clock"
+  ],
+  "insertfieldctrl": [
+    "braces"
+  ],
+  "insertheaderfootermenu": [
+    "document_header_footer"
+  ],
+  "editheaderandfooter": [
+    "document_header_footer"
+  ],
+  "inserttitlepage": [
+    "document_header"
+  ],
+  "titlepagedialog": [
+    "document_header"
+  ],
+  "insertavmedia": [
+    "video_clip"
+  ],
+  "insertobject": [
+    "cube_add",
+    "cube"
+  ],
+  "insertqrcode": [
+    "qr_code"
+  ],
+  "pageformatdialog": [
+    "document_settings"
+  ],
+  "pagedialog": [
+    "document_settings"
+  ],
+  "pagemargin": [
+    "document_margins"
+  ],
+  "orientation": [
+    "document_landscape"
+  ],
+  "pagesize": [
+    "document_one_page"
+  ],
+  "pagecolumntype": [
+    "text_column_two"
+  ],
+  "formatcolumns": [
+    "text_column_two"
+  ],
+  "hyphenate": [
+    "text_hanging"
+  ],
+  "textwrap": [
+    "text_wrap"
+  ],
+  "wrapoff": [
+    "text_wrap_off",
+    "text_wrap"
+  ],
+  "wrapon": [
+    "text_wrap"
+  ],
+  "wrapthrough": [
+    "text_wrap"
+  ],
+  "wrapideal": [
+    "text_wrap"
+  ],
+  "wrapleft": [
+    "text_wrap"
+  ],
+  "wrapright": [
+    "text_wrap"
+  ],
+  "bringtofront": [
+    "arrow_up_square",
+    "position_to_front"
+  ],
+  "sendtoback": [
+    "arrow_down_square",
+    "position_to_back"
+  ],
+  "objectforwardone": [
+    "position_forward"
+  ],
+  "objectbackone": [
+    "position_backward"
+  ],
+  "objectalign": [
+    "align_center_horizontal"
+  ],
+  "objectalignleft": [
+    "align_left"
+  ],
+  "aligncenter": [
+    "align_center_horizontal"
+  ],
+  "objectalignright": [
+    "align_right"
+  ],
+  "alignup": [
+    "align_top"
+  ],
+  "alignmiddle": [
+    "align_center_vertical"
+  ],
+  "aligndown": [
+    "align_bottom"
+  ],
+  "flipvertical": [
+    "flip_vertical"
+  ],
+  "fliphorizontal": [
+    "flip_horizontal"
+  ],
+  "togglerotateobjectmode": [
+    "arrow_rotate_clockwise"
+  ],
+  "toggleobjectrotatemode": [
+    "arrow_rotate_clockwise"
+  ],
+  "rotateright": [
+    "arrow_rotate_clockwise"
+  ],
+  "formatgroup": [
+    "group"
+  ],
+  "formatungroup": [
+    "group_dismiss",
+    "group"
+  ],
+  "crop": [
+    "crop"
+  ],
+  "compressgraphic": [
+    "arrow_minimize"
+  ],
+  "originalsize": [
+    "arrow_maximize"
+  ],
+  "spelldialog": [
+    "text_proofing_tools"
+  ],
+  "spellingandgrammardialog": [
+    "text_proofing_tools"
+  ],
+  "spellonline": [
+    "text_grammar_check",
+    "text_proofing_tools"
+  ],
+  "thesaurusdialog": [
+    "book_search",
+    "book_open"
+  ],
+  "wordcountdialog": [
+    "text_word_count",
+    "number_symbol"
+  ],
+  "trackchanges": [
+    "document_edit"
+  ],
+  "showtrackedchanges": [
+    "eye_tracking",
+    "eye"
+  ],
+  "acceptalltrackedchanges": [
+    "checkmark_circle"
+  ],
+  "rejectalltrackedchanges": [
+    "dismiss_circle"
+  ],
+  "acceptchanges": [
+    "document_checkmark",
+    "checkmark"
+  ],
+  "comparedocuments": [
+    "document_copy"
+  ],
+  "protect": [
+    "lock_closed"
+  ],
+  "translate": [
+    "translate"
+  ],
+  "setlanguageallmenu": [
+    "local_language"
+  ],
+  "zoom": [
+    "zoom_in"
+  ],
+  "zoompage": [
+    "page_fit"
+  ],
+  "zoompagewidth": [
+    "arrow_fit"
+  ],
+  "zoom100percent": [
+    "zoom_fit"
+  ],
+  "fullscreen": [
+    "full_screen_maximize"
+  ],
+  "ruler": [
+    "ruler"
+  ],
+  "gridvisible": [
+    "grid"
+  ],
+  "navigator": [
+    "navigation"
+  ],
+  "statusbarvisible": [
+    "status"
+  ],
+  "outlinemode": [
+    "text_bullet_list_tree"
+  ],
+  "normalmultipanegui": [
+    "slide_layout"
+  ],
+  "datafilterautofilter": [
+    "filter"
+  ],
+  "sortascending": [
+    "text_sort_ascending",
+    "arrow_sort_up"
+  ],
+  "sortdescending": [
+    "text_sort_descending",
+    "arrow_sort_down"
+  ],
+  "datasort": [
+    "arrow_sort"
+  ],
+  "tablesort": [
+    "arrow_sort"
+  ],
+  "autosum": [
+    "auto_sum",
+    "math_formula"
+  ],
+  "functiondialog": [
+    "math_formula"
+  ],
+  "insertrowsbefore": [
+    "table_insert_row"
+  ],
+  "insertrowsafter": [
+    "table_insert_row"
+  ],
+  "insertcolumnsbefore": [
+    "table_insert_column"
+  ],
+  "insertcolumnsafter": [
+    "table_insert_column"
+  ],
+  "deleterows": [
+    "table_delete_row"
+  ],
+  "deletecolumns": [
+    "table_delete_column"
+  ],
+  "togglemergecells": [
+    "table_cells_merge"
+  ],
+  "mergecells": [
+    "table_cells_merge"
+  ],
+  "splitcell": [
+    "table_cells_split"
+  ],
+  "freezepanes": [
+    "table_freeze_row"
+  ],
+  "wraptext": [
+    "text_wrap"
+  ],
+  "numberformatcurrency": [
+    "currency_dollar_euro",
+    "money"
+  ],
+  "numberformatpercent": [
+    "data_usage"
+  ],
+  "numberformatdecimal": [
+    "number_symbol"
+  ],
+  "numberformatincdecimals": [
+    "decimal_arrow_left"
+  ],
+  "numberformatdecdecimals": [
+    "decimal_arrow_right"
+  ],
+  "conditionalformatmenu": [
+    "table_simple_include",
+    "data_bar_vertical"
+  ],
+  "insertslide": [
+    "slide_add"
+  ],
+  "duplicateslide": [
+    "slide_multiple"
+  ],
+  "deleteslide": [
+    "slide_hide"
+  ],
+  "hideslide": [
+    "slide_hide"
+  ],
+  "showslide": [
+    "slide_text"
+  ],
+  "presentation": [
+    "play"
+  ],
+  "presentationcurrentslide": [
+    "play_circle",
+    "play"
+  ],
+  "presentationlayout": [
+    "slide_layout"
+  ],
+  "assignlayout": [
+    "slide_layout"
+  ],
+  "slidesetup": [
+    "slide_size"
+  ],
+  "notesmode": [
+    "notepad"
+  ],
+  "handoutmode": [
+    "document_bullet_list"
+  ],
+  "slidemasterpage": [
+    "slide_settings",
+    "slide_layout"
+  ],
+  "insertmasterpage": [
+    "slide_add"
+  ],
+  "changetheme": [
+    "color"
+  ],
+  "colorsettings": [
+    "color"
+  ],
+  "gallery": [
+    "image_multiple"
+  ],
+  "fillshadow": [
+    "square_shadow",
+    "shadow"
+  ],
+  "formatarea": [
+    "paint_bucket"
+  ],
+  "fillstyle": [
+    "paint_bucket"
+  ],
+  "formatline": [
+    "line_style"
+  ],
+  "linestyle": [
+    "line_style"
+  ],
+  "xlinestyle": [
+    "line_style"
+  ],
+  "xlinecolor": [
+    "pen"
+  ],
+  "transformdialog": [
+    "resize"
+  ],
+  "insertenvelope": [
+    "mail"
+  ],
+  "mailmergewizard": [
+    "mail_multiple"
+  ],
+  "signature": [
+    "signature"
+  ],
+  "signpdf": [
+    "signature"
+  ],
+  "extensionmanager": [
+    "puzzle_piece"
+  ],
+  "optionstreedialog": [
+    "settings"
+  ],
+  "helpindex": [
+    "question_circle"
+  ],
+  "documentation": [
+    "book_question_mark"
+  ],
+  "macrodialog": [
+    "code"
+  ],
+  "runmacro": [
+    "code"
+  ],
+  "basicideappear": [
+    "code"
+  ],
+  "redactdoc": [
+    "eye_off"
+  ],
+  "ruby": [
+    "text_annotation_toggle",
+    "text_effects"
+  ],
+  "trackchangesbar": [
+    "document_edit"
+  ],
+  "recsearch": [
+    "search"
+  ],
+  "inspectordeck": [
+    "document_search"
+  ],
+  "designerdialog": [
+    "design_ideas"
+  ],
+  "pastespecialmenu": [
+    "clipboard_more",
+    "clipboard_paste"
+  ],
+  "pastespecial": [
+    "clipboard_settings",
+    "clipboard_more"
+  ],
+  "pasteunformatted": [
+    "clipboard_text_ltr",
+    "clipboard_letter"
+  ],
+  "pasteonlytext": [
+    "clipboard_text_ltr"
+  ],
+  "pasteonlyvalue": [
+    "clipboard_number_123",
+    "number_symbol"
+  ],
+  "pasteonlyformula": [
+    "math_formula"
+  ],
+  "pastetransposed": [
+    "arrow_rotate_clockwise",
+    "table_switch"
+  ],
+  "charactermenu": [
+    "text_font"
+  ],
+  "paragraphmenu": [
+    "text_paragraph"
+  ],
+  "bulletliststyle": [
+    "text_bullet_list_ltr"
+  ],
+  "numberliststyle": [
+    "text_number_list_ltr"
+  ],
+  "numberingmenu": [
+    "text_number_list_ltr"
+  ],
+  "editstyle": [
+    "text_edit_style"
+  ],
+  "inserthyperlink": [
+    "link"
+  ],
+  "edithyperlink": [
+    "link_edit"
+  ],
+  "removehyperlink": [
+    "link_dismiss"
+  ],
+  "copyhyperlinklocation": [
+    "link_multiple",
+    "copy"
+  ],
+  "openhyperlinkoncursor": [
+    "open"
+  ],
+  "insertcell": [
+    "table_add"
+  ],
+  "deletecell": [
+    "table_delete_row",
+    "table_dismiss"
+  ],
+  "delete": [
+    "delete"
+  ],
+  "formatcelldialog": [
+    "table_settings"
+  ],
+  "editannotation": [
+    "comment_edit"
+  ],
+  "deletenote": [
+    "comment_dismiss"
+  ],
+  "shownote": [
+    "comment"
+  ],
+  "hidenote": [
+    "comment_off"
+  ],
+  "currentvalidation": [
+    "checkbox_checked",
+    "shield_checkmark"
+  ],
+  "definecurrentname": [
+    "tag"
+  ],
+  "thesaurusfromcontext": [
+    "book_open"
+  ],
+  "accepttrackedchange": [
+    "checkmark_circle"
+  ],
+  "rejecttrackedchange": [
+    "dismiss_circle"
+  ],
+  "nexttrackedchange": [
+    "arrow_next"
+  ],
+  "previoustrackedchange": [
+    "arrow_previous"
+  ],
+  "incrementlevel": [
+    "text_indent_increase_ltr"
+  ],
+  "decrementlevel": [
+    "text_indent_decrease_ltr"
+  ],
+  "removebullets": [
+    "text_bullet_list_dismiss"
+  ],
+  "fielddialog": [
+    "textbox_settings",
+    "textbox"
+  ],
+  "updateselectedfield": [
+    "arrow_sync"
+  ],
+  "editcurindex": [
+    "text_bullet_list_square_edit"
+  ],
+  "editfootnote": [
+    "note_edit"
+  ],
+  "clearautofilter": [
+    "filter_dismiss"
+  ],
+  "dataselect": [
+    "list"
+  ],
+  "defaultcharstyle": [
+    "text_clear_formatting"
+  ]
 }

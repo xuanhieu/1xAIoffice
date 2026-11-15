@@ -248,6 +248,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             self.t = TEXTS[_ui_lang(self.ctx)]
             self.cmd_Nd30Document()
             return
+        if url.Path == "AiAccounts":    # cần chạy được ở Start Center, nơi chưa có tài liệu nào
+            self.t = TEXTS[_ui_lang(self.ctx)]
+            self.cmd_AiAccounts(None, False)
+            return
         doc = self.frame.getController().getModel() if self.frame else None
         if doc is None:
             return
@@ -1149,6 +1153,9 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                  and current.getTextTables().getCount() == 0)
         if blank:
             doc = current
+        elif current is None and self.frame is not None:
+            # Gọi từ Start Center: mở Writer ngay trong cửa sổ đó, như bấm "Document", không bật thêm cửa sổ.
+            doc = self.frame.loadComponentFromURL("private:factory/swriter", "_self", 0, ())
         else:
             desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
             doc = desktop.loadComponentFromURL("private:factory/swriter", "_blank", 0, ())
