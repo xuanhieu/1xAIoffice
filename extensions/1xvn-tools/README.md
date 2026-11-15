@@ -73,7 +73,7 @@ Ba cách gắn tài khoản:
 | **Đăng nhập OAuth** | Google Cloud Vertex AI, Azure OpenAI qua Entra ID, cổng AI nội bộ của cơ quan có SSO (OIDC) | Keychain, cùng mục, dạng gói thẻ |
 | **Không cần gì** | Ollama, LM Studio, vLLM chạy ngay trên máy | — |
 
-Khoá gõ vào hộp **che chữ** và đi thẳng vào Keychain qua đầu vào chuẩn của lệnh `security`, nên không hiện trên màn hình, không nằm trong tham số dòng lệnh và không bao giờ nằm trong `providers.json` — tệp đó chỉ giữ *tên mục* `secret_ref`. Muốn tự lưu khoá bằng tay thì vẫn dùng lệnh `security` ở trên.
+Khoá gõ vào hộp **che chữ** và đi thẳng vào Keychain qua `security -i`, nên không hiện trên màn hình, không nằm trong tham số dòng lệnh (danh sách tiến trình không thấy) và không bao giờ nằm trong `providers.json`. Cách này cũng **không bị cắt ở 128 ký tự** như khi để `security` hỏi trên bàn phím — khoá của nhiều hãng và gói thẻ OAuth đều dài hơn thế — tệp đó chỉ giữ *tên mục* `secret_ref`. Muốn tự lưu khoá bằng tay thì vẫn dùng lệnh `security` ở trên.
 
 Đăng nhập OAuth dùng **mã uỷ quyền + PKCE**, không cần client secret: 1xVnOffice mở trình duyệt của bạn và nhận mã trả về ở một cổng loopback `127.0.0.1` dựng tạm rồi đóng ngay. Máy không mở được trình duyệt, hoặc bạn muốn đăng nhập trên điện thoại, thì chọn **mã thiết bị**: app hiện một đường dẫn và một mã ngắn. Thẻ truy cập tự gia hạn bằng refresh token khi còn 2 phút là hết hạn; hết hạn mà không gia hạn được thì app nói rõ phải đăng nhập lại chứ không im lặng hỏng.
 

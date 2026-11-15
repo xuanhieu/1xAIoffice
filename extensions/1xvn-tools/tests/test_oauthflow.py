@@ -272,3 +272,43 @@ class DynamicRegistrationTests(unittest.TestCase):
         oauthflow.webbrowser.open = self.browser()
         oauthflow.login_browser(self.config, "test/chatgpt", timeout=10)
         self.assertEqual(self.server.exchanges[0]["resource"], ["https://api.openai.com/v1"])
+
+
+class LongSecretTests(unittest.TestCase):
+    """Khoá và thẻ dài hơn 128 ký tự phải lưu được nguyên vẹn.
+
+    Bản cũ đưa giá trị qua chỗ nhập bàn phím của `security`, mà chỗ đó chỉ giữ 128 ký tự: gói thẻ OAuth bị cắt
+    cụt mà không báo gì, lưu xong tưởng xong, lúc dùng mới thấy hỏng. Đã xảy ra thật khi nối vào một máy chủ
+    MCP ở xa.
+    """
+
+    REF = "1xvnoffice-test-dai"
+
+    def tearDown(self):
+        import subprocess
+        subprocess.run(["security", "delete-generic-password", "-s", self.REF],
+                       capture_output=True, timeout=10)
+
+    def test_a_token_bundle_longer_than_the_old_limit_survives(self):
+        bundle = {"access_token": "a" * 500, "refresh_token": "b" * 500, "expires_at": 1.0,
+                  "scope": "mcp:tools"}
+        oauthflow.write_bundle(self.REF, bundle)
+        got = oauthflow.read_bundle(self.REF)
+        self.assertEqual(got, bundle)
+        self.assertGreater(len(got["access_token"]), 128)
+
+    def test_a_value_with_quotes_and_spaces_survives(self):
+        oauthflow.write_bundle(self.REF, {"access_token": 'co "nhay" và khoảng trắng', "expires_at": 1.0})
+        self.assertEqual(oauthflow.read_bundle(self.REF)["access_token"], 'co "nhay" và khoảng trắng')
+
+    def test_a_plain_long_secret_survives_too(self):
+        """Khoá API của nhiều hãng dài hơn 128 ký tự."""
+        key = "sk-" + "z" * 200
+        self.assertTrue(oauthflow.keychain_write(self.REF, key))
+        self.assertEqual(oauthflow.read_secret(self.REF), key)
+
+    def test_an_item_written_the_old_way_is_still_readable(self):
+        """Người dùng đã lưu thẻ từ bản trước thì không được mất."""
+        import json as _json
+        oauthflow.keychain_write(self.REF, _json.dumps({"access_token": "cu", "expires_at": 2.0}))
+        self.assertEqual(oauthflow.read_bundle(self.REF)["access_token"], "cu")

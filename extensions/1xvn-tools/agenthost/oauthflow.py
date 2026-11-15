@@ -7,6 +7,8 @@ mạng, mở trình duyệt, và đọc/ghi Keychain.
 Thẻ đi vào Keychain qua ĐẦU VÀO CHUẨN của lệnh `security`, không qua tham số dòng lệnh, nên giá trị thẻ không
 hiện ra trong danh sách tiến trình và không nằm trên đĩa dưới dạng chữ thường.
 """
+import base64
+import binascii
 import json
 import os
 import secrets
@@ -42,6 +44,38 @@ class FlowError(RuntimeError):
 
 # ---------------------------------------------------------------- kho bí mật
 
+def keychain_write(ref, value, label="1xVnOffice"):
+    """Ghi một bí mật vào Keychain, KHÔNG qua tham số dòng lệnh và KHÔNG bị cắt ở 128 ký tự.
+
+    Hai cái bẫy đã gặp thật:
+      * `security add-generic-password -w` không tham số thì hỏi giá trị trên bàn phím, và chỗ nhập đó chỉ giữ
+        **128 ký tự**. Gói thẻ OAuth hay khoá API dài hơn thế bị cắt cụt mà không báo gì — lưu xong tưởng xong,
+        lúc dùng mới thấy hỏng.
+      * Đưa giá trị vào `-w <giá trị>` thì nó hiện trong danh sách tiến trình của máy.
+    `security -i` đọc LỆNH từ đầu vào chuẩn, nên giá trị đi qua stdin mà vẫn không vướng giới hạn 128.
+    """
+    command = f'add-generic-password -U -a 1xvnoffice -s {_quote(ref)} -D {_quote(label)} -w {_quote(value)}\n'
+    try:
+        done = subprocess.run(["security", "-i"], input=command, capture_output=True, text=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return done.returncode == 0
+
+
+def _quote(value):
+    """Bọc một giá trị cho bộ đọc lệnh của `security`."""
+    return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _keychain_read(ref):
+    try:
+        done = subprocess.run(["security", "find-generic-password", "-w", "-s", ref],
+                              capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return done.stdout.strip() if done.returncode == 0 else ""
+
+
 def read_bundle(ref):
     """Gói thẻ đã cất, hoặc {} khi chưa có. Không bao giờ in giá trị ra."""
     if not ref:
@@ -53,15 +87,15 @@ def read_bundle(ref):
                 return json.loads(handle.read() or "{}").get(ref, {})
         except (OSError, ValueError):
             return {}
-    try:
-        done = subprocess.run(["security", "find-generic-password", "-w", "-s", ref],
-                              capture_output=True, text=True, timeout=10)
-    except (OSError, subprocess.SubprocessError):
-        return {}
-    if done.returncode != 0:
+    raw = _keychain_read(ref)
+    if not raw:
         return {}
     try:
-        return json.loads(done.stdout.strip() or "{}")
+        return json.loads(base64.b64decode(raw).decode("utf-8"))
+    except (ValueError, UnicodeDecodeError, binascii.Error):
+        pass
+    try:                                    # mục cũ lưu thẳng JSON, vẫn đọc được
+        return json.loads(raw)
     except ValueError:
         return {}
 
@@ -70,7 +104,7 @@ def write_bundle(ref, bundle):
     """Cất gói thẻ vào kho bí mật của hệ điều hành."""
     if not ref:
         raise FlowError("chưa đặt tên mục trong kho bí mật cho tài khoản này")
-    payload = json.dumps(bundle, ensure_ascii=False)
+    payload = base64.b64encode(json.dumps(bundle, ensure_ascii=False).encode("utf-8")).decode("ascii")
     override = os.environ.get("ONEX_OAUTH_STORE_FOR_TEST")
     if override:
         try:
@@ -82,14 +116,7 @@ def write_bundle(ref, bundle):
         with open(override, "w", encoding="utf-8") as handle:
             handle.write(json.dumps(store, ensure_ascii=False))
         return
-    try:
-        # `security` hỏi giá trị hai lần; đưa qua stdin để thẻ không nằm trong tham số dòng lệnh.
-        done = subprocess.run(["security", "add-generic-password", "-U", "-a", "1xvnoffice", "-s", ref,
-                               "-D", "1xVnOffice OAuth", "-w"],
-                              input=payload + "\n" + payload + "\n", capture_output=True, text=True, timeout=20)
-    except (OSError, subprocess.SubprocessError) as exc:
-        raise FlowError(f"không ghi được vào kho bí mật: {exc}") from None
-    if done.returncode != 0:
+    if not keychain_write(ref, payload, "1xVnOffice OAuth"):
         raise FlowError("không ghi được thẻ vào kho bí mật của hệ điều hành")
 
 
@@ -150,12 +177,7 @@ def read_secret(ref):
                 return json.loads(handle.read() or "{}").get(ref, "")
         except (OSError, ValueError):
             return ""
-    try:
-        done = subprocess.run(["security", "find-generic-password", "-w", "-s", ref],
-                              capture_output=True, text=True, timeout=10)
-    except (OSError, subprocess.SubprocessError):
-        return ""
-    return done.stdout.strip() if done.returncode == 0 else ""
+    return _keychain_read(ref)
 
 
 def _exchange(config, url, headers, body):
@@ -276,14 +298,25 @@ def host_id():
     return fresh
 
 
-def login_browser(config, ref, timeout=LOGIN_TIMEOUT):
-    """Đăng nhập bằng mã uỷ quyền + PKCE. Trả về (mô tả đã che của gói thẻ, client_id được cấp hoặc "")."""
+def login_browser(config, ref, timeout=LOGIN_TIMEOUT, register=None):
+    """Đăng nhập bằng mã uỷ quyền + PKCE. Trả về (mô tả đã che của gói thẻ, client_id được cấp hoặc "").
+
+    `register` (nếu có) được gọi với redirect_uri ĐÃ BIẾT CỔNG và trả về client_id. Phải đăng ký sau khi mở
+    cổng chứ không trước: máy chủ so redirect_uri từng ký tự, nên đăng ký "http://127.0.0.1/callback" rồi đăng
+    nhập bằng "http://127.0.0.1:54321/callback" là bị từ chối.
+    """
     verifier, challenge = oauth.pkce_pair()
     state = oauth.state_token()
     server = HTTPServer(("127.0.0.1", 0), _Callback)
     server.callback_url = None
     server.timeout = 1
     redirect_uri = f"http://127.0.0.1:{server.server_port}{config.get('redirect_path') or '/callback'}"
+    if register is not None:
+        try:
+            config = dict(config, client_id=register(redirect_uri))
+        except Exception:
+            server.server_close()
+            raise
     extra = dict(config.get("extra_auth_params") or {})
     if config.get("dynamic_client") and config.get("client_id") == oauth.DYNAMIC_CLIENT:
         extra.update(oauth.registration_params(host_id(), config.get("app_name") or "1xVnOffice"))

@@ -390,11 +390,14 @@ def mcp_login(request):
         return fail("config", detail="thiếu địa chỉ máy chủ MCP")
     try:
         config = oauthflow.discover_mcp_oauth(url, request.get("challenge"))
-        redirect_probe = "http://127.0.0.1/callback"      # chỉ để đăng ký; cổng thật chọn lúc mở trình duyệt
-        config["client_id"] = request.get("client_id") or oauthflow.register_client(config, redirect_probe)
+        saved = request.get("client_id")
+        config["client_id"] = saved or ""
+        # Đăng ký SAU khi biết cổng loopback, vì máy chủ so redirect_uri từng ký tự.
+        register = None if saved else (lambda redirect_uri: oauthflow.register_client(config, redirect_uri))
         state, _ = oauthflow.login_browser(config, oauthflow.mcp_secret_ref(url),
-                                           request.get("timeout", oauthflow.LOGIN_TIMEOUT))
-        return {"ok": True, "state": state, "client_id": config["client_id"]}
+                                           request.get("timeout", oauthflow.LOGIN_TIMEOUT),
+                                           register=register)
+        return {"ok": True, "state": state, "client_id": config.get("client_id", "")}
     except (oauthflow.FlowError, ValueError) as exc:
         return fail("login", detail=str(exc))
 

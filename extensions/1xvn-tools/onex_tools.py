@@ -887,13 +887,12 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             store[ref] = value
             Path(override).write_text(json.dumps(store, ensure_ascii=False), encoding="utf-8")
             return True
-        try:
-            done = subprocess.run(["security", "add-generic-password", "-U", "-a", "1xvnoffice", "-s", ref,
-                                   "-D", "1xVnOffice", "-w"],
-                                  input=value + "\n" + value + "\n", capture_output=True, text=True, timeout=20)
-        except (OSError, subprocess.SubprocessError):
-            return False
-        return done.returncode == 0
+        # Qua `security -i`: giá trị không nằm trong tham số dòng lệnh, và không bị cắt ở 128 ký tự như khi
+        # `security` hỏi trên bàn phím. Khoá API của nhiều hãng dài hơn 128 ký tự.
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parent / "agenthost"))
+        import oauthflow
+        return oauthflow.keychain_write(ref, value)
 
     def _sign_in(self, entry):
         """Đăng nhập OAuth: trình duyệt trên máy này, hoặc mã ngắn gõ ở máy khác."""
