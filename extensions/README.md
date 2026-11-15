@@ -1,6 +1,6 @@
 # Extensions
 
-Chỗ cho extension của lõi 1xVnOffice (MPL-2.0):
+Chỗ cho extension của lõi 1xAIoffice (MPL-2.0):
 
 - `1xvn-tools/`: công cụ tiếng Việt (giai đoạn 3).
 - `1x-agent/`: Bridge và Agent Host của nền tảng AI (giai đoạn 8).

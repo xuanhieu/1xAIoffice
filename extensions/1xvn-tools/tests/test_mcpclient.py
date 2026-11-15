@@ -194,7 +194,7 @@ class HttpServerTests(unittest.TestCase):
             mcp.list_tools()
         _, auth, agent = srv.seen[0]
         self.assertEqual(auth, "Bearer the-cua-toi")
-        self.assertTrue(agent.startswith("1xVnOffice/"))
+        self.assertTrue(agent.startswith("1xAIoffice/"))
 
     def test_a_server_that_answers_with_an_event_stream_works_too(self):
         srv, url = self.start(reply_type="text/event-stream")

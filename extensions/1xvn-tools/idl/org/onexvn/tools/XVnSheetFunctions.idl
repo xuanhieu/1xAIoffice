@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MPL-2.0 */
-/* Calc add-in functions of 1xVnOffice: numbers and amounts in words, and Vietnamese name handling. */
+/* Calc add-in functions of 1xAIoffice: numbers and amounts in words, and Vietnamese name handling. */
 #ifndef ORG_ONEXVN_TOOLS_XVNSHEETFUNCTIONS_IDL
 #define ORG_ONEXVN_TOOLS_XVNSHEETFUNCTIONS_IDL
 

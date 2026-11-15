@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Tài liệu đang mở của 1xVnOffice nhìn dưới dạng MCP resource, thuần Python (có test riêng, không cần UNO).
+"""Tài liệu đang mở của 1xAIoffice nhìn dưới dạng MCP resource, thuần Python (có test riêng, không cần UNO).
 
 Theo bản thiết kế mục 8: mỗi tài liệu văn bản là `1x://doc/<id>` ở dạng Markdown, mỗi trang tính là
 `1x://sheet/<id>/<tên trang>` ở dạng CSV.
@@ -60,10 +60,10 @@ def descriptors(documents):
             for sheet in document.get("sheets") or []:
                 out.append({"uri": sheet_uri(doc_id, sheet), "name": f"{title} — {sheet}",
                             "mimeType": CSV_TYPE,
-                            "description": f"Trang tính {sheet!r} của bảng tính đang mở trong 1xVnOffice."})
+                            "description": f"Trang tính {sheet!r} của bảng tính đang mở trong 1xAIoffice."})
         else:
             out.append({"uri": doc_uri(doc_id), "name": title, "mimeType": MARKDOWN,
-                        "description": "Tài liệu văn bản đang mở trong 1xVnOffice."})
+                        "description": "Tài liệu văn bản đang mở trong 1xAIoffice."})
     return out
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MPL-2.0
-"""1x Agent Host: tiến trình riêng đứng giữa 1xVnOffice và các mô hình AI.
+"""1x Agent Host: tiến trình riêng đứng giữa 1xAIoffice và các mô hình AI.
 
 Vì sao tách tiến trình (theo ai-platform-design.md mục 2): lỗi hay treo ở phần AI không làm sập tài liệu đang mở,
 mọi kết nối mạng đi qua một chỗ nên ghi nhật ký và áp chính sách được, và thư viện ngoài không lẫn vào Python của
@@ -33,7 +33,7 @@ OPENAI_WIRE = ("openai", "ollama", "azure")
 MAX_TOOL_STEPS = 8          # bản thiết kế nói 12; hạ xuống cho bản đầu để vòng lặp hỏng không chạy lâu
 TOOL_LOOP_SECONDS = 120
 MAX_RETRIES = 2
-USER_AGENT = "1xVnOffice/0.1"      # xem vn1x/mcphttp.USER_AGENT: thiếu thì Cloudflare trả 403
+USER_AGENT = "1xAIoffice/0.1"      # xem vn1x/mcphttp.USER_AGENT: thiếu thì Cloudflare trả 403
 DEFAULT_TIMEOUT = 60
 
 ERRORS = {
@@ -62,7 +62,7 @@ def fail(code, **kwargs):
 
 
 def read_secret(ref):
-    """Khoá API lấy từ Keychain (macOS). `ref` là tên mục, ví dụ "1xvnoffice/anthropic"."""
+    """Khoá API lấy từ Keychain (macOS). `ref` là tên mục, ví dụ "1xaioffice/anthropic"."""
     if not ref:
         return ""
     if os.environ.get("ONEX_AI_SECRET_FOR_TEST") is not None:

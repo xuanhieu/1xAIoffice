@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 1xVnOffice identity layer (MPL-2.0): every web address behind Help, About, the Start Center and the Extension
-     Manager points at the 1xVnOffice owners instead of the upstream project. Installed into the app's registry folder by
+<!-- 1xAIoffice identity layer (MPL-2.0): every web address behind Help, About, the Start Center and the Extension
+     Manager points at the 1xAIoffice owners instead of the upstream project. Installed into the app's registry folder by
      scripts/build-macos.sh (step "config"). Only site roots and the public repository are used, so no link depends on a
      page that may not exist yet; deeper pages can replace them as they go live. -->
 <oor:data xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oor="http://openoffice.org/2001/registry">
@@ -33,7 +33,7 @@
   </oor:component-data>
   <!-- Help menu: the Donate command named the upstream project and pointed at its donation page. It now says who it
        supports and opens the author's donation box (1xag.com/?donate, VietQR or bank transfer). The Start Center
-       donation banner and button stay off (ShowDonation=false in 1x-theme.xcd): 1xVnOffice shows no prompts. -->
+       donation banner and button stay off (ShowDonation=false in 1x-theme.xcd): 1xAIoffice shows no prompts. -->
   <oor:component-data oor:package="org.openoffice.Office.UI" oor:name="GenericCommands">
     <node oor:name="UserInterface">
       <node oor:name="Commands">

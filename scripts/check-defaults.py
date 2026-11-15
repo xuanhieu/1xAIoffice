@@ -15,7 +15,7 @@ EXPECTED = [
     ("/org.openoffice.Office.Linguistic/General", "UILocale", "en-US"),
     # Giao diện tiếng Anh nhưng VĂN BẢN mặc định là tiếng Việt, và phông theo Nghị định 30.
     ("/org.openoffice.Office.Linguistic/General", "DefaultLocale", "vi-VN"),
-    ("/org.openoffice.Office.Writer/DefaultFont", "StandardHeight", 260),
+    ("/org.openoffice.Office.Writer/DefaultFont", "StandardHeight", 459),   # 1/100 mm: 13pt
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.text.TextDocument", "ooSetupFactoryDefaultFilter", "MS Word 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.sheet.SpreadsheetDocument", "ooSetupFactoryDefaultFilter", "Calc MS Excel 2007 XML"),
     ("/org.openoffice.Setup/Office/Factories/com.sun.star.presentation.PresentationDocument", "ooSetupFactoryDefaultFilter", "Impress MS PowerPoint 2007 XML"),
@@ -25,9 +25,9 @@ EXPECTED = [
     ("/org.openoffice.Office.Common/Misc", "ShowTipOfTheDay", False),
     ("/org.openoffice.Setup/Product", "LastTimeGetInvolvedShown", 32503680000),
     ("/org.openoffice.Setup/Product", "LastTimeDonateShown", 32503680000),
-    ("/org.openoffice.Setup/Product", "ooName", "1xVnOffice"),
-    ("/org.openoffice.Office.UI/ColorScheme", "CurrentColorScheme", "1xVnOffice"),
-    ("/org.openoffice.Office.UI/ColorScheme/ColorSchemes/1xVnOffice/AccentColor", "Color", 0x4C7DFF),
+    ("/org.openoffice.Setup/Product", "ooName", "1xAIoffice"),
+    ("/org.openoffice.Office.UI/ColorScheme", "CurrentColorScheme", "1xAIoffice"),
+    ("/org.openoffice.Office.UI/ColorScheme/ColorSchemes/1xAIoffice/AccentColor", "Color", 0x4C7DFF),
     ("/org.openoffice.Office.Common/Appearance", "LibreOfficeTheme", 1),
     ("/org.openoffice.Office.Common/Misc", "SymbolStyle", "1x"),
     ("/org.openoffice.Office.Common/Misc", "ShowDonation", False),

@@ -18,7 +18,7 @@ PROTOCOL_VERSION = "2025-06-18"
 ACCEPT = "application/json, text/event-stream"
 # Tên ứng dụng gửi kèm mọi lời gọi ra ngoài. Nhiều máy chủ (Cloudflare chẳng hạn) trả 403 cho
 # User-Agent mặc định của urllib. Chỉ tên sản phẩm và phiên bản, KHÔNG kèm gì về người dùng.
-USER_AGENT = "1xVnOffice/0.1"
+USER_AGENT = "1xAIoffice/0.1"
 
 
 class HttpMcpError(RuntimeError):
@@ -68,7 +68,7 @@ def authorization_server_urls(metadata):
     return out
 
 
-def oauth_config(resource_url, resource_metadata, server_metadata, app_name="1xVnOffice"):
+def oauth_config(resource_url, resource_metadata, server_metadata, app_name="1xAIoffice"):
     """Cấu hình OAuth cho vn1x.oauth, dựng từ hai bản mô tả vừa đọc được."""
     for field in ("authorization_endpoint", "token_endpoint"):
         if not (server_metadata or {}).get(field):

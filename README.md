@@ -1,14 +1,14 @@
-# 1xVnOffice
+# 1xAIoffice
 
 Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 1xDoc, 1xSheet, 1xSlide trong một ứng dụng.
 
 Sản phẩm của [xuanhieu.org](https://xuanhieu.org) và [1xag.com](https://1xag.com). Trạng thái: **đang phát triển, chưa phát hành bản cài**.
 
-## Giới thiệu 1xVnOffice
+## Giới thiệu 1xAIoffice
 
 Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 1xDoc, 1xSheet, 1xSlide trong một ứng dụng.
 
-**Ai làm ra.** xuanhieu.org là nơi tác giả làm việc về tìm kiếm, nội dung và phần mềm. 1xag.com là hệ sản phẩm 1X, nhà của 1xVnOffice.
+**Ai làm ra.** xuanhieu.org là nơi tác giả làm việc về tìm kiếm, nội dung và phần mềm. 1xag.com là hệ sản phẩm 1X, nhà của 1xAIoffice.
 
 **Sứ mệnh.** Mang đến cho mọi người Việt, từ cơ quan nhà nước, doanh nghiệp đến cá nhân, một bộ văn phòng hiện đại, miễn phí, tôn trọng quyền riêng tư và hiểu tiếng Việt.
 
@@ -38,7 +38,7 @@ Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 
 
 **Ủng hộ tác giả**
 
-1xVnOffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.
+1xAIoffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.
 
 <img src="branding/out/vietqr.svg" alt="VietQR" width="180">
 
@@ -47,11 +47,11 @@ Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 
 
 ---
 
-## About 1xVnOffice
+## About 1xAIoffice
 
 The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSlide in one app.
 
-**Who makes it.** xuanhieu.org is the home of the author's work on search, content and software. 1xag.com is the 1X product family that 1xVnOffice belongs to.
+**Who makes it.** xuanhieu.org is the home of the author's work on search, content and software. 1xag.com is the 1X product family that 1xAIoffice belongs to.
 
 **Mission.** Give everyone in Vietnam, from government agencies and businesses to individuals, a modern office suite that is free, respects privacy and understands Vietnamese.
 
@@ -81,7 +81,7 @@ The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSli
 
 **Support the author**
 
-1xVnOffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.
+1xAIoffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.
 
 <img src="branding/out/vietqr.svg" alt="VietQR" width="180">
 

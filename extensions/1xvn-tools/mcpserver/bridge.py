@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Lớp chạm vào tài liệu cho MCP server: nối vào một phiên 1xVnOffice đang chạy qua UNO.
+"""Lớp chạm vào tài liệu cho MCP server: nối vào một phiên 1xAIoffice đang chạy qua UNO.
 
 Chạy trong tiến trình của máy chủ MCP, không trong tiến trình office, nên một client MCP cư xử tệ không làm sập
 tài liệu người dùng đang mở.
@@ -70,7 +70,7 @@ class OfficeBackend:
         if os.environ.get("ONEX_MCP_AUTO_APPLY") == "1":
             return True
         toolkit = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx)
-        box = toolkit.createMessageBox(None, QUERYBOX, BUTTONS_YES_NO, "1xVnOffice", question)
+        box = toolkit.createMessageBox(None, QUERYBOX, BUTTONS_YES_NO, "1xAIoffice", question)
         try:
             return box.execute() == 2      # 2 = YES
         finally:

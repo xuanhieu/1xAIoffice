@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Dựng chuỗi VietQR (chuẩn EMVCo của NAPAS) và vẽ thành mã QR, thuần Python.
 
-Dùng cho mục "Ủng hộ tác giả" trong hướng dẫn đi kèm 1xVnOffice, để mã QR nằm sẵn trong tệp, không cần mạng và không
+Dùng cho mục "Ủng hộ tác giả" trong hướng dẫn đi kèm 1xAIoffice, để mã QR nằm sẵn trong tệp, không cần mạng và không
 gửi số tài khoản tới dịch vụ bên ngoài mỗi lần build.
 
 Chuỗi sinh ra được kiểm hai lớp: tests/test_vietqr.py so với một mã VietQR thật của chủ tài khoản, còn

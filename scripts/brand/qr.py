@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Vẽ mã QR (chế độ byte, phiên bản 1–10, mức sửa lỗi L/M) bằng Python thuần, không cần thư viện ngoài.
 
-Đủ cho mã VietQR của 1xVnOffice (khoảng 110 byte, vừa phiên bản 7). Chuỗi dài hơn sức chứa phiên bản 10 thì báo lỗi
+Đủ cho mã VietQR của 1xAIoffice (khoảng 110 byte, vừa phiên bản 7). Chuỗi dài hơn sức chứa phiên bản 10 thì báo lỗi
 thay vì vẽ sai. Theo ISO/IEC 18004.
 
 Mã vẽ ra LUÔN được kiểm bằng cách giải mã lại ảnh thật (scripts/brand/check-vietqr.sh): một mã QR sai sẽ đưa tiền đi

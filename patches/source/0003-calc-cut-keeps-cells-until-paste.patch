@@ -2,7 +2,7 @@ Subject: Calc: cắt giữ nguyên ô cho tới khi dán, như Excel/WPS/Google 
 Why: Lệnh Cut của bản gốc xoá ô ngay lập tức. Excel, WPS và Google Sheets đều giữ
  nguyên nội dung, vẽ viền đứt quanh vùng nguồn, và chỉ chuyển khi người dùng dán;
  bấm Esc là bỏ. Người quen ba phần mềm kia mà cắt xong đổi ý sẽ tưởng vừa mất dữ
- liệu — đúng nhóm người dùng 1xVnOffice nhắm tới.
+ liệu — đúng nhóm người dùng 1xAIoffice nhắm tới.
  Cách làm: CutToClip ghi nhớ vùng nguồn trong ScModule thay vì xoá; PasteFromClip
  xoá vùng đó ngay sau khi mở nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu;
  Esc gọi ClearPendingCut; ScGridWindow vẽ viền NÉT ĐỨT CHẠY quanh vùng đang chờ,
@@ -29,7 +29,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
  class ScRange;
 +class ScDocShell;
 +
-+// 1xVnOffice: hình dạng và nhịp của viền chạy quanh vùng đã cắt (marching ants).
++// 1xAIoffice: hình dạng và nhịp của viền chạy quanh vùng đã cắt (marching ants).
 +// Nét 5 điểm ảnh, hở 3, nên một chu kỳ là 8; mỗi nhịp dịch 2 điểm ảnh sau 150ms, tức khoảng 13 điểm ảnh/giây —
 +// đủ thấy là đang chạy mà không phải vẽ lại liên tục.
 +inline constexpr tools::Long SC_CUTMARK_DASH = 5;
@@ -44,7 +44,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
      bool                m_bIsInSharedDocLoading:1;
      bool                m_bIsInSharedDocSaving:1;
  
-+    // 1xVnOffice: cắt kiểu Excel/WPS/Sheets. Lệnh Cut không xoá ô ngay nữa mà ghi nhớ vùng nguồn ở đây,
++    // 1xAIoffice: cắt kiểu Excel/WPS/Sheets. Lệnh Cut không xoá ô ngay nữa mà ghi nhớ vùng nguồn ở đây,
 +    // vẽ viền đứt quanh nó, và chỉ thật sự xoá khi người dùng dán. Bấm Esc là bỏ, dữ liệu còn nguyên.
 +    ScDocShell*         m_pPendingCutShell = nullptr;
 +    ScRange             m_aPendingCutRange;
@@ -85,10 +85,10 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
      GetStaticInterface()->RegisterStatusBar(StatusBarId::CalcStatusBar);
  }
  
-+// 1xVnOffice: vùng đã cắt nhưng chưa dán.
++// 1xAIoffice: vùng đã cắt nhưng chưa dán.
 +// Lệnh Cut của bản gốc xoá ô ngay lập tức. Excel, WPS và Google Sheets thì giữ nguyên nội dung, vẽ viền đứt, và
 +// chỉ chuyển khi người dùng dán — ai quen ba phần mềm kia mà cắt xong đổi ý sẽ tưởng mình vừa mất dữ liệu.
-+// 1xVnOffice: tài liệu còn đang mở không?
++// 1xAIoffice: tài liệu còn đang mở không?
 +// Bộ đếm giờ của viền chạy giữ một ScDocShell* trần. Đóng tài liệu trong lúc còn chờ dán thì con trỏ đó treo,
 +// và nhịp kế tiếp gọi PostPaint vào bộ nhớ đã chết — app sập (đã dựng lại được, báo cáo sự cố chỉ đúng
 +// ScModule::CutMarkHandler -> ScDocShell::PostPaint).
@@ -174,7 +174,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
      m_aIdleTimer.SetInvokeHandler( LINK( this, ScModule, IdleHandler ) );
      m_aIdleTimer.Start();
  
-+    // 1xVnOffice: nhịp cho viền chạy quanh vùng đã cắt; chỉ chạy khi có vùng đang chờ dán.
++    // 1xAIoffice: nhịp cho viền chạy quanh vùng đã cắt; chỉ chạy khi có vùng đang chờ dán.
 +    m_aCutMarkTimer.SetTimeout( SC_CUTMARK_TICK_MS );
 +    m_aCutMarkTimer.SetInvokeHandler( LINK( this, ScModule, CutMarkHandler ) );
 +
@@ -187,7 +187,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
  
          CopyToClip( nullptr, true, false, true/*bIncludeObjects*/ );           // copy to clipboard
  
-+        // 1xVnOffice: cắt kiểu Excel/WPS/Sheets — giữ nguyên nội dung, vẽ viền đứt, chỉ xoá khi dán.
++        // 1xAIoffice: cắt kiểu Excel/WPS/Sheets — giữ nguyên nội dung, vẽ viền đứt, chỉ xoá khi dán.
 +        // Bản gốc xoá ngay tại đây; ai quen Excel mà cắt xong đổi ý sẽ tưởng vừa mất dữ liệu.
 +        // Chỉ làm vậy với vùng chọn đơn giản; mọi trường hợp khác giữ nguyên cách cũ cho chắc.
 +        if ( !rMark.IsMultiMarked() )
@@ -204,7 +204,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
          //! just check truly intersection !!!!!!!
  
      ScDocFunc& rDocFunc = pDocSh->GetDocFunc();
-+    // 1xVnOffice: đếm số bước hoàn tác TRƯỚC khi mở nhóm, để biết tài liệu có bị sửa giữa lúc cắt và lúc dán.
++    // 1xAIoffice: đếm số bước hoàn tác TRƯỚC khi mở nhóm, để biết tài liệu có bị sửa giữa lúc cắt và lúc dán.
 +    const size_t nUndoBeforePaste = pUndoMgr ? pUndoMgr->GetUndoActionCount() : 0;
      if ( bRecord )
      {
@@ -212,7 +212,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
          pUndoMgr->EnterListAction( aUndo, aUndo, 0, GetViewData().GetViewShell()->GetViewShellId() );
      }
  
-+    // 1xVnOffice: đây là lúc vùng đã cắt thật sự biến mất. Xoá TRƯỚC khi ghi dữ liệu vào ô đích, và nằm trong
++    // 1xAIoffice: đây là lúc vùng đã cắt thật sự biến mất. Xoá TRƯỚC khi ghi dữ liệu vào ô đích, và nằm trong
 +    // cùng nhóm hoàn tác, nên Ctrl+Z một lần trả lại cả hai đầu.
 +    // Vùng nguồn chồng lên vùng đích thì không xoá: phần chồng nhau vừa được ghi đè, xoá tiếp là mất dữ liệu.
 +    {
@@ -244,7 +244,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
                      pTabViewShell->ResetBrushDocument();            // abort format paint brush
                  else if (pTabViewShell->HasHintWindow())
                      pTabViewShell->RemoveHintWindow();
-+                // 1xVnOffice: Esc bỏ vùng đang chờ cắt, dữ liệu giữ nguyên (giống Excel/WPS/Sheets).
++                // 1xAIoffice: Esc bỏ vùng đang chờ cắt, dữ liệu giữ nguyên (giống Excel/WPS/Sheets).
 +                else if (pScMod->GetPendingCutShell())
 +                    pScMod->ClearPendingCut();
                  else if( ScViewUtil::IsFullScreen( *pTabViewShell ) )
@@ -265,7 +265,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
      }
  }
  
-+// 1xVnOffice: vẽ viền nét đứt chạy quanh một hình chữ nhật.
++// 1xAIoffice: vẽ viền nét đứt chạy quanh một hình chữ nhật.
 +// VCL không có tham số "pha" cho nét đứt, nên tự đi vòng chu vi và vẽ từng đoạn nét một. Đi theo chu vi (chứ
 +// không vẽ từng cạnh riêng) thì nét chạy liền mạch qua góc, giống Excel. Vẽ theo ĐOẠN chứ không theo điểm ảnh,
 +// nên một vùng rộng cũng chỉ tốn chu-vi/8 lệnh vẽ.
@@ -309,7 +309,7 @@ Test: scripts/build-macos.sh tools, phần "cut" — cắt, dán, Ctrl+Z một l
  
      aOutputData.DrawClipMarks();
  
-+    // 1xVnOffice: viền chạy quanh vùng vừa bị cắt mà chưa dán, như Excel/WPS/Sheets. Vẽ sau nội dung ô nên
++    // 1xAIoffice: viền chạy quanh vùng vừa bị cắt mà chưa dán, như Excel/WPS/Sheets. Vẽ sau nội dung ô nên
 +    // không bị ô nào đè lên; pha do bộ đếm giờ trong ScModule dịch dần nên nét đứt chạy vòng quanh chu vi.
 +    if (ScDocShell* pCutShell = ScModule::get()->GetPendingCutShell())
 +    {

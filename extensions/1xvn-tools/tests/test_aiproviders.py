@@ -27,7 +27,7 @@ class CatalogueTests(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
 
     def test_no_secret_value_ships_with_the_app(self):
-        """1xVnOffice không nhúng bí mật của ai cả: người dùng mang khoá và ứng dụng OAuth của họ.
+        """1xAIoffice không nhúng bí mật của ai cả: người dùng mang khoá và ứng dụng OAuth của họ.
 
         Mục Google có cờ `client_secret: True` — đó là CÂU HỎI "nhà cung cấp này có đòi client secret không",
         không phải giá trị secret.
@@ -41,7 +41,7 @@ class CatalogueTests(unittest.TestCase):
 
     def test_a_provider_that_needs_a_client_secret_only_stores_its_name(self):
         entry = aiproviders.fill(aiproviders.get("vertex"), {"client_id": "c", "base_url": "https://x/v1"})
-        self.assertEqual(entry["oauth"]["client_secret_ref"], "1xvnoffice/vertex/client_secret")
+        self.assertEqual(entry["oauth"]["client_secret_ref"], "1xaioffice/vertex/client_secret")
         self.assertNotIn("client_secret", entry["oauth"])
         self.assertEqual(aiconfig.problems({"providers": [dict(entry, models=["m"])]}), [])
 
@@ -59,7 +59,7 @@ class FillTests(unittest.TestCase):
     def test_a_simple_key_provider_needs_nothing_more(self):
         entry = aiproviders.fill(aiproviders.get("openai"), {})
         self.assertEqual(entry["auth"], "key")
-        self.assertEqual(entry["secret_ref"], "1xvnoffice/openai")
+        self.assertEqual(entry["secret_ref"], "1xaioffice/openai")
         self.assertEqual(aiconfig.problems({"providers": [dict(entry, models=["m"])]}), [])
 
     def test_a_local_provider_carries_no_secret_ref(self):

@@ -82,7 +82,7 @@ class ListTests(unittest.TestCase):
         text = mcpperm.describe(SERVER, TOOL)
         self.assertIn("tra_cuu_van_ban", text)
         self.assertIn("so_hieu", text)
-        self.assertIn("không phải do 1xVnOffice kiểm chứng", text)
+        self.assertIn("không phải do 1xAIoffice kiểm chứng", text)
 
 
 if __name__ == "__main__":

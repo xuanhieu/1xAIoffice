@@ -5,7 +5,7 @@ Thứ tự ưu tiên theo ai-platform-design.md mục 4: vùng đang chọn → 
 Cắt ở ranh giới đoạn để mô hình không nhận nửa câu, và luôn nói rõ cho người dùng biết đã gửi đi bao nhiêu.
 """
 BUDGET_CHARS = 12000      # khoảng 3–4 nghìn token tiếng Việt, đủ cho một văn bản hành chính
-SYSTEM = ("Bạn là trợ lý trong bộ văn phòng 1xVnOffice. Trả lời bằng tiếng Việt, ngắn gọn và chính xác. "
+SYSTEM = ("Bạn là trợ lý trong bộ văn phòng 1xAIoffice. Trả lời bằng tiếng Việt, ngắn gọn và chính xác. "
           "Chỉ dựa vào phần tài liệu được cung cấp; không bịa thêm. Nếu tài liệu không đủ dữ kiện để trả lời, "
           "hãy nói rõ là không đủ dữ kiện.")
 

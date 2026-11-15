@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Merge the 1xVnOffice translation layer (l10n/<lang>/**.po) into the upstream translations tree before a build.
+"""Merge the 1xAIoffice translation layer (l10n/<lang>/**.po) into the upstream translations tree before a build.
 
 Each overlay file mirrors a path under translations/source/<lang>/ (for example l10n/vi/sw/messages.po ->
 translations/source/vi/sw/messages.po). An overlay entry replaces the msgstr of the entry with the same msgctxt and
-msgid and clears its fuzzy flag. When 1xVnOffice patches the English text itself (patches/source), the overlay
+msgid and clears its fuzzy flag. When 1xAIoffice patches the English text itself (patches/source), the overlay
 entry carries the new msgid: it is matched by its msgctxt alone if that context is unique in the target file, and the
 target's msgid is rewritten (reported as "ĐỔI CHỮ GỐC"). Overlay entries that match nothing are reported (the English source changed) and make
 the run fail with --strict.

@@ -1,6 +1,6 @@
-Subject: About dialog: 1xVnOffice owners, description and links
+Subject: About dialog: 1xAIoffice owners, description and links
 Why: The About dialog named the upstream project in its description, copyright and "derived from" lines and linked the build
-  id to the upstream repository. 1xVnOffice presents its own owners (xuanhieu.org, 1xag.com) and mission instead. Only
+  id to the upstream repository. 1xAIoffice presents its own owners (xuanhieu.org, 1xag.com) and mission instead. Only
   texts and one link change; ids and layout are unchanged. The license dialog (sfx2) keeps the legally required notices.
   Vietnamese texts: l10n/vi/cui/messages.po.
 Upstream: not suitable: product branding.
@@ -26,7 +26,7 @@ Test: scripts/build-macos.sh smoke opens the About dialog; docs/ui screenshot ab
      {
          const tools::Long nMaxChar = 25;
 -        m_pBuildLabel->set_uri("https://git.libreoffice.org/core/commit/" + sbuildId);
-+        // 1xVnOffice: the build id is not a link to an upstream repository, just text.
++        // 1xAIoffice: the build id is not a link to an upstream repository, just text.
          m_pBuildLabel->set_label(
              sbuildId.getLength() > nMaxChar
                  ? sbuildId.replaceAt(nMaxChar, sbuildId.getLength() - nMaxChar, u"...")
@@ -42,7 +42,7 @@ Test: scripts/build-macos.sh smoke opens the About dialog; docs/ui screenshot ab
 -        aCopyrightString += CuiResId(RID_CUISTR_ABOUT_DERIVED);
 -
 -    return aCopyrightString;
-+    // 1xVnOffice: vendor and copyright lines only.
++    // 1xAIoffice: vendor and copyright lines only.
 +    return sVendorTextStr + "\n" + CuiResId(RID_CUISTR_ABOUT_COPYRIGHT);
  }
  

@@ -3,7 +3,7 @@
 <oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="Addons" oor:package="org.openoffice.Office">
   <node oor:name="AddonUI">
     <node oor:name="OfficeMenuBar">
-      <node oor:name="org.1xvnoffice.tools.menu" oor:op="replace">
+      <node oor:name="org.1xaioffice.tools.menu" oor:op="replace">
         <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Vietnamese</value><value xml:lang="vi">Tiếng Việt</value></prop>
         <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
         <node oor:name="Submenu">
@@ -27,7 +27,7 @@
           </node>
           <node oor:name="m000d" oor:op="replace">
             <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:McpServer</value></prop>
-            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Let Assistants Use 1xVnOffice (MCP Server)...</value><value xml:lang="vi">Cho trợ lý AI dùng 1xVnOffice (máy chủ MCP)...</value></prop>
+            <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Let Assistants Use 1xAIoffice (MCP Server)...</value><value xml:lang="vi">Cho trợ lý AI dùng 1xAIoffice (máy chủ MCP)...</value></prop>
             <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
             <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
           </node>
@@ -127,155 +127,98 @@
     <!-- Ribbon: the Vietnamese commands are merged into the Home tab by the NotebookBarAddonsToolMergePoint that
          scripts/ui/ribbon.py moves there from the (hidden) Extension tab. Title is the button label; Context limits
          each command to the modules that can run it. -->
-    <node oor:name="OfficeNotebookBar">
-      <node oor:name="org.1xvnoffice.tools.ribbon" oor:op="replace">
-        <node oor:name="m00a" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Document</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Decree 30 document</value><value xml:lang="vi">Văn bản NĐ30</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
-        </node>
-        <node oor:name="m000" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiAsk</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Ask AI</value><value xml:lang="vi">Hỏi AI</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
-        </node>
-        <node oor:name="m000b" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiRewrite</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Rewrite</value><value xml:lang="vi">Viết lại</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
-        </node>
-        <node oor:name="m00b" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Check</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Check NĐ30</value><value xml:lang="vi">Kiểm NĐ30</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument</value></prop>
-        </node>
-        <node oor:name="m00" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NumberToWords</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Number to words</value><value xml:lang="vi">Đọc số</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
-        </node>
-        <node oor:name="m01" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:MoneyToWords</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Amount in words</value><value xml:lang="vi">Đọc tiền</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
-        </node>
-        <node oor:name="m02" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:ConvertTCVN3</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">TCVN3 to Unicode</value><value xml:lang="vi">Mã TCVN3</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
-        </node>
-        <node oor:name="m03" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NormalizeUnicode</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Normalize Vietnamese</value><value xml:lang="vi">Chuẩn hoá</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
-        </node>
-        <node oor:name="m04" oor:op="replace">
-          <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:RemoveDiacritics</value></prop>
-          <prop oor:name="Title" oor:type="xs:string"><value xml:lang="en-US">Remove diacritics</value><value xml:lang="vi">Bỏ dấu</value></prop>
-          <prop oor:name="Target" oor:type="xs:string"><value>_self</value></prop>
-          <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument</value></prop>
-        </node>
-      </node>
-    </node>
+    <!-- Không còn khai lệnh vào ribbon ở đây: scripts/ui/ribbon.py dựng thẻ "AI" riêng với nút lớn có chữ. -->
     <!-- Button icons, generated by scripts/brand/make-brand.py (option fluent) into icons/. -->
     <node oor:name="Images">
     <node oor:name="img_Nd30Document" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Document</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Document_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Document_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/Nd30Document_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/Nd30Document_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_AiAsk" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiAsk</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiAsk_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiAsk_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiAsk_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiAsk_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_McpTools" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:McpTools</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/McpTools_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/McpTools_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/McpTools_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/McpTools_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_McpServer" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:McpServer</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/McpServer_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/McpServer_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/McpServer_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/McpServer_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_AiAccounts" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiAccounts</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiAccounts_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiAccounts_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiAccounts_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiAccounts_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_AiSkill" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiSkill</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiSkill_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiSkill_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiSkill_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiSkill_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_AiRewrite" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:AiRewrite</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiRewrite_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/AiRewrite_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiRewrite_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/AiRewrite_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_Nd30Check" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:Nd30Check</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Check_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/Nd30Check_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/Nd30Check_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/Nd30Check_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_NumberToWords" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NumberToWords</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/NumberToWords_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/NumberToWords_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/NumberToWords_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/NumberToWords_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_MoneyToWords" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:MoneyToWords</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/MoneyToWords_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/MoneyToWords_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/MoneyToWords_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/MoneyToWords_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_ConvertTCVN3" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:ConvertTCVN3</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/ConvertTCVN3_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/ConvertTCVN3_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/ConvertTCVN3_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/ConvertTCVN3_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_NormalizeUnicode" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:NormalizeUnicode</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/NormalizeUnicode_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/NormalizeUnicode_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/NormalizeUnicode_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/NormalizeUnicode_26.svg</value></prop>
       </node>
     </node>
     <node oor:name="img_RemoveDiacritics" oor:op="replace">
       <prop oor:name="URL" oor:type="xs:string"><value>vnd.1x.tools:RemoveDiacritics</value></prop>
       <node oor:name="UserDefinedImages">
-        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/RemoveDiacritics_16.svg</value></prop>
-        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xvnoffice.tools/icons/RemoveDiacritics_26.svg</value></prop>
+        <prop oor:name="ImageSmallURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/RemoveDiacritics_16.svg</value></prop>
+        <prop oor:name="ImageBigURL" oor:type="xs:string"><value>vnd.sun.star.extension://org.1xaioffice.tools/icons/RemoveDiacritics_26.svg</value></prop>
       </node>
     </node>
     </node>

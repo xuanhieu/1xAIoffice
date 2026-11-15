@@ -20,7 +20,7 @@ cho Claude chạy được ở đây với rất ít sửa đổi.
 **Nạp từng phần** (mục 9.2): mô hình chỉ thấy `name` và `description` của mọi skill đã cài; thân `SKILL.md` chỉ
 được nạp khi người dùng chọn skill đó, và `references/` chỉ nạp khi thân skill xin.
 
-**Chưa chạy `scripts/`.** Front matter khai được quyền `process`, nhưng ở mốc này 1xVnOffice không chạy script
+**Chưa chạy `scripts/`.** Front matter khai được quyền `process`, nhưng ở mốc này 1xAIoffice không chạy script
 của skill: một skill tải về từ mạng mà chạy được lệnh thì mất an toàn, và việc duyệt kho skill chưa có.
 """
 import os
@@ -193,7 +193,7 @@ def allowed_tools(skill, available):
 
 def prompt(skill, question=""):
     """Tin nhắn hệ thống cho một lượt chạy skill: thân skill là HƯỚNG DẪN, câu hỏi người dùng là việc cần làm."""
-    lines = [f"Bạn đang chạy skill “{skill['name']}” của 1xVnOffice.", "", body(skill)]
+    lines = [f"Bạn đang chạy skill “{skill['name']}” của 1xAIoffice.", "", body(skill)]
     if skill["permissions"]["network"]:
         lines += ["", "Skill này khai cần mạng tới: " + ", ".join(skill["permissions"]["network"])]
     if question.strip():

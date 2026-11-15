@@ -1,17 +1,17 @@
 {
-  "_about": "Nội dung giới thiệu 1xVnOffice và chủ sở hữu. Hướng dẫn trong app (scripts/guides/make-guides.py) sinh thẳng từ file này; README.md chép lại cùng nội dung bằng tay. Phần 'available' chỉ liệt kê thứ ĐÃ chạy được trong bản build hiện tại; thứ chưa xong nằm ở 'roadmap'. Chủ dự án duyệt chữ trước khi phát hành.",
+  "_about": "Nội dung giới thiệu 1xAIoffice và chủ sở hữu. Hướng dẫn trong app (scripts/guides/make-guides.py) sinh thẳng từ file này; README.md chép lại cùng nội dung bằng tay. Phần 'available' chỉ liệt kê thứ ĐÃ chạy được trong bản build hiện tại; thứ chưa xong nằm ở 'roadmap'. Chủ dự án duyệt chữ trước khi phát hành.",
   "links": {
     "site": "https://xuanhieu.org",
     "hub": "https://1xag.com",
     "repo": "https://github.com/xuanhieu/1xvnoffice"
   },
   "en": {
-    "title": "About 1xVnOffice",
+    "title": "About 1xAIoffice",
     "tagline": "The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSlide in one app.",
     "who_title": "Who makes it",
     "who": [
       "xuanhieu.org is the home of the author's work on search, content and software.",
-      "1xag.com is the 1X product family that 1xVnOffice belongs to."
+      "1xag.com is the 1X product family that 1xAIoffice belongs to."
     ],
     "mission_title": "Mission",
     "mission": "Give everyone in Vietnam, from government agencies and businesses to individuals, a modern office suite that is free, respects privacy and understands Vietnamese.",
@@ -41,16 +41,16 @@
     ],
     "footer": "Questions and feedback: https://github.com/xuanhieu/1xvnoffice/issues",
     "support_title": "Support the author",
-    "support": "1xVnOffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.",
+    "support": "1xAIoffice is free and has no ads. If it helps you, you can buy Xuân Hiếu a coffee: scan the VietQR code with any Vietnamese banking app, or transfer, from 50,000 VND.",
     "support_link": "Donation page"
   },
   "vi": {
-    "title": "Giới thiệu 1xVnOffice",
+    "title": "Giới thiệu 1xAIoffice",
     "tagline": "Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 1xDoc, 1xSheet, 1xSlide trong một ứng dụng.",
     "who_title": "Ai làm ra",
     "who": [
       "xuanhieu.org là nơi tác giả làm việc về tìm kiếm, nội dung và phần mềm.",
-      "1xag.com là hệ sản phẩm 1X, nhà của 1xVnOffice."
+      "1xag.com là hệ sản phẩm 1X, nhà của 1xAIoffice."
     ],
     "mission_title": "Sứ mệnh",
     "mission": "Mang đến cho mọi người Việt, từ cơ quan nhà nước, doanh nghiệp đến cá nhân, một bộ văn phòng hiện đại, miễn phí, tôn trọng quyền riêng tư và hiểu tiếng Việt.",
@@ -80,7 +80,7 @@
     ],
     "footer": "Hỏi đáp và góp ý: https://github.com/xuanhieu/1xvnoffice/issues",
     "support_title": "Ủng hộ tác giả",
-    "support": "1xVnOffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.",
+    "support": "1xAIoffice miễn phí và không quảng cáo. Nếu phần mềm giúp ích cho bạn, mời Xuân Hiếu ly cafe: quét mã VietQR bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản, từ 50.000đ.",
     "support_link": "Trang ủng hộ"
   },
   "donate": {

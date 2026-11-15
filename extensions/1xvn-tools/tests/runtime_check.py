@@ -553,7 +553,7 @@ def mcp_server_checks(desktop, prop, run, check):
     """Mốc M4: một trợ lý ngoài (Claude Desktop) đọc và sửa được tài liệu đang mở, nhưng chỉ khi được cho phép.
 
     Chạy máy chủ MCP như một tiến trình riêng, nối vào chính phiên office này qua UNO pipe mà lệnh
-    "Cho trợ lý AI dùng 1xVnOffice" vừa mở.
+    "Cho trợ lý AI dùng 1xAIoffice" vừa mở.
     """
     import json as _json
     import os
@@ -561,7 +561,7 @@ def mcp_server_checks(desktop, prop, run, check):
     server_py = os.path.join(os.path.dirname(here), "mcpserver", "server.py")
     state_path = os.environ["ONEX_MCP_SERVER_PATH"]
     clients_path = os.environ["ONEX_MCP_CLIENTS_PATH"]
-    pipe = f"1xvnoffice-check-{os.getpid()}"
+    pipe = f"1xaioffice-check-{os.getpid()}"
     for path in (state_path, clients_path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(state_path, "w", encoding="utf-8") as handle:
@@ -991,12 +991,12 @@ def accounts_checks(desktop, prop, run, check):
         config = saved()
         entry = next((p for p in config["providers"] if p["id"] == "openai"), {})
         check("Gắn khoá API: đã lưu nhà cung cấp", entry.get("auth"), "key")
-        check("Gắn khoá API: tệp cấu hình chỉ giữ TÊN mục khoá", entry.get("secret_ref"), "1xvnoffice/openai")
+        check("Gắn khoá API: tệp cấu hình chỉ giữ TÊN mục khoá", entry.get("secret_ref"), "1xaioffice/openai")
         with open(config_path, encoding="utf-8") as handle:
             check("Gắn khoá API: khoá không nằm trong providers.json",
                   "khoa-gia-khong-duoc-ghi-ra" in handle.read(), False)
         check("Gắn khoá API: khoá nằm trong kho bí mật của máy",
-              stored(secrets_path).get("1xvnoffice/openai"), "khoa-gia-khong-duoc-ghi-ra")
+              stored(secrets_path).get("1xaioffice/openai"), "khoa-gia-khong-duoc-ghi-ra")
 
         # 3. Đăng nhập OAuth bằng mã thiết bị vào một cổng AI nội bộ.
         script({"preset": "oidc", "login": "device", "model": "mo-hinh-gia",
@@ -1010,7 +1010,7 @@ def accounts_checks(desktop, prop, run, check):
         check("Đăng nhập OAuth: giữ client_id của cơ quan",
               (entry.get("oauth") or {}).get("client_id"), "ung-dung-co-quan")
         check("Đăng nhập OAuth: thẻ nằm trong kho bí mật",
-              stored(tokens_path).get("1xvnoffice/oidc", {}).get("access_token"), "the-cua-thiet-bi")
+              stored(tokens_path).get("1xaioffice/oidc", {}).get("access_token"), "the-cua-thiet-bi")
         with open(config_path, encoding="utf-8") as handle:
             check("Đăng nhập OAuth: thẻ không nằm trong providers.json",
                   "the-cua-thiet-bi" in handle.read(), False)
@@ -1031,13 +1031,13 @@ def accounts_checks(desktop, prop, run, check):
 
         # 5. Luồng "dùng gói ChatGPT": hình dạng Responses API, trả lời tới theo chuỗi sự kiện.
         tokens = stored(tokens_path)
-        tokens["1xvnoffice/chatgpt"] = {"access_token": "the-cua-goi-chatgpt", "token_type": "Bearer",
+        tokens["1xaioffice/chatgpt"] = {"access_token": "the-cua-goi-chatgpt", "token_type": "Bearer",
                                         "expires_at": 99999999999}
         with open(tokens_path, "w", encoding="utf-8") as handle:
             _json.dump(tokens, handle, ensure_ascii=False)
         config["providers"].append({"id": "chatgpt", "type": "responses", "auth": "oauth",
                                     "base_url": ai_url.rsplit("/v1", 1)[0],
-                                    "secret_ref": "1xvnoffice/chatgpt", "models": ["gpt-x"],
+                                    "secret_ref": "1xaioffice/chatgpt", "models": ["gpt-x"],
                                     "oauth": {"authorize_url": login_url + "/auth",
                                               "token_url": login_url + "/token",
                                               "client_id": "oaiapp_da_cap",

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Nhãn của lệnh 1xvn-tools trong bảng mô tả lệnh của lõi. Lõi tra nhãn ở đây cho MỌI chỗ lệnh xuất hiện:
+     nút trên thẻ AI của ribbon (Label), menu và menu chuột phải (PopupLabel), chú thích khi rê chuột (TooltipLabel).
+     Thiếu bảng này thì nút trên ribbon trống trơn, vì lõi bỏ qua nhãn ghi trong tệp .ui khi nút gắn với một lệnh. -->
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    oor:name="GenericCommands" oor:package="org.openoffice.Office.UI">
+  <node oor:name="UserInterface">
+    <node oor:name="Commands">
+      <node oor:name="vnd.1x.tools:AiAsk" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Ask AI</value><value xml:lang="vi">Hỏi AI</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Ask AI about This Document...</value><value xml:lang="vi">Hỏi AI về tài liệu này...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Ask AI about This Document</value><value xml:lang="vi">Hỏi AI về tài liệu này</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:AiRewrite" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Rewrite</value><value xml:lang="vi">Viết lại</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Rewrite with AI...</value><value xml:lang="vi">Viết lại bằng AI...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Rewrite with AI</value><value xml:lang="vi">Viết lại bằng AI</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:AiSkill" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Run Skill</value><value xml:lang="vi">Chạy skill</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Run a Skill...</value><value xml:lang="vi">Chạy một skill...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Run a Skill</value><value xml:lang="vi">Chạy một skill</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:Nd30Document" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Decree 30 Document</value><value xml:lang="vi">Văn bản NĐ30</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">New Administrative Document (Decree 30)...</value><value xml:lang="vi">Văn bản hành chính NĐ30 mới...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">New Administrative Document (Decree 30)</value><value xml:lang="vi">Văn bản hành chính NĐ30 mới</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:Nd30Check" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Check Decree 30</value><value xml:lang="vi">Kiểm thể thức</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Check Decree 30 Format</value><value xml:lang="vi">Kiểm thể thức NĐ30</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Check Decree 30 Format</value><value xml:lang="vi">Kiểm thể thức NĐ30</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:McpTools" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">MCP Tools</value><value xml:lang="vi">Công cụ MCP</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">AI Tools (MCP)...</value><value xml:lang="vi">Công cụ AI (MCP)...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">AI Tools (MCP)</value><value xml:lang="vi">Công cụ AI (MCP)</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:McpServer" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Share with Assistants</value><value xml:lang="vi">Cho trợ lý ngoài</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Let Assistants Use 1xAIoffice (MCP Server)...</value><value xml:lang="vi">Cho trợ lý AI dùng 1xAIoffice (máy chủ MCP)...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Let Assistants Use 1xAIoffice (MCP Server)</value><value xml:lang="vi">Cho trợ lý AI dùng 1xAIoffice (máy chủ MCP)</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:AiAccounts" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">AI Accounts</value><value xml:lang="vi">Tài khoản AI</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">AI Accounts (API key or sign-in)...</value><value xml:lang="vi">Tài khoản AI (khoá API hoặc đăng nhập)...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">AI Accounts (API key or sign-in)</value><value xml:lang="vi">Tài khoản AI (khoá API hoặc đăng nhập)</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:OpenCsvSafely" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Open CSV Safely</value><value xml:lang="vi">Mở CSV an toàn</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Open CSV Safely (UTF-8, as text)...</value><value xml:lang="vi">Mở CSV an toàn (UTF-8, dạng chữ)...</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Open CSV Safely (UTF-8, as text)</value><value xml:lang="vi">Mở CSV an toàn (UTF-8, dạng chữ)</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NumberToWords" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Number in Words</value><value xml:lang="vi">Đọc số</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Number to Words</value><value xml:lang="vi">Đọc số thành chữ</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Number to Words</value><value xml:lang="vi">Đọc số thành chữ</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:MoneyToWords" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Amount in Words</value><value xml:lang="vi">Đọc số tiền</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Amount in Words (VND)</value><value xml:lang="vi">Đọc số tiền thành chữ</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Amount in Words (VND)</value><value xml:lang="vi">Đọc số tiền thành chữ</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:ConvertVNI" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">VNI to Unicode</value><value xml:lang="vi">Chuyển VNI</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Convert VNI Typing to Unicode</value><value xml:lang="vi">Chuyển kiểu gõ VNI sang Unicode</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Convert VNI Typing to Unicode</value><value xml:lang="vi">Chuyển kiểu gõ VNI sang Unicode</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:ConvertVIQR" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">VIQR to Unicode</value><value xml:lang="vi">Chuyển VIQR</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Convert VIQR Typing to Unicode</value><value xml:lang="vi">Chuyển kiểu gõ VIQR sang Unicode</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Convert VIQR Typing to Unicode</value><value xml:lang="vi">Chuyển kiểu gõ VIQR sang Unicode</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:ConvertTCVN3" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">TCVN3 to Unicode</value><value xml:lang="vi">Chuyển mã TCVN3</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Convert TCVN3 to Unicode</value><value xml:lang="vi">Chuyển mã TCVN3 sang Unicode</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Convert TCVN3 to Unicode</value><value xml:lang="vi">Chuyển mã TCVN3 sang Unicode</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NormalizeUnicode" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Normalize Unicode</value><value xml:lang="vi">Chuẩn hoá Unicode</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Normalize Vietnamese Unicode</value><value xml:lang="vi">Chuẩn hoá Unicode tiếng Việt</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Normalize Vietnamese Unicode</value><value xml:lang="vi">Chuẩn hoá Unicode tiếng Việt</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:ToneStyleOld" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Old Tone Style</value><value xml:lang="vi">Dấu kiểu cũ</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Tone Marks, Old Style (hòa)</value><value xml:lang="vi">Dấu thanh kiểu cũ (hòa)</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Tone Marks, Old Style (hòa)</value><value xml:lang="vi">Dấu thanh kiểu cũ (hòa)</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:ToneStyleNew" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">New Tone Style</value><value xml:lang="vi">Dấu kiểu mới</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Tone Marks, New Style (hoà)</value><value xml:lang="vi">Dấu thanh kiểu mới (hoà)</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Tone Marks, New Style (hoà)</value><value xml:lang="vi">Dấu thanh kiểu mới (hoà)</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:RemoveDiacritics" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Remove Diacritics</value><value xml:lang="vi">Bỏ dấu</value></prop>
+          <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Remove Vietnamese Diacritics</value><value xml:lang="vi">Bỏ dấu tiếng Việt</value></prop>
+          <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Remove Vietnamese Diacritics</value><value xml:lang="vi">Bỏ dấu tiếng Việt</value></prop>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

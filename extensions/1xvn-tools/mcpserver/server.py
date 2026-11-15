@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MPL-2.0
-"""1xVnOffice làm **máy chủ MCP**: Claude Desktop, Cursor hay trợ lý khác đọc và sửa tài liệu đang mở.
+"""1xAIoffice làm **máy chủ MCP**: Claude Desktop, Cursor hay trợ lý khác đọc và sửa tài liệu đang mở.
 
 Theo ai-platform-design.md mục 8. Ở mốc này chỉ có bản **stdio**; bản HTTP nghe ở 127.0.0.1 kèm token để sau
 (xem plans/reports/buildnotes-261114-0051-ai-platform-mcp.md, default #3 và mục "không mở cổng mạng nào").
 
-Chạy: `python3 mcpserver/server.py --pipe <tên pipe>` — nối vào một phiên 1xVnOffice đang chạy qua UNO.
+Chạy: `python3 mcpserver/server.py --pipe <tên pipe>` — nối vào một phiên 1xAIoffice đang chạy qua UNO.
 Không có phiên nào thì máy chủ vẫn trả lời tools/list, nhưng mọi lần gọi công cụ đều báo chưa có tài liệu.
 
 Ba điều giữ cho an toàn:
@@ -27,7 +27,7 @@ from vn1x import doctools, mcpresources, skills  # noqa: E402
 
 PROTOCOL_VERSION = "2025-06-18"
 BUNDLED_SKILLS = Path(__file__).resolve().parent.parent / "skills"
-SERVER_INFO = {"name": "1xVnOffice", "version": "0.1.0"}
+SERVER_INFO = {"name": "1xAIoffice", "version": "0.1.0"}
 
 
 class Unpaired(RuntimeError):
@@ -36,7 +36,7 @@ class Unpaired(RuntimeError):
 
 def clients_path():
     override = os.environ.get("ONEX_MCP_CLIENTS_PATH")
-    return override or str(Path.home() / ".config" / "1xvnoffice" / "mcp_clients.json")
+    return override or str(Path.home() / ".config" / "1xaioffice" / "mcp_clients.json")
 
 
 def paired(name, path=None):
@@ -52,7 +52,7 @@ def paired(name, path=None):
 
 
 def remember_pending(name, path=None):
-    """Ghi lại client vừa xin phép, để 1xVnOffice hỏi người dùng ở lần mở lệnh Công cụ AI (MCP) tới.
+    """Ghi lại client vừa xin phép, để 1xAIoffice hỏi người dùng ở lần mở lệnh Công cụ AI (MCP) tới.
 
     Chỉ ghi tên client; không bao giờ ghi nội dung yêu cầu. Tệp hỏng thì dựng lại từ đầu thay vì chết.
     """
@@ -137,8 +137,8 @@ class Server:
     def call_tool(self, params):
         self.require_pairing()
         if self.backend is None:
-            return doctools.result("Chưa nối được vào phiên 1xVnOffice nào đang chạy. "
-                                   "Hãy mở 1xVnOffice rồi thử lại.", is_error=True)
+            return doctools.result("Chưa nối được vào phiên 1xAIoffice nào đang chạy. "
+                                   "Hãy mở 1xAIoffice rồi thử lại.", is_error=True)
         return doctools.call(self.backend, params.get("name", ""), params.get("arguments") or {})
 
 
@@ -153,7 +153,7 @@ class Server:
         """Đọc NỘI DUNG thì phải được phép, đúng như gọi công cụ: nội dung tài liệu cũng nhạy cảm như vậy."""
         self.require_pairing()
         if self.backend is None:
-            raise RuntimeError("Chưa nối được vào phiên 1xVnOffice nào đang chạy.")
+            raise RuntimeError("Chưa nối được vào phiên 1xAIoffice nào đang chạy.")
         uri = params.get("uri", "")
         return {"contents": mcpresources.contents(uri, self.backend.read_resource(uri))}
 
@@ -184,14 +184,14 @@ class Server:
     def require_pairing(self):
         if not paired(self.client, self.clients_file):
             remember_pending(self.client, self.clients_file)
-            raise Unpaired(f"“{self.client}” chưa được phép điều khiển 1xVnOffice. "
-                           "Mở 1xVnOffice, vào Tiếng Việt ▸ Công cụ AI (MCP) để cho phép.")
+            raise Unpaired(f"“{self.client}” chưa được phép điều khiển 1xAIoffice. "
+                           "Mở 1xAIoffice, vào Tiếng Việt ▸ Công cụ AI (MCP) để cho phép.")
 
 
 def user_skills_path():
     """Thư mục skill của người dùng; bước kiểm tự động trỏ chỗ khác."""
     override = os.environ.get("ONEX_SKILLS_PATH")
-    return Path(override) if override else Path.home() / ".config" / "1xvnoffice" / "skills"
+    return Path(override) if override else Path.home() / ".config" / "1xaioffice" / "skills"
 
 
 def connect(pipe):
@@ -205,9 +205,9 @@ def connect(pipe):
 
 def main(argv=None):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    parser = argparse.ArgumentParser(description="MCP server của 1xVnOffice (stdio)")
-    parser.add_argument("--pipe", default=os.environ.get("ONEX_MCP_PIPE", "1xvnoffice"),
-                        help="tên UNO pipe của phiên 1xVnOffice đang chạy")
+    parser = argparse.ArgumentParser(description="MCP server của 1xAIoffice (stdio)")
+    parser.add_argument("--pipe", default=os.environ.get("ONEX_MCP_PIPE", "1xaioffice"),
+                        help="tên UNO pipe của phiên 1xAIoffice đang chạy")
     args = parser.parse_args(argv)
     Server(backend=connect(args.pipe)).run()
     return 0

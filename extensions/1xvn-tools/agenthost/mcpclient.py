@@ -8,7 +8,7 @@ chủ dự án chưa duyệt (xem plans/reports/buildnotes-261114-0051-ai-platfo
 Hai nguyên tắc an toàn, theo ai-platform-design.md mục 7:
 
 1. **Kết quả của công cụ là DỮ LIỆU, không phải lệnh.** Hàm ở đây chỉ trả chữ về cho người gọi; không có đường nào
-   để một máy chủ MCP bảo 1xVnOffice chạy thêm việc gì. Chống prompt injection nằm ở chỗ đó.
+   để một máy chủ MCP bảo 1xAIoffice chạy thêm việc gì. Chống prompt injection nằm ở chỗ đó.
 2. **Không công cụ nào chạy khi chưa được cho phép.** Việc hỏi quyền nằm ở lớp trên (permissions.py); client này
    chỉ gọi khi đã được bảo là gọi.
 
@@ -26,7 +26,7 @@ import urllib.request
 from pathlib import Path
 
 PROTOCOL_VERSION = "2025-06-18"
-CLIENT_INFO = {"name": "1xVnOffice", "version": "0.1.0"}
+CLIENT_INFO = {"name": "1xAIoffice", "version": "0.1.0"}
 MAX_RESULT_CHARS = 20000      # chống máy chủ trả kết quả khổng lồ làm tốn token của người dùng
 DEFAULT_TIMEOUT = 30
 
@@ -242,7 +242,7 @@ class HttpServer(StdioServer):
         self.next_id += 1
         status, kind, raw, challenge = self._post(mcphttp.request_body(
             "initialize", {"protocolVersion": mcphttp.PROTOCOL_VERSION, "capabilities": {},
-                           "clientInfo": {"name": "1xVnOffice", "version": "0.1"}}, self.next_id))
+                           "clientInfo": {"name": "1xAIoffice", "version": "0.1"}}, self.next_id))
         if status == 401:
             raise Unauthorized(challenge, self.url)
         if status >= 400:
@@ -275,7 +275,7 @@ class Unauthorized(McpError):
 def from_claude_desktop(config):
     """Đọc cấu hình kiểu claude_desktop_config.json thành danh sách máy chủ.
 
-    Nhờ vậy người dùng chép thẳng cấu hình sẵn có vào 1xVnOffice. Nhận cả máy chủ chạy bằng lệnh (stdio) lẫn máy
+    Nhờ vậy người dùng chép thẳng cấu hình sẵn có vào 1xAIoffice. Nhận cả máy chủ chạy bằng lệnh (stdio) lẫn máy
     chủ ở xa khai bằng `url` (HTTP).
     """
     out = []

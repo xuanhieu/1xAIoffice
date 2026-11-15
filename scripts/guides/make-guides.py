@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Sinh bộ hướng dẫn nhanh đi kèm 1xVnOffice: 1xDoc (.docx + .pdf), 1xSheet (.xlsx), 1xSlide (.pptx), mỗi file
-tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp chính 1xVnOffice (docs/ui).
+"""Sinh bộ hướng dẫn nhanh đi kèm 1xAIoffice: 1xDoc (.docx + .pdf), 1xSheet (.xlsx), 1xSlide (.pptx), mỗi file
+tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp chính 1xAIoffice (docs/ui).
 
 Chạy bằng Python của app, nối vào một soffice headless đang nghe ở pipe:
   App/Contents/Resources/python scripts/guides/make-guides.py --pipe <tên> --out <thư mục> --only vi:doc
@@ -29,8 +29,8 @@ NAMES = {
 
 DOC_TEXT = {
     "en": {
-        "title": "Welcome to 1xVnOffice – 1xDoc",
-        "intro": "1xVnOffice is a free office suite made for Vietnam: documents, spreadsheets and presentations that open "
+        "title": "Welcome to 1xAIoffice – 1xDoc",
+        "intro": "1xAIoffice is a free office suite made for Vietnam: documents, spreadsheets and presentations that open "
                  "and save Microsoft Office files, with Vietnamese tools built in. No ads, no tracking, and macros are "
                  "blocked unless you trust them.",
         "sections": [
@@ -75,8 +75,8 @@ DOC_TEXT = {
                      "The ribbon groups commands by task, like Microsoft Office and WPS."],
     },
     "vi": {
-        "title": "Chào mừng đến với 1xVnOffice – 1xDoc",
-        "intro": "1xVnOffice là bộ văn phòng miễn phí làm cho người Việt: văn bản, bảng tính và trình chiếu mở và lưu "
+        "title": "Chào mừng đến với 1xAIoffice – 1xDoc",
+        "intro": "1xAIoffice là bộ văn phòng miễn phí làm cho người Việt: văn bản, bảng tính và trình chiếu mở và lưu "
                  "được file Microsoft Office, có sẵn công cụ tiếng Việt. Không quảng cáo, không theo dõi, macro bị chặn "
                  "trừ khi bạn tin cậy.",
         "sections": [
@@ -122,7 +122,7 @@ DOC_TEXT = {
 }
 
 SHEET_TEXT = {
-    "en": {"sheet": "Get started", "title": "Welcome to 1xVnOffice – 1xSheet",
+    "en": {"sheet": "Get started", "title": "Welcome to 1xAIoffice – 1xSheet",
            "intro": "Try it here: change a quantity or a price and every total, the amount in words and the chart update.",
            "head": ["Code", "Item", "Qty", "Unit price (VND)", "Amount (VND)", "Amount in words"],
            "rows": [("VPP01", "A4 paper, 500 sheets", 20, 78000), ("VPP02", "Ballpoint pens, box of 20", 15, 65000),
@@ -136,9 +136,9 @@ SHEET_TEXT = {
                     "Amounts above 1,000,000 VND are highlighted by conditional formatting (Format ▸ Conditional).",
                     "Select the table and use Insert ▸ Chart to chart it; the chart on the right is an example.",
                     "Files are saved as .xlsx by default so Excel users can open them. DOCSO and DOCTIEN are "
-                    "1xVnOffice functions: Excel shows their last values but cannot recalculate them."],
+                    "1xAIoffice functions: Excel shows their last values but cannot recalculate them."],
            "chart": "Amount by item"},
-    "vi": {"sheet": "Bắt đầu", "title": "Chào mừng đến với 1xVnOffice – 1xSheet",
+    "vi": {"sheet": "Bắt đầu", "title": "Chào mừng đến với 1xAIoffice – 1xSheet",
            "intro": "Thử ngay tại đây: đổi số lượng hoặc đơn giá, mọi tổng, số tiền bằng chữ và biểu đồ tự cập nhật.",
            "head": ["Mã", "Mặt hàng", "SL", "Đơn giá (đồng)", "Thành tiền (đồng)", "Bằng chữ"],
            "rows": [("VPP01", "Giấy A4, ram 500 tờ", 20, 78000), ("VPP02", "Bút bi, hộp 20 cây", 15, 65000),
@@ -151,14 +151,14 @@ SHEET_TEXT = {
                     "Dùng mũi tên lọc ở dòng tiêu đề để chỉ hiện một số dòng (Dữ liệu ▸ Tự động lọc).",
                     "Thành tiền trên 1.000.000 đồng được tô nổi bằng định dạng có điều kiện (Định dạng ▸ Có điều kiện).",
                     "Chọn bảng rồi Chèn ▸ Biểu đồ để vẽ biểu đồ; biểu đồ bên phải là ví dụ.",
-                    "Tệp được lưu dạng .xlsx để người dùng Excel mở được. DOCSO và DOCTIEN là hàm của 1xVnOffice: "
+                    "Tệp được lưu dạng .xlsx để người dùng Excel mở được. DOCSO và DOCTIEN là hàm của 1xAIoffice: "
                     "Excel hiện giá trị đã tính nhưng không tính lại được."],
            "chart": "Thành tiền theo mặt hàng"},
 }
 
 SLIDE_TEXT = {
     "en": [
-        ("Welcome to 1xVnOffice – 1xSlide", "Presentations that open in PowerPoint, made in Vietnam. Press F5 to play."),
+        ("Welcome to 1xAIoffice – 1xSlide", "Presentations that open in PowerPoint, made in Vietnam. Press F5 to play."),
         ("The workspace", None, "impress"),
         ("Build your slides", ["Home ▸ New Slide adds a slide; right-click a thumbnail to duplicate or delete it.",
                                "Drag thumbnails on the left to reorder.",
@@ -174,7 +174,7 @@ SLIDE_TEXT = {
                    "Fonts that the other computer lacks can be embedded: File ▸ Properties ▸ Font."]),
     ],
     "vi": [
-        ("Chào mừng đến với 1xVnOffice – 1xSlide", "Bài trình chiếu mở được bằng PowerPoint, làm tại Việt Nam. Bấm F5 để trình chiếu."),
+        ("Chào mừng đến với 1xAIoffice – 1xSlide", "Bài trình chiếu mở được bằng PowerPoint, làm tại Việt Nam. Bấm F5 để trình chiếu."),
         ("Màn hình làm việc", None, "impress"),
         ("Dựng các slide", ["Trang đầu ▸ Slide mới để thêm slide; bấm chuột phải vào ảnh thu nhỏ để nhân bản hoặc xoá.",
                             "Kéo ảnh thu nhỏ ở cột trái để đổi thứ tự.",
@@ -282,7 +282,7 @@ def make_doc(office, lang, out):
         text.insertTextContent(cur, obj, False)
         para(caption, "Caption" if paras.hasByName("Caption") else "Text body", center=True)
 
-    para("1xVnOffice", "Subtitle", center=True, color=ACCENT)
+    para("1xAIoffice", "Subtitle", center=True, color=ACCENT)
     para(t["title"], "Title", center=True)
     para(t["intro"], center=True)
     image(shot("start", lang), "① " + t["callouts"][0])

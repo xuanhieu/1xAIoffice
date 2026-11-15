@@ -1,4 +1,4 @@
-# Build 1xVnOffice trên macOS
+# Build 1xAIoffice trên macOS
 
 ## Yêu cầu
 

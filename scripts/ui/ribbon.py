@@ -15,7 +15,7 @@ quả và không cần build lại lõi. Quy tắc:
      4px và vạch ngăn mảnh của WPS (skins/2018white_dark: separator ở mức trắng 10%, thang 0/4/8/12/16/20/24/32).
   4. Gỡ thẻ "Extension" (nơi upstream dồn mọi lệnh của extension) và chuyển điểm chèn lệnh extension sang cuối thẻ
      Home, nên nút NĐ30 và công cụ tiếng Việt nằm ngay trên Home như các lệnh riêng của WPS.
-Dùng: scripts/ui/ribbon.py --src <mã nguồn upstream> --app <1xVnOffice.app> [--check]
+Dùng: scripts/ui/ribbon.py --src <mã nguồn upstream> --app <1xAIoffice.app> [--check]
 """
 import argparse
 import sys
@@ -205,12 +205,119 @@ def move_addons_to_home(root):
     notebook.remove(tab_label)
 
 
+# ---------------------------------------------------------------- thẻ AI
+# Chức năng của mình phải tự lộ ra: người dùng tìm theo thẻ trên ribbon, không đọc hướng dẫn. Nên có một thẻ riêng
+# đứng ngay sau Trang chủ, nút lớn có chữ, thay vì vài icon nhỏ dồn cuối thẻ Home như trước.
+T = "vnd.1x.tools:"
+AI_TAB = {   # (nhóm, nút lớn?, lệnh). Nhãn lấy từ extensions/1xvn-tools/GenericCommands.xcu, theo ngôn ngữ giao diện.
+    "swriter": [
+        ("Trợ lý AI", True, ["AiAsk", "AiRewrite", "AiSkill"]),
+        ("Văn bản NĐ30", True, ["Nd30Document", "Nd30Check"]),
+        ("Kết nối", True, ["McpTools", "McpServer", "AiAccounts"]),
+        ("Tiếng Việt", False, ["ConvertTCVN3", "ConvertVNI", "ConvertVIQR", "NormalizeUnicode", "RemoveDiacritics",
+                               "MoneyToWords"]),
+    ],
+    "scalc": [
+        ("Trợ lý AI", True, ["AiAsk", "AiSkill"]),
+        ("Kết nối", True, ["McpTools", "McpServer", "AiAccounts"]),
+        ("Dữ liệu tiếng Việt", False, ["OpenCsvSafely", "NumberToWords", "MoneyToWords", "RemoveDiacritics",
+                                       "ConvertTCVN3", "NormalizeUnicode"]),
+    ],
+}
+
+
+def _el(tag, parent=None, **attrs):
+    node = ET.Element(tag, attrs) if parent is None else ET.SubElement(parent, tag, attrs)
+    return node
+
+
+def _props(obj, **values):
+    for name, value in values.items():
+        _el("property", obj, name=name.replace("_", "-")).text = str(value)
+
+
+def _ai_group(gid, items, large, position):
+    """Một nhóm: hộp chứa một thanh công cụ. Nút lớn thì icon trên chữ dưới; nhóm nhỏ thì hai hàng icon cạnh chữ."""
+    child = _el("child")
+    box = _el("object", child, **{"class": "GtkBox", "id": f"box1xAI{gid}"})
+    _props(box, visible="True", can_focus="False", margin_start=GROUP_GAP, margin_end=GROUP_GAP,
+           margin_top=6, margin_bottom=6, spacing=2)
+    rows = [items] if large else [items[i::2] for i in range(2)]
+    if not large:
+        _props(box, orientation="vertical")
+    for r, row in enumerate(rows):
+        holder = _el("child", box)
+        bar = _el("object", holder, **{"class": TOOLBOX, "id": f"tb1xAI{gid}{r}"})
+        _props(bar, visible="True", can_focus="False", show_arrow="False",
+               toolbar_style="both" if large else "both-horiz")
+        if large:
+            _props(bar, icon_size=3, valign="center", vexpand="True")
+        for i, name in enumerate(row):
+            item = _el("child", bar)
+            btn = _el("object", item, **{"class": "GtkToolButton", "id": f"bt1xAI{gid}{r}{i}"})
+            # Lõi không tự tìm icon cho lệnh extension trên ribbon, nên chỉ thẳng tệp trong icon theme "1x"
+            # (scripts/brand/make-brand.py ghi cmd/lc_<lệnh>.svg và cmd/sc_<lệnh>.svg, tên viết thường).
+            icon = f"cmd/{'lc' if large else 'sc'}_{name.lower()}.png"
+            _props(btn, visible="True", can_focus="False", action_name=T + name, icon_name=icon)
+            _props(_el("packing", item), expand="False", homogeneous="False")
+        _props(_el("packing", holder), expand="False", fill="True", position=r)
+    _props(_el("packing", child), expand="False", fill="True", position=position)
+    return child
+
+
+def add_ai_tab(root, app):
+    """Chèn trang "AI" và nhãn của nó ngay sau thẻ Trang chủ. Không có bố cục cho ứng dụng này thì bỏ qua."""
+    groups = AI_TAB.get(app)
+    if not groups:
+        return 0
+    parent = {c: p for p in root.iter() for c in p}
+    label = next((o for o in root.iter("object") if o.get("id") == "HomeLabel"), None)
+    if label is None:
+        raise SystemExit(f"LỖI ribbon {app}: không thấy nhãn thẻ Home để đặt thẻ AI sau nó")
+    tab_child = parent[label]
+    notebook = parent[tab_child]
+    page_child = _el("child")
+    page = _el("object", page_child, **{"class": "sfxlo-PriorityHBox", "id": "1xAI Tab"})
+    _props(page, visible="True", can_focus="False", valign="center", vexpand="True")
+    holder = _el("child", page)
+    merged = _el("object", holder, **{"class": "sfxlo-PriorityMergedHBox", "id": "pmhb1xAI"})
+    _props(merged, visible="True", can_focus="False")
+    for n, (_title, large, items) in enumerate(groups):   # vạch ngăn và vị trí do group_rhythm đặt sau
+        merged.append(_ai_group(n, items, large, n))
+    # PHẢI giãn như hộp của thẻ Home: không giãn thì hộp rộng bằng 0 và PriorityMergedHBox đẩy hết nhóm vào "»".
+    _props(_el("packing", holder), expand="True", fill="True", position=0)
+    tab = _el("child", type="tab")
+    text = _el("object", tab, **{"class": "GtkLabel", "id": "1xAILabel"})
+    _props(text, visible="True", can_focus="False", label="AI", use_underline="False")
+    style = _el("style", text)
+    for ctx in ("context-default", "context-any"):
+        _el("class", style, name=ctx)
+    _props(_el("packing", tab), tab_fill="False")
+    kids = list(notebook)
+    at = kids.index(tab_child) + 1
+    notebook.insert(at, page_child)
+    notebook.insert(at + 1, tab)
+    # Đánh lại vị trí trang/nhãn theo đúng thứ tự trong tệp, để thẻ AI đứng sau Home chứ không bị xếp lại.
+    pages = [c for c in notebook if c.tag == "child" and c.get("type") != "tab"]
+    labels = [c for c in notebook if c.tag == "child" and c.get("type") == "tab"]
+    for group in (pages, labels):
+        for i, c in enumerate(group):
+            pack = c.find("packing")
+            if pack is None:
+                pack = _el("packing", c)
+            pos = next((x for x in pack.findall("property") if x.get("name") == "position"), None)
+            if pos is None:
+                pos = _el("property", pack, name="position")
+            pos.text = str(i)
+    return sum(len(items) for _, _, items in groups)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True)
     ap.add_argument("--app", required=True)
     ap.add_argument("--check", action="store_true", help="chỉ kiểm, không ghi")
-    ap.add_argument("--skip", action="append", default=[], choices=["labels", "style", "addons", "rhythm"],
+    ap.add_argument("--skip", action="append", default=[], choices=["labels", "style", "addons", "rhythm", "ai"],
                     help="tắt một phần biến đổi để tìm nguyên nhân khi ribbon lỗi")
     a = ap.parse_args()
     ok = True
@@ -225,6 +332,7 @@ def main():
         stats = transform(tree.getroot(), a.skip)
         if "addons" not in a.skip:
             move_addons_to_home(tree.getroot())
+        ai_buttons = add_ai_tab(tree.getroot(), app) if "ai" not in a.skip else 0
         separators = group_rhythm(tree.getroot()) if "rhythm" not in a.skip else 0
         if stats["labels"] == 0:
             print(f"LỖI {app}: không thấy tên nhóm nào, bố cục gốc đã đổi?")
@@ -233,7 +341,7 @@ def main():
             tree.write(dest, encoding="UTF-8", xml_declaration=True)
         print(f"{app}: gỡ {stats['labels']} tên nhóm, giữ {stats['large']} nút lớn, hạ {stats['demoted']} nút lớn "
               f"tên dài, {stats['icon_only']} nút chỉ icon, {separators} vạch ngăn nhóm, "
-              "lệnh extension chuyển sang Home")
+              f"lệnh extension chuyển sang Home, thẻ AI {ai_buttons} nút")
     sys.exit(0 if ok else 1)
 
 

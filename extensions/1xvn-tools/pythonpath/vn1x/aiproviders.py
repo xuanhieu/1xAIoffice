@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Danh mục nhà cung cấp AI cài sẵn của 1xVnOffice, thuần Python.
+"""Danh mục nhà cung cấp AI cài sẵn của 1xAIoffice, thuần Python.
 
 Mục đích: người dùng chọn tên nhà cung cấp trong một danh sách thay vì tự gõ base_url và nhớ hình dạng API.
 
@@ -13,7 +13,7 @@ Mỗi mục có:
   note        một dòng nói rõ cần gì
 
 Vì sao không kèm sẵn client_id cho các mục OAuth: client_id của OpenAI/Google/Microsoft gắn với một ứng dụng
-đã đăng ký, và cơ quan thường tự đăng ký ứng dụng nội bộ của mình. 1xVnOffice không nhúng client_id của người
+đã đăng ký, và cơ quan thường tự đăng ký ứng dụng nội bộ của mình. 1xAIoffice không nhúng client_id của người
 khác; người dùng dán client_id của chính họ (hoặc của cơ quan) vào bước cài đặt.
 """
 
@@ -64,7 +64,7 @@ PRESETS = [
                "resource": "https://api.openai.com/v1",
                "redirect_path": "/auth/callback",
                "dynamic_client": True,
-               "app_name": "1xVnOffice",
+               "app_name": "1xAIoffice",
                "scopes": ["openid", "profile", "email", "offline_access",
                           "chatgpt.tokens.use.direct", "resource.invoke"]},
      "needs": [],
@@ -139,7 +139,7 @@ def summary(preset):
 
 def secret_ref(preset_id):
     """Tên mục trong kho bí mật của hệ điều hành. Không phải giá trị khoá, chỉ là tên."""
-    return f"1xvnoffice/{preset_id}"
+    return f"1xaioffice/{preset_id}"
 
 
 def client_secret_ref(provider_id):

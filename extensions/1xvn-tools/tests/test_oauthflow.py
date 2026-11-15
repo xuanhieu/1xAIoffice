@@ -68,7 +68,7 @@ class FlowTests(unittest.TestCase):
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         base = f"http://127.0.0.1:{self.server.server_port}"
         self.config = {"authorize_url": base + "/auth", "token_url": base + "/token",
-                       "device_url": base + "/device", "client_id": "1xvnoffice-test",
+                       "device_url": base + "/device", "client_id": "1xaioffice-test",
                        "scopes": ["openid"]}
         self.store = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
         self.store.write("{}")
@@ -165,7 +165,7 @@ class ClientSecretTests(unittest.TestCase):
 
     def setUp(self):
         self.store = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
-        self.store.write(json.dumps({"1xvnoffice/vertex/client_secret": "bi-mat-cua-ung-dung"}))
+        self.store.write(json.dumps({"1xaioffice/vertex/client_secret": "bi-mat-cua-ung-dung"}))
         self.store.close()
         os.environ["ONEX_SECRET_STORE_FOR_TEST"] = self.store.name
         self.addCleanup(os.environ.pop, "ONEX_SECRET_STORE_FOR_TEST", None)
@@ -173,7 +173,7 @@ class ClientSecretTests(unittest.TestCase):
 
     def test_the_secret_is_fetched_from_the_store_at_the_moment_it_is_needed(self):
         config = oauthflow.with_client_secret({"client_id": "c", "token_url": "https://x",
-                                               "client_secret_ref": "1xvnoffice/vertex/client_secret"})
+                                               "client_secret_ref": "1xaioffice/vertex/client_secret"})
         self.assertEqual(config["client_secret"], "bi-mat-cua-ung-dung")
 
     def test_a_provider_without_a_secret_is_left_alone(self):
@@ -211,7 +211,7 @@ class DynamicRegistrationTests(unittest.TestCase):
         base = f"http://127.0.0.1:{self.server.server_port}"
         self.config = {"authorize_url": base + "/auth", "token_url": base + "/token",
                        "client_id": oauth.DYNAMIC_CLIENT, "dynamic_client": True,
-                       "redirect_path": "/auth/callback", "app_name": "1xVnOffice",
+                       "redirect_path": "/auth/callback", "app_name": "1xAIoffice",
                        "resource": "https://api.openai.com/v1", "scopes": ["openid"]}
         store = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
         store.write("{}")
@@ -251,7 +251,7 @@ class DynamicRegistrationTests(unittest.TestCase):
         oauthflow.webbrowser.open = self.browser()
         oauthflow.login_browser(self.config, "test/chatgpt", timeout=10)
         query = parse_qs(urlparse(self.seen_url[0]).query)
-        self.assertEqual(query["agent_name_hint"], ["1xVnOffice"])
+        self.assertEqual(query["agent_name_hint"], ["1xAIoffice"])
         self.assertTrue(query["ext_agent_host_id"][0])
         self.assertEqual(query["resource"], ["https://api.openai.com/v1"])
         self.assertTrue(query["redirect_uri"][0].endswith("/auth/callback"))
@@ -282,7 +282,7 @@ class LongSecretTests(unittest.TestCase):
     MCP ở xa.
     """
 
-    REF = "1xvnoffice-test-dai"
+    REF = "1xaioffice-test-dai"
 
     def tearDown(self):
         import subprocess
@@ -312,3 +312,53 @@ class LongSecretTests(unittest.TestCase):
         import json as _json
         oauthflow.keychain_write(self.REF, _json.dumps({"access_token": "cu", "expires_at": 2.0}))
         self.assertEqual(oauthflow.read_bundle(self.REF)["access_token"], "cu")
+
+
+class RenameMigrationTests(unittest.TestCase):
+    """Đổi tên sản phẩm thì tiền tố mục trong Keychain đổi theo, nhưng không ai phải đăng nhập lại.
+
+    Thẻ hub và khoá API đã lưu dưới tên cũ phải đọc được nguyên vẹn, và được chép sang tên mới ngay lần
+    đọc đầu tiên để lần sau không phải dò nữa.
+    """
+
+    SUFFIX = "kiem-doi-ten"
+    NEW = oauthflow.SECRET_PREFIX + SUFFIX
+    OLD = oauthflow.OLD_SECRET_PREFIX + SUFFIX
+
+    def tearDown(self):
+        import subprocess
+        for ref in (self.NEW, self.OLD):
+            subprocess.run(["security", "delete-generic-password", "-s", ref],
+                           capture_output=True, timeout=10)
+
+    def test_a_token_stored_under_the_old_name_is_still_found(self):
+        oauthflow.write_bundle(self.OLD, {"access_token": "the-cu", "expires_at": 9.0})
+        self.assertEqual(oauthflow.read_bundle(self.NEW)["access_token"], "the-cu")
+
+    def test_reading_it_once_copies_it_to_the_new_name(self):
+        oauthflow.write_bundle(self.OLD, {"access_token": "the-cu", "expires_at": 9.0})
+        oauthflow.read_bundle(self.NEW)
+        self.assertTrue(oauthflow._keychain_find(self.NEW), "phải có mục dưới tên mới sau lần đọc đầu")
+
+    def test_the_new_name_wins_when_both_exist(self):
+        oauthflow.write_bundle(self.OLD, {"access_token": "the-cu", "expires_at": 9.0})
+        oauthflow.write_bundle(self.NEW, {"access_token": "the-moi", "expires_at": 9.0})
+        self.assertEqual(oauthflow.read_bundle(self.NEW)["access_token"], "the-moi")
+
+    def test_an_unrelated_name_does_not_fall_back(self):
+        """Chỉ mục mang đúng tiền tố mới mới được dò sang tên cũ."""
+        self.assertEqual(oauthflow._keychain_read("khong-co-tien-to-nay"), "")
+
+    def test_a_host_id_made_under_the_old_name_is_kept(self):
+        """Đổi mã máy là nhà cung cấp coi đây là máy lạ, phải đăng nhập lại — nên giữ nguyên mã cũ."""
+        with tempfile.TemporaryDirectory() as home:
+            legacy = Path(home) / oauthflow.OLD_CONFIG_DIR / "host-id"
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text("ma-may-cu\n", encoding="utf-8")
+            fresh = Path(home) / "1xaioffice" / "host-id"
+            os.environ["ONEX_HOST_ID_PATH"] = str(fresh)
+            try:
+                self.assertEqual(oauthflow.host_id(), "ma-may-cu")
+                self.assertEqual(fresh.read_text(encoding="utf-8").strip(), "ma-may-cu")
+            finally:
+                os.environ.pop("ONEX_HOST_ID_PATH", None)

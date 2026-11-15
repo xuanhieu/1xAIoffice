@@ -84,5 +84,5 @@ def describe(server_id, tool):
     return (f"Máy chủ “{server_id}” muốn dùng công cụ “{tool['name']}”.\n\n"
             f"Máy chủ mô tả: {tool.get('description') or '(không có mô tả)'}\n"
             f"Tham số: {fields}\n\n"
-            "Mô tả này do máy chủ tự khai, không phải do 1xVnOffice kiểm chứng. "
+            "Mô tả này do máy chủ tự khai, không phải do 1xAIoffice kiểm chứng. "
             "Chỉ cho phép những máy chủ bạn tin cậy.")

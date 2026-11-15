@@ -33,7 +33,7 @@ DEVICE_POLL_TIMEOUT = 300
 HTTP_TIMEOUT = 30
 
 DONE_PAGE = """<!doctype html><html lang="vi"><meta charset="utf-8">
-<title>1xVnOffice</title>
+<title>1xAIoffice</title>
 <body style="font-family:-apple-system,system-ui,sans-serif;text-align:center;padding:4rem">
 <h1>{title}</h1><p>{body}</p></body></html>"""
 
@@ -44,7 +44,7 @@ class FlowError(RuntimeError):
 
 # ---------------------------------------------------------------- kho bí mật
 
-def keychain_write(ref, value, label="1xVnOffice"):
+def keychain_write(ref, value, label="1xAIoffice"):
     """Ghi một bí mật vào Keychain, KHÔNG qua tham số dòng lệnh và KHÔNG bị cắt ở 128 ký tự.
 
     Hai cái bẫy đã gặp thật:
@@ -54,7 +54,7 @@ def keychain_write(ref, value, label="1xVnOffice"):
       * Đưa giá trị vào `-w <giá trị>` thì nó hiện trong danh sách tiến trình của máy.
     `security -i` đọc LỆNH từ đầu vào chuẩn, nên giá trị đi qua stdin mà vẫn không vướng giới hạn 128.
     """
-    command = f'add-generic-password -U -a 1xvnoffice -s {_quote(ref)} -D {_quote(label)} -w {_quote(value)}\n'
+    command = f'add-generic-password -U -a 1xaioffice -s {_quote(ref)} -D {_quote(label)} -w {_quote(value)}\n'
     try:
         done = subprocess.run(["security", "-i"], input=command, capture_output=True, text=True, timeout=20)
     except (OSError, subprocess.SubprocessError):
@@ -67,13 +67,34 @@ def _quote(value):
     return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def _keychain_read(ref):
+# Tên cũ của sản phẩm, giữ lại để không ai phải đăng nhập lại sau khi đổi tên. Đừng sửa hai dòng này.
+OLD_SECRET_PREFIX = "1xvnoffice/"
+OLD_CONFIG_DIR = "1xvnoffice"
+SECRET_PREFIX = "1xaioffice/"
+
+
+def _keychain_find(ref):
     try:
         done = subprocess.run(["security", "find-generic-password", "-w", "-s", ref],
                               capture_output=True, text=True, timeout=10)
     except (OSError, subprocess.SubprocessError):
         return ""
     return done.stdout.strip() if done.returncode == 0 else ""
+
+
+def _keychain_read(ref):
+    """Đọc một mục trong Keychain, và tự chuyển mục còn mang tên cũ sang tên mới.
+
+    Đổi tên sản phẩm thì tiền tố mục đổi theo. Người dùng đã đăng nhập trước đó không có lý do gì phải
+    đăng nhập lại, nên lần đọc đầu tiên sau khi đổi tên sẽ lấy mục cũ ra và ghi lại dưới tên mới.
+    """
+    found = _keychain_find(ref)
+    if found or not ref.startswith(SECRET_PREFIX):
+        return found
+    legacy = _keychain_find(OLD_SECRET_PREFIX + ref[len(SECRET_PREFIX):])
+    if legacy:
+        keychain_write(ref, legacy)
+    return legacy
 
 
 def read_bundle(ref):
@@ -116,7 +137,7 @@ def write_bundle(ref, bundle):
         with open(override, "w", encoding="utf-8") as handle:
             handle.write(json.dumps(store, ensure_ascii=False))
         return
-    if not keychain_write(ref, payload, "1xVnOffice OAuth"):
+    if not keychain_write(ref, payload, "1xAIoffice OAuth"):
         raise FlowError("không ghi được thẻ vào kho bí mật của hệ điều hành")
 
 
@@ -196,8 +217,8 @@ class _Callback(BaseHTTPRequestHandler):
         ok = "error=" not in self.path
         page = DONE_PAGE.format(
             title="Đã đăng nhập xong" if ok else "Đăng nhập không thành công",
-            body="Bạn quay lại 1xVnOffice được rồi; đóng tab này đi." if ok
-                 else "Quay lại 1xVnOffice và thử lại.")
+            body="Bạn quay lại 1xAIoffice được rồi; đóng tab này đi." if ok
+                 else "Quay lại 1xAIoffice và thử lại.")
         body = page.encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -220,7 +241,7 @@ def fetch_json(url, timeout=HTTP_TIMEOUT):
         return None
 
 
-def discover_mcp_oauth(url, challenge=None, app_name="1xVnOffice"):
+def discover_mcp_oauth(url, challenge=None, app_name="1xAIoffice"):
     """Tự tìm cách đăng nhập của một máy chủ MCP ở xa, theo chuẩn uỷ quyền của MCP.
 
     Đi đúng ba bước: lời thách thức 401 → bản mô tả tài nguyên (RFC 9728) → bản mô tả máy chủ uỷ quyền. Không
@@ -250,7 +271,7 @@ def register_client(config, redirect_uri):
     url = config.get("registration_url")
     if not url:
         raise FlowError("máy chủ không cho tự đăng ký ứng dụng; cần quản trị viên cấp client_id")
-    body = json.dumps(mcphttp.registration_body(config.get("app_name") or "1xVnOffice", redirect_uri,
+    body = json.dumps(mcphttp.registration_body(config.get("app_name") or "1xAIoffice", redirect_uri,
                                                 config.get("scopes")), ensure_ascii=False).encode("utf-8")
     request = urllib.request.Request(url, data=body, method="POST",
                                      headers={"Content-Type": "application/json",
@@ -273,7 +294,7 @@ def register_client(config, redirect_uri):
 def mcp_secret_ref(url):
     """Tên mục trong kho bí mật cho thẻ của một máy chủ MCP; mỗi máy chủ một mục."""
     host = url.split("://", 1)[-1].split("/", 1)[0]
-    return f"1xvnoffice/mcp/{host}"
+    return f"1xaioffice/mcp/{host}"
 
 
 def host_id():
@@ -282,20 +303,28 @@ def host_id():
     Không phải bí mật và không nói gì về người dùng: chỉ là một chuỗi ngẫu nhiên sinh một lần rồi giữ lại.
     """
     path = Path(os.environ.get("ONEX_HOST_ID_PATH")
-                or Path.home() / ".config" / "1xvnoffice" / "host-id")
-    try:
-        existing = path.read_text(encoding="utf-8").strip()
+                or Path.home() / ".config" / "1xaioffice" / "host-id")
+    legacy = path.parent.parent / OLD_CONFIG_DIR / path.name
+    for candidate in (path, legacy):
+        try:
+            existing = candidate.read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
         if existing:
+            if candidate is legacy:      # ma sinh duoi ten cu: giu nguyen, chep sang cho moi
+                _save_host_id(path, existing)
             return existing
-    except OSError:
-        pass
     fresh = secrets.token_hex(16)
+    _save_host_id(path, fresh)
+    return fresh
+
+
+def _save_host_id(path, value):
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(fresh + "\n", encoding="utf-8")
+        path.write_text(value + "\n", encoding="utf-8")
     except OSError:
         pass
-    return fresh
 
 
 def login_browser(config, ref, timeout=LOGIN_TIMEOUT, register=None):
@@ -319,7 +348,7 @@ def login_browser(config, ref, timeout=LOGIN_TIMEOUT, register=None):
             raise
     extra = dict(config.get("extra_auth_params") or {})
     if config.get("dynamic_client") and config.get("client_id") == oauth.DYNAMIC_CLIENT:
-        extra.update(oauth.registration_params(host_id(), config.get("app_name") or "1xVnOffice"))
+        extra.update(oauth.registration_params(host_id(), config.get("app_name") or "1xAIoffice"))
     if config.get("resource"):
         extra["resource"] = config["resource"]
     config = dict(config, extra_auth_params=extra)

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MPL-2.0
 """Nghiệm thu mốc M5: AI soạn một công văn, và công văn đó phải ĐẠT kiểm thể thức NĐ30.
 
-Chạy bằng Python của chính app, nối vào một phiên 1xVnOffice đang mở qua UNO pipe. Xem scripts/nghiem-thu-m5.sh.
+Chạy bằng Python của chính app, nối vào một phiên 1xAIoffice đang mở qua UNO pipe. Xem scripts/nghiem-thu-m5.sh.
 
 Khoá API không đi qua script này: app đọc nhà cung cấp từ providers.json của người dùng, còn giá trị khoá thì
 chỉ tiến trình Agent Host lấy ra từ kho bí mật của hệ điều hành.
@@ -30,7 +30,7 @@ def connect(pipe):
             return resolver.resolve(f"uno:pipe,name={pipe};urp;StarOffice.ComponentContext")
         except Exception:                      # noqa: BLE001 - app còn đang khởi động
             time.sleep(1)
-    sys.exit("không nối được tới 1xVnOffice")
+    sys.exit("không nối được tới 1xAIoffice")
 
 
 def main():

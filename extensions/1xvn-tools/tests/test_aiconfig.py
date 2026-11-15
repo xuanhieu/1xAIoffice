@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pythonpath"))
 from vn1x import aiconfig  # noqa: E402
 
-CLAUDE = {"id": "claude", "type": "anthropic", "secret_ref": "1xvnoffice/anthropic",
+CLAUDE = {"id": "claude", "type": "anthropic", "secret_ref": "1xaioffice/anthropic",
           "models": ["claude-sonnet-5-5", "claude-haiku-5-5"]}
 LOCAL = {"id": "local", "type": "ollama", "base_url": "http://127.0.0.1:11434/v1", "models": ["qwen3:8b"]}
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
 class AuthModeTests(unittest.TestCase):
     OAUTH = {"id": "cong", "type": "openai", "models": ["m"], "auth": "oauth",
-             "base_url": "https://ai.coquan.gov.vn/v1", "secret_ref": "1xvnoffice/cong",
+             "base_url": "https://ai.coquan.gov.vn/v1", "secret_ref": "1xaioffice/cong",
              "oauth": {"authorize_url": "https://sso/a", "token_url": "https://sso/t", "client_id": "c"}}
 
     def test_a_signed_in_provider_is_a_valid_configuration(self):

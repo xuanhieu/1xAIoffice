@@ -65,7 +65,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_the_registration_asks_for_a_public_client(self):
         """Ứng dụng chạy trên máy người dùng không giữ nổi bí mật, nên phải đăng ký là client công khai."""
-        body = mcphttp.registration_body("1xVnOffice", "http://127.0.0.1:1/callback", ["mcp:tools"])
+        body = mcphttp.registration_body("1xAIoffice", "http://127.0.0.1:1/callback", ["mcp:tools"])
         self.assertEqual(body["token_endpoint_auth_method"], "none")
         self.assertEqual(body["redirect_uris"], ["http://127.0.0.1:1/callback"])
         self.assertIn("refresh_token", body["grant_types"])
@@ -104,5 +104,5 @@ class MessageTests(unittest.TestCase):
 
     def test_the_user_agent_names_the_product_and_nothing_about_the_person(self):
         """Máy chủ sau Cloudflare trả 403 cho User-Agent mặc định của urllib, nên phải gửi tên sản phẩm."""
-        self.assertTrue(mcphttp.USER_AGENT.startswith("1xVnOffice/"))
+        self.assertTrue(mcphttp.USER_AGENT.startswith("1xAIoffice/"))
         self.assertNotIn("@", mcphttp.USER_AGENT)

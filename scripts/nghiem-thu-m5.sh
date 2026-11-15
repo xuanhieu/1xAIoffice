@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # Nghiệm thu mốc M5 với nhà cung cấp AI THẬT của bạn.
 # Cần: đã gắn tài khoản AI trong app (Tiếng Việt ▸ Tài khoản AI), tức có ~/Library/Application Support/
-# 1xVnOffice/4/user/providers.json và khoá nằm trong Keychain.
+# 1xAIoffice/4/user/providers.json và khoá nằm trong Keychain.
 # Script này KHÔNG đọc và KHÔNG in khoá; app tự lấy từ kho bí mật.
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 
 APP="$(ls -dt "$ONEX_WORK"/src/libreoffice-*/instdir/*.app 2>/dev/null | head -1)"
 [ -n "$APP" ] || { echo "Chưa có bản dựng nào trong instdir."; exit 1; }
-CONFIG="${ONEX_AI_CONFIG_PATH:-$HOME/Library/Application Support/1xVnOffice/4/user/providers.json}"
+CONFIG="${ONEX_AI_CONFIG_PATH:-$HOME/Library/Application Support/1xAIoffice/4/user/providers.json}"
 if [ ! -f "$CONFIG" ]; then
   echo "Chưa thấy cấu hình nhà cung cấp AI:"
   echo "  $CONFIG"
   echo
-  echo "Mở 1xVnOffice, vào Tiếng Việt ▸ Tài khoản AI (khoá API hoặc đăng nhập), chọn nhà cung cấp"
+  echo "Mở 1xAIoffice, vào Tiếng Việt ▸ Tài khoản AI (khoá API hoặc đăng nhập), chọn nhà cung cấp"
   echo "rồi dán khoá vào hộp che chữ. Xong thì chạy lại lệnh này."
   exit 1
 fi
@@ -35,7 +35,7 @@ sleep 20
 rc=0
 "$APP/Contents/Resources/python" "$REPO_ROOT/scripts/nghiem-thu-m5.py" "$PIPE" "$ANSWER" || rc=$?
 echo
-echo "==> Cửa sổ 1xVnOffice đang mở để bạn đọc văn bản. Đóng xong thì nhấn Enter ở đây để dọn."
+echo "==> Cửa sổ 1xAIoffice đang mở để bạn đọc văn bản. Đóng xong thì nhấn Enter ở đây để dọn."
 read -r _ || true
 kill -9 "$PID" 2>/dev/null || true
 rm -rf "$PROFILE" "/tmp/OSL_PIPE_$(id -u)_$PIPE"

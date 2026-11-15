@@ -1,10 +1,10 @@
-# Giao diện 1xVnOffice
+# Giao diện 1xAIoffice
 
 Chủ dự án chốt ngày 13/11/2026: **không dùng giao diện upstream**. Bố cục và cách làm việc theo kiểu WPS Office, chất lượng hướng tới Microsoft Office 2026.
 
 ## Giới hạn pháp lý
 
-- Bố cục ribbon, thứ tự thẻ, tên lệnh thông dụng và phím tắt là quy ước chung mà Microsoft, WPS, ONLYOFFICE đều dùng. 1xVnOffice theo các quy ước này.
+- Bố cục ribbon, thứ tự thẻ, tên lệnh thông dụng và phím tắt là quy ước chung mà Microsoft, WPS, ONLYOFFICE đều dùng. 1xAIoffice theo các quy ước này.
 - **Không chép** icon, hình vẽ, logo, màu thương hiệu, tên sản phẩm hay ảnh chụp của WPS (Kingsoft) và Microsoft. Đó là tài sản có bản quyền và nhãn hiệu.
 - **Bộ icon:** dùng Fluent UI System Icons của Microsoft (giấy phép MIT, `github.com/microsoft/fluentui-system-icons`). Nhờ vậy giao diện có nét hiện đại giống Office 2026 mà vẫn hợp pháp. Icon riêng của 1x (NĐ30, chuyển mã, AI) vẽ cùng phong cách.
 
@@ -47,7 +47,7 @@ Chủ dự án không muốn theme mặc định của upstream. Hướng đã l
   - logo sáng và tối cho About và Start Center, nền About, splash hai cỡ, icon app `main.icns`;
   - icon theme `images_1x.zip`;
   - lớp cấu hình `config/1x-theme.xcd`.
-- **Theme:** dùng cơ chế ColorScheme của upstream 26.8 (`LibreOfficeTheme=1`, scheme `1xVnOffice`). Plugin macOS có áp các màu này. Không vá mã lõi. Người dùng vẫn đổi về Automatic/Light/Dark được trong Options.
+- **Theme:** dùng cơ chế ColorScheme của upstream 26.8 (`LibreOfficeTheme=1`, scheme `1xAIoffice`). Plugin macOS có áp các màu này. Không vá mã lõi. Người dùng vẫn đổi về Automatic/Light/Dark được trong Options.
 - **Icon theme "1x":** chỉ chứa icon đã thay, ở dạng SVG nên sắc nét trên Retina. Icon nào chưa có thì upstream tự lấy từ `colibre_dark`. Vì vậy có thể thay dần sang bộ Fluent (mục 6) mà không phải làm hết một lần.
 - **Start Center:**
   - Bản vá `0001-startcenter-1x-labels.patch` đổi tên ứng dụng thành 1xDoc/1xSheet/1xSlide.
@@ -94,7 +94,7 @@ Gỡ tên nhóm xong mà không thay bằng gì thì cả dải chỉ còn một
 nào. WPS cũng không ghi tên nhóm, nhưng nó giữ **vạch ngăn và nhịp khoảng cách**. Số đo lấy từ chính bộ cài WPS
 Office trên máy (`Resources/office6/skins/2018white_dark/*.kuip`, là XML token thường):
 
-| Thứ | WPS (nền tối) | 1xVnOffice làm theo |
+| Thứ | WPS (nền tối) | 1xAIoffice làm theo |
 |---|---|---|
 | Thang khoảng cách | 0 / 4 / 8 / 12 / 16 / 20 / 24 / 32 | `GROUP_GAP = 6` mỗi bên vạch → 12px giữa hai nhóm |
 | Vạch ngăn | trắng 10% (`#FFFFFF1A`); loại đậm hơn là 20% | theo màu đường kẻ của theme |
@@ -145,7 +145,7 @@ từng nút một chứ không gắn cho cả cụm. Muốn giống WPS phải t
 
 ## Bộ hướng dẫn nhanh đi kèm (13/11/2026)
 
-- `scripts/guides/make-guides.py` dùng chính 1xVnOffice sinh ra 1xDoc (.docx, kèm .pdf), 1xSheet (.xlsx) và 1xSlide (.pptx), mỗi file có bản tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp 1xVnOffice. Bước build `guides` cài chúng vào `App/Contents/Resources/guides/<lang>/`, kèm ảnh xem trước trang đầu.
+- `scripts/guides/make-guides.py` dùng chính 1xAIoffice sinh ra 1xDoc (.docx, kèm .pdf), 1xSheet (.xlsx) và 1xSlide (.pptx), mỗi file có bản tiếng Anh và tiếng Việt. Nội dung do 1x tự viết, ảnh là ảnh chụp 1xAIoffice. Bước build `guides` cài chúng vào `App/Contents/Resources/guides/<lang>/`, kèm ảnh xem trước trang đầu.
 - Hướng dẫn 1xSheet là bảng chạy được: đổi số lượng thì thành tiền, số tiền bằng chữ (DOCTIEN) và biểu đồ tự cập nhật. Bảng có sẵn lọc, cố định dòng tiêu đề và định dạng có điều kiện.
 - Lần chạy đầu, job `GuideSeeder` (sự kiện `onFirstRunInitialization`) đưa ba hướng dẫn vào mục Gần đây theo ngôn ngữ giao diện, rồi nạp lại Start Center. Job chỉ chạy khi mục Gần đây còn trống.
 - Bài học: upstream headless trên macOS bị abort trong `AquaSalMenu::setMainMenu` khi mở một tài liệu ẩn (`Hidden=True`) hoặc một cửa sổ tài liệu thứ hai. Vì vậy mỗi tệp được sinh trong một phiên soffice riêng, với tài liệu hiển thị.
@@ -165,7 +165,7 @@ Những lệnh lệch chính: đầu trang, chân trang, số trang, ngày giờ
 
 - Ribbon dạng thẻ đã là mặc định trong cả bốn ứng dụng nhờ `config/1x-defaults.xcd`. Ảnh: `docs/ui/writer-ribbon-baseline-2026-11-13.png` (so với giao diện cổ điển trước đó: `docs/ui/writer-classic-upstream-2026-11-13.png`).
 - **Bản dịch tiếng Việt của upstream 26.8 mới đạt 62% giao diện** (20.444/32.460 chuỗi; Writer `sw` 38%, `svx` 50%, `sfx2` 54%, `vcl` 55%, `cui` 85%). Hậu quả: ribbon lẫn Anh–Việt ("Home", "Insert", "Cut" chưa dịch; "Dán", "Tiêu đề 1" đã dịch).
-- Đã sửa (13/11/2026): tên sản phẩm, hộp chào mừng, hộp About và các địa chỉ web đều là của 1xVnOffice (xem mục Nhận diện và Bộ nhận diện riêng).
+- Đã sửa (13/11/2026): tên sản phẩm, hộp chào mừng, hộp About và các địa chỉ web đều là của 1xAIoffice (xem mục Nhận diện và Bộ nhận diện riêng).
 
 ### Bản dịch tiếng Việt của 1x (việc mới, giai đoạn 2)
 
@@ -182,7 +182,7 @@ Tiến độ:
 | 13/11/2026 | Toàn bộ Writer (`sw/messages.po`): 3.214 chuỗi còn thiếu, dịch song song bằng 11 subagent theo bảng thuật ngữ, qua bước kiểm biến và phím tắt; `sw` đạt 5.353/5.353 (100%) | 3.214 | Ảnh `docs/ui/writer-vi-full-2026-11-13.png`. Mặc định giao diện là tiếng Anh (chủ dự án chốt 13/11/2026), tiếng Việt chọn trong Tùy chọn |
 | 13/11/2026 | Ribbon Writer (`notebookbar.ui`) và nhãn của 415 lệnh trên ribbon đó | 97 + 353 | Nhiều bản dịch nháp cũ sai nghĩa ("Reject All" → "Chọn tất cả", "Orientation" → "Trình chiếu", "Next" → "Văn bản"); đã dịch lại theo `l10n/vi/glossary.csv` |
 
-Kết quả trên bản build release (ảnh `docs/ui/writer-1xvnoffice-vi-2026-11-13.png`): toàn bộ thẻ, nhóm và nút của ribbon Writer đã tiếng Việt; tên sản phẩm 1xVnOffice; không còn hộp chào mừng, mẹo hằng ngày hay thanh mời quyên góp khi mở app.
+Kết quả trên bản build release (ảnh `docs/ui/writer-1xaioffice-vi-2026-11-13.png`): toàn bộ thẻ, nhóm và nút của ribbon Writer đã tiếng Việt; tên sản phẩm 1xAIoffice; không còn hộp chào mừng, mẹo hằng ngày hay thanh mời quyên góp khi mở app.
 
 Còn tiếng Anh, làm ở lượt sau: tên kiểu đoạn ("Default Paragraph Style", "Body Text", "Block Quotation"), thanh trạng thái ("0 words, 0 characters", "Default Page Style", "Insert"). Ngôn ngữ tài liệu mặc định vẫn là "Anh (Mỹ)", cần đổi sang tiếng Việt để kiểm tra chính tả đúng.
 

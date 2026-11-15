@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Logic OAuth 2.0 cho 1xVnOffice, thuần Python (có test riêng, không cần mạng và không cần UNO).
+"""Logic OAuth 2.0 cho 1xAIoffice, thuần Python (có test riêng, không cần mạng và không cần UNO).
 
 Hai luồng được hỗ trợ, cả hai đều KHÔNG cần client secret:
 

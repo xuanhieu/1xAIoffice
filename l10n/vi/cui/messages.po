@@ -1,4 +1,4 @@
-# 1xVnOffice Vietnamese overlay for cui (About dialog). MPL-2.0.
+# 1xAIoffice Vietnamese overlay for cui (About dialog). MPL-2.0.
 # Entries whose msgid differs from the upstream text come from patches/libreoffice/0002-about-1x.patch.
 msgid ""
 msgstr ""

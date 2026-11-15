@@ -1,5 +1,5 @@
-Subject: Start Center: 1xVnOffice app names and shorter labels
-Why: The Start Center listed LibreOffice module names (Writer, Calc, Impress, Draw, Math, Base). 1xVnOffice names its
+Subject: Start Center: 1xAIoffice app names and shorter labels
+Why: The Start Center listed LibreOffice module names (Writer, Calc, Impress, Draw, Math, Base). 1xAIoffice names its
   apps 1xDoc, 1xSheet and 1xSlide and labels the rest by what they make, like WPS and Microsoft Office do. Labels only;
   widget ids and structure are unchanged, so no code depends on this patch. Vietnamese text: l10n/vi/sfx2/messages.po.
 Upstream: not suitable: product branding.

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""ProtocolHandler "vnd.1x.tools:" của 1xVnOffice: các lệnh tiếng Việt cho Writer và Calc,
+"""ProtocolHandler "vnd.1x.tools:" của 1xAIoffice: các lệnh tiếng Việt cho Writer và Calc,
 và add-in hàm bảng tính DOCSO, DOCTIEN (interface org.onexvn.tools.XVnSheetFunctions, types/onexvn-tools.rdb).
 
 Lệnh: NumberToWords, MoneyToWords, RemoveDiacritics, NormalizeUnicode, ConvertTCVN3.
@@ -36,14 +36,14 @@ FIELD_LABELS = {
     "token_url": "địa chỉ cấp thẻ (token)",
 }
 
-IMPL = "org.1xvnoffice.tools.ProtocolHandler"
+IMPL = "org.1xaioffice.tools.ProtocolHandler"
 PROTOCOL = "vnd.1x.tools:"
 BOLD_WEIGHT = 150.0      # com.sun.star.awt.FontWeight.BOLD
 TCVN3_REPLACEMENT_FONT = "Times New Roman"
 
 TEXTS = {
     "en": {
-        "title": "1xVnOffice",
+        "title": "1xAIoffice",
         "words_done": "Converted {n} number(s) to words.",
         "words_calc": "Wrote words for {n} cell(s) into the cell on the right; {k} skipped because that cell was not empty.",
         "not_number": "The selection is not a number: {text}",
@@ -113,13 +113,13 @@ TEXTS = {
         "csv_title": "Open a CSV file safely",
         "csv_done": "Opened {name} as text: leading zeros, codes and dates are kept exactly as written, and cells starting with \"=\" are not run as formulas.",
         "csv_cancel": "",
-        "xlsx_warning": ("Saved as {ext}. The sheet uses {n} 1xVnOffice formula(s) ({names}).\n\n"
+        "xlsx_warning": ("Saved as {ext}. The sheet uses {n} 1xAIoffice formula(s) ({names}).\n\n"
                          "Excel shows the values they produced but cannot recalculate them: for an Excel user the "
                          "cells are frozen. Save as .ods to keep them live, or replace them with their values "
                          "before sending the file."),
     },
     "vi": {
-        "title": "1xVnOffice",
+        "title": "1xAIoffice",
         "words_done": "Đã đọc {n} số thành chữ.",
         "words_calc": "Đã ghi chữ cho {n} ô vào ô bên phải; bỏ qua {k} ô vì ô bên phải không trống.",
         "not_number": "Vùng chọn không phải số: {text}",
@@ -190,7 +190,7 @@ TEXTS = {
         "csv_title": "Mở tệp CSV an toàn",
         "csv_done": "Đã mở {name} dưới dạng chữ: số 0 đầu, mã số và ngày tháng giữ nguyên như trong tệp, ô bắt đầu bằng \"=\" không bị chạy như công thức.",
         "csv_cancel": "",
-        "xlsx_warning": ("Đã lưu dạng {ext}. Bảng tính đang dùng {n} công thức của 1xVnOffice ({names}).\n\n"
+        "xlsx_warning": ("Đã lưu dạng {ext}. Bảng tính đang dùng {n} công thức của 1xAIoffice ({names}).\n\n"
                          "Excel hiện được giá trị đã tính nhưng không tính lại được: với người dùng Excel, các ô đó "
                          "đứng yên. Muốn giữ công thức sống thì lưu dạng .ods, hoặc thay công thức bằng giá trị "
                          "trước khi gửi tệp."),
@@ -422,7 +422,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
                                                    version=skill["version"]))
 
     def cmd_McpServer(self, doc, is_writer):
-        """Bật/tắt máy chủ MCP của 1xVnOffice và duyệt những trợ lý đang xin phép.
+        """Bật/tắt máy chủ MCP của 1xAIoffice và duyệt những trợ lý đang xin phép.
 
         Mặc định TẮT (ai-platform-design.md mục 8 và bảng mục 14): chưa bật thì không trợ lý nào vào được.
         """
@@ -432,7 +432,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         if not state.get("enabled"):
             if not self.ask(self.t["mcpsrv_off"]):
                 return
-            state = {"enabled": True, "pipe": state.get("pipe") or f"1xvnoffice-{os.getuid()}"}
+            state = {"enabled": True, "pipe": state.get("pipe") or f"1xaioffice-{os.getuid()}"}
             self._write_json(self._profile_file("mcp_server.json"), state)
             _start_acceptor(self.ctx, state["pipe"])
             self.message(self.t["mcpsrv_started"].format(config=self._mcp_server_config(state["pipe"])))
@@ -454,7 +454,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
 
     def _mcp_server_config(self, pipe):
         script = Path(__file__).resolve().parent / "mcpserver" / "server.py"
-        return json.dumps({"mcpServers": {"1xvnoffice": {"command": self._python_executable(),
+        return json.dumps({"mcpServers": {"1xaioffice": {"command": self._python_executable(),
                                                          "args": [str(script), "--pipe", pipe]}}},
                           ensure_ascii=False, indent=2)
 
@@ -1190,7 +1190,7 @@ MCP_EXAMPLE = json.dumps({
 
 AI_EXAMPLE = json.dumps({
     "providers": [
-        {"id": "claude", "type": "anthropic", "secret_ref": "1xvnoffice/anthropic",
+        {"id": "claude", "type": "anthropic", "secret_ref": "1xaioffice/anthropic",
          "models": ["claude-sonnet-5-5"]},
         {"id": "local", "type": "ollama", "base_url": "http://127.0.0.1:11434/v1", "models": ["qwen3:8b"]},
     ],
@@ -1221,7 +1221,7 @@ except ImportError:  # type library not registered (e.g. imported outside the of
 
 if XVnSheetFunctions is not None:
     class SheetFunctions(unohelper.Base, XVnSheetFunctions, XServiceInfo):
-        """Hàm bảng tính của 1xVnOffice: =DOCSO(số; ["lẻ"|"linh"]), =DOCTIEN(số tiền; [đơn vị, mặc định "đồng"]),
+        """Hàm bảng tính của 1xAIoffice: =DOCSO(số; ["lẻ"|"linh"]), =DOCTIEN(số tiền; [đơn vị, mặc định "đồng"]),
         =TACHHO / =TACHDEM / =TACHTEN(họ tên) và =SAPTEN(họ tên) cho khoá sắp xếp. Giá trị không đọc được
         (quá 18 chữ số…) báo lỗi trong ô thay vì trả về chữ sai."""
 
@@ -1271,7 +1271,7 @@ if XVnSheetFunctions is not None:
             return ("com.sun.star.sheet.AddIn",)
 
 
-MCP_ACCEPTOR_IMPL = "org.1xvnoffice.tools.McpAcceptor"
+MCP_ACCEPTOR_IMPL = "org.1xaioffice.tools.McpAcceptor"
 _ACCEPTING = set()        # tên pipe đang nghe, để không mở hai lần trong một phiên
 
 
@@ -1325,7 +1325,7 @@ class McpAcceptor(unohelper.Base, XJob):
         return ()
 
 
-GUIDES_IMPL = "org.1xvnoffice.tools.GuideSeeder"
+GUIDES_IMPL = "org.1xaioffice.tools.GuideSeeder"
 
 
 class GuideSeeder(unohelper.Base, XJob):
@@ -1396,13 +1396,13 @@ class GuideSeeder(unohelper.Base, XJob):
             window.setVisible(True)
 
 
-WARNER_IMPL = "org.1xvnoffice.tools.XlsxWarner"
+WARNER_IMPL = "org.1xaioffice.tools.XlsxWarner"
 ADDIN_MARK = "ORG.ONEXVN.TOOLS."          # công thức của add-in hiện ra dưới tên đầy đủ này
 RISKY_EXT = (".xlsx", ".xls", ".xlsm", ".csv")
 
 
 def _addin_formulas(doc):
-    """Tên các hàm của 1xVnOffice đang dùng trong bảng tính, không trùng lặp."""
+    """Tên các hàm của 1xAIoffice đang dùng trong bảng tính, không trùng lặp."""
     from com.sun.star.sheet.CellFlags import FORMULA
     found = set()
     sheets = doc.getSheets()
@@ -1424,7 +1424,7 @@ def _addin_formulas(doc):
 
 
 class SaveWatcher(unohelper.Base, XDocumentEventListener):
-    """Sau khi lưu bảng tính sang định dạng Excel, nhắc rằng hàm riêng của 1xVnOffice không tính lại được ở Excel.
+    """Sau khi lưu bảng tính sang định dạng Excel, nhắc rằng hàm riêng của 1xAIoffice không tính lại được ở Excel.
     Mỗi tài liệu chỉ nhắc một lần trong phiên."""
 
     def __init__(self, ctx, texts):

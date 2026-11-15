@@ -24,7 +24,7 @@ def _schema(properties, required=()):
 TOOLS = [
     {"name": "docs.list_open", "read_only": True, "destructive": False,
      "title": "Tài liệu đang mở",
-     "description": "Liệt kê tài liệu đang mở trong 1xVnOffice: mã, tên, loại (văn bản, bảng tính, trình chiếu), "
+     "description": "Liệt kê tài liệu đang mở trong 1xAIoffice: mã, tên, loại (văn bản, bảng tính, trình chiếu), "
                     "đã lưu hay chưa.",
      "schema": _schema({})},
     {"name": "doc.read", "read_only": True, "destructive": False,

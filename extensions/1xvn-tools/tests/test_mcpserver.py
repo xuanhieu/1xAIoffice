@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-"""1xVnOffice làm máy chủ MCP: giao thức, ghép đôi, và cư xử khi không có phiên nào đang chạy."""
+"""1xAIoffice làm máy chủ MCP: giao thức, ghép đôi, và cư xử khi không có phiên nào đang chạy."""
 import io
 import os
 import json
@@ -54,7 +54,7 @@ class ProtocolTests(ClientsFile):
     def test_initialize_answers_with_the_protocol_version(self):
         answer = talk([hello()], clients_file=self.missing)[0]
         self.assertEqual(answer["result"]["protocolVersion"], server.PROTOCOL_VERSION)
-        self.assertEqual(answer["result"]["serverInfo"]["name"], "1xVnOffice")
+        self.assertEqual(answer["result"]["serverInfo"]["name"], "1xAIoffice")
 
     def test_tools_list_works_before_pairing(self):
         # Client chưa được phép vẫn xem được có những công cụ gì; chỉ không gọi được.
@@ -121,7 +121,7 @@ class NoSessionTests(ClientsFile):
                        backend=None, clients_file=self.allow("Claude Desktop"))
         result = answers[1]["result"]
         self.assertTrue(result["isError"])
-        self.assertIn("1xVnOffice", result["content"][0]["text"])
+        self.assertIn("1xAIoffice", result["content"][0]["text"])
 
 
 class ProcessTests(ClientsFile):
@@ -134,7 +134,7 @@ class ProcessTests(ClientsFile):
                               env={"PATH": "/usr/bin:/bin", "ONEX_MCP_CLIENTS_PATH": self.missing})
         self.assertEqual(done.returncode, 0, done.stderr)
         answers = [json.loads(line) for line in done.stdout.splitlines() if line.strip()]
-        self.assertEqual(answers[0]["result"]["serverInfo"]["name"], "1xVnOffice")
+        self.assertEqual(answers[0]["result"]["serverInfo"]["name"], "1xAIoffice")
         self.assertIn("doc.read", [t["name"] for t in answers[1]["result"]["tools"]])
 
 

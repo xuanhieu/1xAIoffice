@@ -1,4 +1,4 @@
-# 1xVnOffice Vietnamese overlay for sfx2 (Start Center). MPL-2.0.
+# 1xAIoffice Vietnamese overlay for sfx2 (Start Center). MPL-2.0.
 # Entries whose msgid differs from LibreOffice come from patches/libreoffice/0001-startcenter-1x-labels.patch.
 msgid ""
 msgstr ""
