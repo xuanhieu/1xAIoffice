@@ -96,6 +96,7 @@ TEXTS = {
                           "pay for, an API key, or an AI server on this computer."),
         "acct_open_key_page": "{label} needs an API key.\n\nOpen the page where you create one ({url}) in your browser now? Sign in there, create a key, copy it, then come back here to paste it.",
         "acct_open_failed": "Could not open the browser. Open this address yourself: {url}",
+        "cancel": "Cancel",
         "acct_title": "AI accounts",
         "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
         "acct_pick": "Type the number or the name of the provider to add (empty to close):",
@@ -177,6 +178,7 @@ TEXTS = {
                           "một khoá API, hoặc máy chủ AI chạy trong máy."),
         "acct_open_key_page": "{label} cần một khoá API.\n\nMở trang tạo khoá ({url}) trong trình duyệt ngay bây giờ? Bạn đăng nhập ở đó, tạo khoá, chép lại, rồi quay về đây dán vào.",
         "acct_open_failed": "Không mở được trình duyệt. Bạn tự mở địa chỉ này: {url}",
+        "cancel": "Huỷ",
         "acct_title": "Tài khoản AI",
         "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
         "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
@@ -718,7 +720,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         if not config.get("providers"):
             # Người dùng văn phòng không đi viết providers.json: mời mở thẳng màn hình Tài khoản AI, gắn xong
             # thì làm tiếp đúng việc họ vừa bấm.
-            if not self.ask(self.t["ai_no_account"]):
+            if not self.ask(self.t["ai_no_account"], default_yes=True):
                 return None
             self.cmd_AiAccounts(None, False)
             try:
@@ -869,7 +871,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         """Nhận khoá API và đưa thẳng vào kho bí mật của máy. Không ghi ra tệp, không hiện lại."""
         key = self._scripted("secret")
         if key is None and preset.get("key_url") and self.ask(
-                self.t["acct_open_key_page"].format(label=preset["label"], url=preset["key_url"])):
+                self.t["acct_open_key_page"].format(label=preset["label"], url=preset["key_url"]), default_yes=True):
             # Người dùng tự đăng nhập và tự tạo khoá trên trang của hãng; app chỉ mở trang, không đụng vào đó.
             self._open_url(preset["key_url"])
         if key is None:
@@ -1041,19 +1043,20 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             return ""
         smgr = self.ctx.ServiceManager
         model = smgr.createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", self.ctx)
-        model.Width, model.Height, model.Title = 260, 90, title
+        # Lời nhắc dài nhất (dán khoá API) chiếm 4-5 dòng, nên chừa 56 đơn vị cho nhãn.
+        model.Width, model.Height, model.Title = 260, 112, title
         label = model.createInstance("com.sun.star.awt.UnoControlFixedTextModel")
-        label.PositionX, label.PositionY, label.Width, label.Height, label.MultiLine = 8, 8, 244, 24
+        label.PositionX, label.PositionY, label.Width, label.Height, label.MultiLine = 8, 8, 244, 56, True
         label.Label = prompt
         model.insertByName("lbl", label)
         edit = model.createInstance("com.sun.star.awt.UnoControlEditModel")
-        edit.PositionX, edit.PositionY, edit.Width, edit.Height = 8, 36, 244, 16
+        edit.PositionX, edit.PositionY, edit.Width, edit.Height = 8, 68, 244, 16
         if secret:
             edit.EchoChar = ord("*")
         model.insertByName("q", edit)
-        for name, text, kind, pos in (("ok", "OK", 1, 0), ("cancel", "Huỷ", 2, 1)):
+        for name, text, kind, pos in (("ok", "OK", 1, 0), ("cancel", self.t["cancel"], 2, 1)):
             button = model.createInstance("com.sun.star.awt.UnoControlButtonModel")
-            button.PositionX, button.PositionY = model.Width - (pos + 1) * 60, 60
+            button.PositionX, button.PositionY = model.Width - (pos + 1) * 60, 92
             button.Width, button.Height = 52, 14
             button.Label, button.PushButtonType, button.DefaultButton = text, kind, kind == 1
             model.insertByName(name, button)
@@ -1196,13 +1199,18 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         if warning:
             self.message(warning)
 
-    def ask(self, text):
-        """Hỏi Có/Không. Khi chạy tự động (ONEX_TOOLS_SILENT) thì coi như Có, để bước kiểm chạy được phần sửa."""
+    def ask(self, text, default_yes=False):
+        """Hỏi Có/Không. Khi chạy tự động (ONEX_TOOLS_SILENT) thì coi như Có, để bước kiểm chạy được phần sửa.
+
+        `default_yes` cho những lời mời người dùng vừa tự bấm tới (mở trang lấy khoá, gắn tài khoản): Enter là Có.
+        Câu hỏi có thể làm thay đổi tài liệu giữ mặc định Không.
+        """
         if os.environ.get("ONEX_TOOLS_SILENT") == "1" or self.frame is None:
             return os.environ.get("ONEX_TOOLS_CHECK_FIX") == "1"
         from com.sun.star.awt.MessageBoxType import QUERYBOX
         toolkit = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.Toolkit", self.ctx)
-        box = toolkit.createMessageBox(self.frame.getContainerWindow(), QUERYBOX, 3, self.t["title"], text)
+        buttons = 3 | (0x40000 if default_yes else 0)   # BUTTONS_YES_NO, DEFAULT_BUTTON_YES
+        box = toolkit.createMessageBox(self.frame.getContainerWindow(), QUERYBOX, buttons, self.t["title"], text)
         answer = box.execute()
         box.dispose()
         return answer == 2   # com.sun.star.awt.MessageBoxResults.YES

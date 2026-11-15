@@ -430,3 +430,29 @@ class ResponsesStreamTests(unittest.TestCase):
 
     def test_the_plan_limit_turns_into_a_message_a_person_can_act_on(self):
         self.assertIn("hết lượt", host.ERRORS["plan_limit"])
+
+
+class StaticTokenServerTests(unittest.TestCase):
+    """Máy chủ MCP chỉ nhận khoá tĩnh (ví dụ Office Skills): cấu hình ghi tên mục Keychain, khoá đọc lúc gọi."""
+
+    def setUp(self):
+        import tempfile
+        self.store = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        json.dump({"office-skills-mcp-token": "khoa-tinh-gia"}, self.store)
+        self.store.close()
+        self.addCleanup(os.unlink, self.store.name)
+        os.environ["ONEX_SECRET_STORE_FOR_TEST"] = self.store.name
+        self.addCleanup(os.environ.pop, "ONEX_SECRET_STORE_FOR_TEST", None)
+
+    def test_the_named_secret_becomes_the_bearer_token(self):
+        server = host.open_mcp({"id": "office-skills", "url": "https://office-skill.example/mcp",
+                                "transport": "http", "token_ref": "office-skills-mcp-token"})
+        self.assertEqual(server._headers()["Authorization"], "Bearer khoa-tinh-gia")
+
+    def test_a_missing_secret_sends_no_authorization(self):
+        server = host.open_mcp({"id": "x", "url": "https://x.example/mcp", "token_ref": "khong-co"})
+        self.assertNotIn("Authorization", server._headers())
+
+    def test_the_config_never_holds_the_token(self):
+        entry = {"id": "office-skills", "url": "https://office-skill.example/mcp", "token_ref": "office-skills-mcp-token"}
+        self.assertNotIn("khoa-tinh-gia", json.dumps(entry))

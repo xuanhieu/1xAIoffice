@@ -211,3 +211,10 @@ class HttpServerTests(unittest.TestCase):
     def test_a_server_that_is_not_there_says_so_plainly(self):
         with self.assertRaises(mcpclient.McpError):
             mcpclient.HttpServer("http://127.0.0.1:1/mcp", timeout=2).list_tools()
+
+
+class TokenRefConfigTests(unittest.TestCase):
+    def test_a_static_token_server_keeps_its_keychain_name(self):
+        servers = mcpclient.from_claude_desktop({"mcpServers": {"office-skills": {
+            "type": "http", "url": "https://office-skill.example/mcp", "token_ref": "office-skills-mcp-token"}}})
+        self.assertEqual(servers[0]["token_ref"], "office-skills-mcp-token")

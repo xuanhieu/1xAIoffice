@@ -118,6 +118,12 @@ Khai máy chủ trong `mcp_servers.json` ở hồ sơ người dùng. Cấu trú
 
 **Máy chủ ở xa tự lo phần đăng nhập.** Lần đầu gọi tới, máy chủ trả 401 kèm chỉ dẫn; 1xAIoffice đi theo đúng chuẩn uỷ quyền của MCP để tự tìm đường: bản mô tả tài nguyên (RFC 9728) cho biết máy chủ uỷ quyền nào đứng sau, bản mô tả của máy chủ uỷ quyền cho đường đăng nhập và đường tự đăng ký ứng dụng (RFC 7591). Nhờ vậy bạn **không phải xin client_id** ở đâu cả — app tự đăng ký, rồi hỏi bạn một câu trước khi mở trình duyệt. Thẻ nằm trong kho bí mật của máy, một mục cho mỗi máy chủ.
 
+**Máy chủ chỉ nhận khoá tĩnh** (không có OAuth, ví dụ kho biểu mẫu Office Skills) thì thêm `token_ref`: đó là **tên** mục trong Keychain giữ khoá, không phải bản thân khoá. App đọc khoá ngay lúc gọi và gửi dạng `Authorization: Bearer`; khoá không bao giờ nằm trong tệp cấu hình.
+
+```json
+"office-skills": {"type": "http", "url": "https://office-skill.xuanhieu.org/mcp", "token_ref": "office-skills-mcp-token"}
+```
+
 Lời gọi tới máy chủ ở xa đi qua tiến trình Agent Host như mọi kết nối mạng khác, nên tài liệu đang mở không bao giờ tự ra Internet, và thẻ đăng nhập chỉ tiến trình đó chạm vào.
 
 Ba nguyên tắc an toàn:

@@ -282,7 +282,10 @@ def from_claude_desktop(config):
     for name, entry in (config.get("mcpServers") or {}).items():
         url = entry.get("url")
         if url and (entry.get("type") or "").lower() in ("http", "streamable-http", "sse", ""):
-            out.append({"id": name, "url": url, "transport": "http"})
+            server = {"id": name, "url": url, "transport": "http"}
+            if entry.get("token_ref"):            # tên mục Keychain giữ khoá tĩnh, không phải bản thân khoá
+                server["token_ref"] = entry["token_ref"]
+            out.append(server)
             continue
         command = entry.get("command")
         if not command:

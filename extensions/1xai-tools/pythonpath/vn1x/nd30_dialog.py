@@ -82,6 +82,13 @@ def validate(raw, lang="en", today=None):
     return out, None
 
 
+DEFAULT_TYPE = "cong_van"   # loại văn bản dùng nhiều nhất; chọn theo MÃ, không theo vị trí trong danh sách
+
+
+def default_type_index(types):
+    """Vị trí của Công văn trong danh sách loại văn bản (0 nếu bảng không có, để hộp thoại vẫn mở được)."""
+    return next((i for i, (code, _) in enumerate(types) if code == DEFAULT_TYPE), 0)
+
 def run(ctx, parent_window, lang="en"):
     import uno  # noqa: F401  (khởi tạo cầu nối UNO trước khi dùng unohelper)
     import unohelper
@@ -106,7 +113,7 @@ def run(ctx, parent_window, lang="en"):
             ctl.Dropdown = True
             items = [v["name"] for _, v in types] if key == "type" else [a or "—" for a in prefixes]
             ctl.StringItemList = tuple(items)
-            ctl.SelectedItems = (1 if key == "type" else 0,)
+            ctl.SelectedItems = (default_type_index(types) if key == "type" else 0,)
         else:
             ctl = model.createInstance("com.sun.star.awt.UnoControlEditModel")
             ctl.MultiLine = kind == "multi"

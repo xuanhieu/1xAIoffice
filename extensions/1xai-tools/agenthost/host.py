@@ -360,7 +360,11 @@ def open_mcp(server):
     if server.get("transport") == "http" or server.get("url"):
         import oauthflow
         url = server["url"]
-        token = (oauthflow.read_bundle(oauthflow.mcp_secret_ref(url)) or {}).get("access_token", "")
+        if server.get("token_ref"):
+            # Máy chủ chỉ nhận khoá tĩnh (không có OAuth): cấu hình chỉ ghi TÊN mục Keychain, khoá đọc ngay lúc gọi.
+            token = oauthflow.read_secret(server["token_ref"]) or ""
+        else:
+            token = (oauthflow.read_bundle(oauthflow.mcp_secret_ref(url)) or {}).get("access_token", "")
         return mcpclient.HttpServer(url, token=token,
                                     timeout=server.get("timeout", mcpclient.DEFAULT_TIMEOUT))
     return mcpclient.StdioServer(server.get("command", ""), server.get("args") or [],

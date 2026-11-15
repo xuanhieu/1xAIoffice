@@ -18,15 +18,18 @@ Bộ văn phòng trọn gói, miễn phí và riêng tư của người Việt: 
 
 - Một ứng dụng cho văn bản, bảng tính và trình chiếu, mặc định lưu .docx, .xlsx, .pptx.
 - Giao diện tiếng Việt đầy đủ, đổi từ tiếng Anh trong Tuỳ chọn.
-- Trình soạn văn bản hành chính theo Nghị định 30/2020/NĐ-CP (khổ giấy, lề, phông chữ, khối chữ ký).
+- Văn bản hành chính theo Nghị định 30/2020/NĐ-CP: 28 loại văn bản có khung nội dung mẫu và khối chữ ký (cả loại hai bên cùng ký), cùng lệnh kiểm thể thức văn bản đang mở và sửa phần trang (khổ giấy, lề, phông chữ).
+- Trợ lý AI dùng tài khoản của chính bạn: gói ChatGPT đang trả, khoá API (nhiều hãng có gói miễn phí) hoặc AI chạy ngay trong máy. Hỏi về tài liệu, viết lại có xem trước và hoàn tác bằng một lần Ctrl+Z, chạy skill. Khoá nằm trong kho bí mật của máy.
+- Kết nối MCP: dùng công cụ của máy chủ MCP bên ngoài, và cho trợ lý như Claude Desktop làm việc với tài liệu đang mở, chỉ khi bạn cho phép.
 - Công cụ tiếng Việt: chuyển mã TCVN3 sang Unicode, chuẩn hoá Unicode, bỏ dấu, đọc số và đọc tiền thành chữ (DOCSO, DOCTIEN trong 1xSheet).
+- 1xSheet: Ctrl+X giữ nguyên ô, có viền chạy cho tới khi dán như Excel; mở CSV an toàn không mất số 0 đầu của số điện thoại, căn cước.
 - Không quảng cáo, không nhắc nâng cấp, không theo dõi; macro bị chặn trừ khi bạn tin cậy.
 
 **Đang làm tiếp**
 
 - Đo độ tương thích với Microsoft Office trên bộ tài liệu thật của Việt Nam.
 - Ký số bằng USB Token.
-- Nền tảng AI mở: khoá API riêng, máy chủ MCP, plugin và skill của bạn.
+- Bản cài đặt chính thức, có chữ ký, cho macOS và Windows.
 - Triển khai hàng loạt cho tổ chức.
 
 **Điểm khác biệt**
@@ -61,15 +64,18 @@ The free, private, all-in-one office suite for Vietnam: 1xDoc, 1xSheet and 1xSli
 
 - One app for documents, spreadsheets and presentations, saved as .docx, .xlsx and .pptx by default.
 - Full Vietnamese interface, switchable from English in Options.
-- Administrative document composer following Decree 30/2020/ND-CP (layout, margins, fonts, signature block).
+- Vietnamese administrative documents under Decree 30/2020/ND-CP: 28 document types with body templates and signature blocks (including two-party signing), plus a check of the open document that fixes the page setup (paper size, margins, font).
+- An AI assistant on your own account: the ChatGPT plan you already pay for, an API key (many providers have a free tier) or AI running on this computer. Ask about a document, rewrite with a preview and one-step undo, run skills. Keys stay in the computer's secret store.
+- MCP connections: use tools from outside MCP servers, and let assistants such as Claude Desktop work with your open documents, only when you allow it.
 - Vietnamese tools: TCVN3 to Unicode, Unicode normalization, remove diacritics, number and amount in words (DOCSO, DOCTIEN in 1xSheet).
+- 1xSheet: Ctrl+X keeps the cells, with marching ants until you paste, as in Excel; open CSV safely without losing leading zeros in phone and ID numbers.
 - No ads, no upgrade prompts and no tracking; macros are blocked unless you trust them.
 
 **On the roadmap**
 
 - Measured compatibility with Microsoft Office on a collection of real Vietnamese documents.
 - Digital signatures with USB tokens.
-- An open AI platform: your own API keys, MCP servers, plugins and skills.
+- Official signed installers for macOS and Windows.
 - Managed deployment for organizations.
 
 **Why it is different**

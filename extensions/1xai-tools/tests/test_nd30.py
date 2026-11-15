@@ -355,3 +355,16 @@ class DataConsistencyTests(unittest.TestCase):
 
     def test_a4_is_the_page_size(self):
         self.assertEqual((nd30.DATA["page"]["width_mm"], nd30.DATA["page"]["height_mm"]), (210, 297))
+
+
+class DialogDefaultTests(unittest.TestCase):
+    """Hộp soạn văn bản NĐ30 mở ra là Công văn, loại dùng nhiều nhất, dù bảng loại văn bản có đổi thứ tự."""
+
+    def test_the_dialog_starts_on_cong_van(self):
+        from vn1x import nd30_dialog
+        types = list(nd30_dialog.DATA["doc_types"].items())
+        self.assertEqual(types[nd30_dialog.default_type_index(types)][0], "cong_van")
+
+    def test_a_table_without_cong_van_still_opens(self):
+        from vn1x import nd30_dialog
+        self.assertEqual(nd30_dialog.default_type_index([("to_trinh", {}), ("bao_cao", {})]), 0)
