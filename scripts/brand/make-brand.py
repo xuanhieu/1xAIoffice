@@ -216,6 +216,13 @@ def fluent_icons(fluent_dir):
             text = re.sub(r'<svg ', f'<svg fill="{ICON_FG}" ', text, count=1)
             text = re.sub(r'width="\d+" height="\d+"', f'width="{size}" height="{size}"', text, count=1)
             out[pattern.format(cmd)] = text
+    # Nút "+" trên thanh nhỏ trên cùng: chỉ cỡ nhỏ đổi thành dấu cộng; cỡ lớn của .uno:AddDirect là icon dải thẻ
+    # thanh bên "Trang", giữ nguyên.
+    for cmd, name in SMALL_ONLY.items():
+        src = Path(fluent_dir) / f"{name}_16_regular.svg"
+        if src.is_file():
+            text = re.sub(r'<svg ', f'<svg fill="{ICON_FG}" ', src.read_text(encoding="utf-8"), count=1)
+            out[f"cmd/sc_{cmd}.svg"] = re.sub(r'width="\d+" height="\d+"', 'width="16" height="16"', text, count=1)
     # Icon của dải thẻ thanh bên (Sidebar.xcu trỏ thẳng tới các tệp này, không qua tên lệnh). Bản gốc là icon
     # màu kiểu cũ, nằm ngay mép phải nên rất dễ thấy lệch tông với phần còn lại.
     for path, name in SIDEBAR_DECKS.items():
@@ -245,7 +252,8 @@ SIDEBAR_DECKS = {f"sfx2/res/symphony/sidebar-{k}-large.svg": v for k, v in {
     "property": "options", "style": "text_font_size", "gallery": "image_multiple", "navigator": "compass_northwest",
     "template": "document_multiple", "functions": "math_formula", "elements": "math_symbols",
     "transition": "slide_transition", "animation": "data_histogram", "a11y": "accessibility"}.items()}
-SIDEBAR_DECKS["res/1x_deck_ai.svg"] = "sparkle"     # mục "AI" của 1xAIoffice trên dải thẻ thanh bên
+SIDEBAR_DECKS["res/1x_deck_ai.svg"] = "sparkle"
+SMALL_ONLY = {"adddirect": "add"}      # lệnh: icon Fluent chỉ cho cỡ nhỏ (sc_)     # mục "AI" của 1xAIoffice trên dải thẻ thanh bên
 
 # Icon cho lệnh của extension 1xai-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
 ADDON_ICONS = {"AiAccounts": "key", "AiAsk": "sparkle", "AiRewrite": "text_edit_style", "McpTools": "plug_connected",

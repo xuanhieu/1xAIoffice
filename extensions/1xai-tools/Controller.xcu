@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Nút "chuyển tệp" trên thanh nhỏ trên cùng: .uno:WindowList thả xuống danh sách cửa sổ đang mở (bộ điều khiển
+     menu WindowListMenuController có sẵn trong lõi, mở bằng GenericPopupToolbarController). -->
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    oor:name="Controller" oor:package="org.openoffice.Office.UI">
+  <node oor:name="Registered">
+    <node oor:name="ToolBar">
+      <node oor:name="OnexWindowListController" oor:op="replace">
+        <prop oor:name="Command"><value>.uno:WindowList</value></prop>
+        <prop oor:name="Module"><value/></prop>
+        <prop oor:name="Controller"><value>com.sun.star.comp.framework.GenericPopupToolbarController</value></prop>
+        <prop oor:name="Value"><value>.uno:WindowList</value></prop>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

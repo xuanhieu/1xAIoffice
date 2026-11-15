@@ -67,6 +67,26 @@ def insert(root, after, items):
     return sum(1 for item in items if item)
 
 
+# Thanh nhỏ trên cùng của ribbon (toolbar/notebookbarshortcuts.xml): nút "+" tạo nhanh mọi loại tài liệu và nút
+# chuyển nhanh giữa các tệp đang mở, như thanh trên cùng của WPS (chủ dự án chọn hướng này 15/11/2026, thay cho thẻ
+# cửa sổ của macOS mà lõi cố ý tắt vì lỗi bố cục).
+TB = "http://openoffice.org/2001/toolbar"
+XLINK = "http://www.w3.org/1999/xlink"
+SHORTCUT_APPS = {"swriter": "sw", "scalc": "sc", "simpress": "sd", "sdraw": "sd"}
+
+
+def quick_bar(root):
+    """Chèn ".uno:AddDirect" ngay sau nút menu và ".uno:WindowList" ở cuối; chạy lại không chèn lần hai."""
+    href = f"{{{XLINK}}}href"
+    have = [el.get(href) for el in root]
+    if ".uno:AddDirect" not in have:
+        at = next((i + 1 for i, el in enumerate(root) if el.get(href) == ".uno:Menubar"), 0)
+        root.insert(at, ET.Element(f"{{{TB}}}toolbaritem", {href: ".uno:AddDirect"}))
+    if ".uno:WindowList" not in have:
+        root.append(ET.Element(f"{{{TB}}}toolbarseparator"))
+        root.append(ET.Element(f"{{{TB}}}toolbaritem", {href: ".uno:WindowList"}))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True)
@@ -87,6 +107,20 @@ def main():
         if not a.check:
             tree.write(dest, encoding="UTF-8", xml_declaration=True)
         print(f"{app}/{name}: thêm {count} lệnh vào đầu menu chuột phải")
+    ET.register_namespace("toolbar", TB)
+    ET.register_namespace("xlink", XLINK)
+    for app, module in SHORTCUT_APPS.items():
+        src = Path(a.src) / module / "uiconfig" / app / "toolbar" / "notebookbarshortcuts.xml"
+        dest = Path(a.app) / "Contents/Resources/config/soffice.cfg/modules" / app / "toolbar" / src.name
+        if not src.is_file() or not dest.parent.is_dir():
+            print(f"BỎ QUA {app}/{src.name}")
+            ok = False
+            continue
+        tree = ET.parse(src)
+        quick_bar(tree.getroot())
+        if not a.check:
+            tree.write(dest, encoding="UTF-8", xml_declaration=True)
+        print(f"{app}/{src.name}: nút + tạo nhanh và nút chuyển tệp")
     sys.exit(0 if ok else 1)
 
 

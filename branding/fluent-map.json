@@ -884,5 +884,8 @@
   ],
   "defaultcharstyle": [
     "text_clear_formatting"
+  ],
+  "windowlist": [
+    "window_multiple"
   ]
 }
