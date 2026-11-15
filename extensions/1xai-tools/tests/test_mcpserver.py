@@ -193,23 +193,42 @@ class ResourceAndPromptTests(unittest.TestCase):
         out = srv.handle("resources/read", {"uri": "1x://sheet/doc2/Sheet1"})["contents"][0]
         self.assertEqual(out["mimeType"], "text/csv")
 
-    def test_every_installed_skill_is_offered_as_a_prompt(self):
-        srv = self.server()
-        names = [p["name"] for p in srv.handle("prompts/list", {})["prompts"]]
-        self.assertIn("soan-van-ban-nd30", names)
-        self.assertEqual(len(names), len(set(names)))
+    def user_skill(self):
+        """Một skill do người dùng tự cài, chép từ một skill đi kèm rồi đổi tên."""
+        import shutil, tempfile
+        home = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, home, True)
+        dest = home / "skill-cua-toi"
+        shutil.copytree(server.BUNDLED_SKILLS / "soan-van-ban-nd30", dest)
+        md = dest / "SKILL.md"
+        md.write_text(md.read_text(encoding="utf-8").replace("name: soan-van-ban-nd30", "name: skill-cua-toi"),
+                      encoding="utf-8")
+        os.environ["ONEX_SKILLS_PATH"] = str(home)
+        self.addCleanup(os.environ.pop, "ONEX_SKILLS_PATH", None)
 
-    def test_an_unpaired_assistant_cannot_read_a_skill_body(self):
-        srv = self.server()
-        with self.assertRaises(server.Unpaired):
+    def test_bundled_skills_are_never_offered_to_outside_assistants(self):
+        self.user_skill()
+        names = [p["name"] for p in self.server().handle("prompts/list", {})["prompts"]]
+        self.assertNotIn("soan-van-ban-nd30", names)
+        self.assertIn("skill-cua-toi", names)
+
+    def test_even_a_paired_assistant_cannot_pull_a_bundled_skill(self):
+        self.user_skill()
+        srv = self.server(paired_name="Trợ lý Thử")
+        with self.assertRaises(RuntimeError):
             srv.handle("prompts/get", {"name": "soan-van-ban-nd30"})
 
-    def test_a_paired_assistant_gets_the_skill_body_and_its_question(self):
+    def test_an_unpaired_assistant_cannot_read_a_skill_body(self):
+        self.user_skill()
+        srv = self.server()
+        with self.assertRaises(server.Unpaired):
+            srv.handle("prompts/get", {"name": "skill-cua-toi"})
+
+    def test_a_paired_assistant_gets_the_user_skill_body_and_its_question(self):
+        self.user_skill()
         srv = self.server(paired_name="Trợ lý Thử")
-        out = srv.handle("prompts/get", {"name": "soan-van-ban-nd30", "arguments": {"viec": "soạn công văn"}})
-        text = out["messages"][0]["content"]["text"]
-        self.assertIn("soạn công văn", text)
-        self.assertIn("NĐ30", text.upper().replace("NGHỊ ĐỊNH 30", "NĐ30"))
+        out = srv.handle("prompts/get", {"name": "skill-cua-toi", "arguments": {"viec": "soạn công văn"}})
+        self.assertIn("soạn công văn", out["messages"][0]["content"]["text"])
 
     def test_asking_for_a_skill_that_does_not_exist_says_so(self):
         srv = self.server(paired_name="Trợ lý Thử")

@@ -363,8 +363,23 @@ Bản thiết kế mục 8 đòi hai thứ mà M4 chưa làm: resource và promp
   mới là thứ nguy hiểm.
 - `1x://sheet/<mã>/<tên trang>` — **mỗi trang tính một resource**, CSV đúng RFC 4180. Gộp cả sổ vào một tệp thì
   mất ranh giới giữa các trang. Tên trang có dấu gạch chéo ("Quý 1/2026") vẫn đọc đúng.
-- Mỗi skill đã cài là một MCP prompt, nên skill "Soạn văn bản NĐ30" dùng được thẳng trong Claude Desktop.
+- Mỗi skill người dùng tự cài là một MCP prompt. Skill đi kèm app (như "Soạn văn bản NĐ30") KHÔNG đưa ra qua MCP: đó là giá trị của gói trả phí, không để trợ lý bên ngoài gom về (chủ dự án chốt 15/11/2026).
 
 **Quyền, một luật cho cả ba:** trợ lý chưa ghép đôi xem được *danh sách* tài liệu và danh sách prompt, nhưng
 không đọc được nội dung tài liệu lẫn thân skill. Đọc trộm cũng tệ như sửa trộm. Có bước kiểm trên app thật cho
 đúng điều đó.
+
+## Start Center và chỗ của AI (15/11/2026)
+
+Chủ dự án: AI chỉ nằm trong panel, thanh bên, khi người dùng cần; không ép ngay ở Start Center. Start Center theo
+kiểu trang chủ Google Docs.
+
+- **Start Center** (bản vá 0004): dải "Bắt đầu tài liệu mới" gồm thẻ Văn bản/Bảng tính/Trình chiếu trống và thẻ mẫu
+  NĐ30 (Công văn, Tờ trình, Quyết định, Biên bản, Tất cả mẫu NĐ30), rồi "Tài liệu gần đây". Không có lối vào AI.
+  Thẻ NĐ30 mở hộp soạn đã chọn sẵn loại; thẻ trống mở ứng dụng ngay trong cửa sổ Start Center. Hình thẻ sinh bởi
+  `scripts/brand/make-brand.py` (`res/1x_card_*`), nhãn từ `GenericCommands.xcu`.
+- **Thanh bên AI**: mục "AI" trên dải thẻ thanh bên phải (Writer, Calc), mở khi người dùng bấm. Dòng trạng thái cho
+  biết đang dùng AI nào hoặc mời gắn tài khoản; nút Hỏi AI, Viết lại, Chạy skill, Văn bản NĐ30, Kiểm thể thức, Công cụ
+  MCP, Tài khoản AI (Calc chỉ giữ nút hợp với bảng tính).
+- **Thẻ AI trên ribbon** chỉ mang ngữ cảnh `context-any`: luôn có mặt nhưng không bao giờ được chọn sẵn khi mở tài
+  liệu (trước đó Calc mở lên ở thẻ AI vì vcl chọn thẻ `context-default` cuối cùng).

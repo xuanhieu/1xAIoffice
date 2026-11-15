@@ -368,3 +368,26 @@ class DialogDefaultTests(unittest.TestCase):
     def test_a_table_without_cong_van_still_opens(self):
         from vn1x import nd30_dialog
         self.assertEqual(nd30_dialog.default_type_index([("to_trinh", {}), ("bao_cao", {})]), 0)
+
+
+class StartCardTests(unittest.TestCase):
+    def test_a_start_card_preselects_its_document_type(self):
+        from vn1x import nd30_dialog
+        types = list(nd30_dialog.DATA["doc_types"].items())
+        self.assertEqual(types[nd30_dialog.default_type_index(types, "to_trinh")][0], "to_trinh")
+
+    def test_an_unknown_card_type_falls_back_to_cong_van(self):
+        from vn1x import nd30_dialog
+        types = list(nd30_dialog.DATA["doc_types"].items())
+        self.assertEqual(types[nd30_dialog.default_type_index(types, "khong_co")][0], "cong_van")
+
+    def test_every_start_card_type_exists(self):
+        """Thẻ trên Start Center trỏ tới mã loại có thật; sai mã thì hộp soạn sẽ lặng lẽ rơi về Công văn."""
+        import ast
+        from vn1x import nd30_dialog
+        tree = ast.parse((Path(__file__).resolve().parent.parent / "onex_tools.py").read_text(encoding="utf-8"))
+        cards = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
+                     and any(getattr(t, "id", "") == "START_CARD_TYPES" for t in n.targets))
+        self.assertTrue(cards)
+        for code in cards.values():
+            self.assertIn(code, nd30_dialog.DATA["doc_types"])

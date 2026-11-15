@@ -636,12 +636,10 @@ def mcp_server_checks(desktop, prop, run, check):
         body = friend.request("resources/read", {"uri": uri})["result"]["contents"][0]
         check("Máy chủ MCP: đọc resource ra đúng nội dung tài liệu", "TỜ TRÌNH" in body["text"], True)
         prompts = friend.request("prompts/list")["result"]["prompts"]
-        check("Máy chủ MCP: mỗi skill đã cài là một prompt",
-              "soan-van-ban-nd30" in [x["name"] for x in prompts], True)
-        got = friend.request("prompts/get", {"name": "soan-van-ban-nd30",
-                                             "arguments": {"viec": "soạn giúp tôi một công văn"}})
-        check("Máy chủ MCP: prompt mang theo thân skill và câu người dùng",
-              "soạn giúp tôi một công văn" in got["result"]["messages"][0]["content"]["text"], True)
+        check("Máy chủ MCP: skill đi kèm app KHÔNG hiện cho trợ lý bên ngoài",
+              "soan-van-ban-nd30" in [x["name"] for x in prompts], False)
+        got = friend.request("prompts/get", {"name": "soan-van-ban-nd30"})
+        check("Máy chủ MCP: trợ lý đã được phép vẫn KHÔNG lấy được nguyên văn skill đi kèm", "error" in got, True)
     finally:
         friend.close()
     stranger2 = McpClient(command, "Trợ lý chưa xin phép lần hai", clients_path)

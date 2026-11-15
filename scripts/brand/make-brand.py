@@ -242,6 +242,7 @@ SIDEBAR_DECKS = {f"sfx2/res/symphony/sidebar-{k}-large.svg": v for k, v in {
     "property": "options", "style": "text_font_size", "gallery": "image_multiple", "navigator": "compass_northwest",
     "template": "document_multiple", "functions": "math_formula", "elements": "math_symbols",
     "transition": "slide_transition", "animation": "data_histogram", "a11y": "accessibility"}.items()}
+SIDEBAR_DECKS["res/1x_deck_ai.svg"] = "sparkle"     # mục "AI" của 1xAIoffice trên dải thẻ thanh bên
 
 # Icon cho lệnh của extension 1xai-tools (Addons.xcu trỏ tới bằng ImageSmallURL/ImageBigURL).
 ADDON_ICONS = {"AiAccounts": "key", "AiAsk": "sparkle", "AiRewrite": "text_edit_style", "McpTools": "plug_connected",
@@ -277,10 +278,78 @@ def addon_icons(fluent_dir, out_dir):
             (out_dir / f"{cmd}_{px}.svg").write_text(text, encoding="utf-8")
 
 
-def icon_theme_zip(path, fluent_dir=None):
+# ---------------------------------------------------------------- thẻ Start Center (bản vá 0004)
+# Dải "Bắt đầu tài liệu mới" kiểu trang chủ Google Docs: mỗi thẻ là một trang giấy thu nhỏ. Thẻ trống có dấu cộng màu
+# ứng dụng; thẻ NĐ30 vẽ khung văn bản hành chính (cơ quan, quốc hiệu, tên loại, nội dung, chữ ký) với chữ thật.
+CARD_W, CARD_H = 136, 176
+CARD_BLANK = {"doc": "doc", "sheet": "sheet", "slide": "slide"}
+CARD_ND30 = {"congvan": "CÔNG VĂN", "totrinh": "TỜ TRÌNH", "quyetdinh": "QUYẾT ĐỊNH", "bienban": "BIÊN BẢN"}
+PAGE = (f'<rect x="0.5" y="0.5" width="{CARD_W - 1}" height="{CARD_H - 1}" rx="8" fill="#FFFFFF" '
+        f'stroke="#D7DAE0"/>')
+
+
+def _line(x1, x2, y, color="#C4C8CF", w=2.2):
+    return f'<rect x="{x1}" y="{y - w / 2:.1f}" width="{x2 - x1}" height="{w}" rx="{w / 2:.1f}" fill="{color}"/>'
+
+
+def _centered(font, text, size, cx, baseline, fill):
+    d, width = text_path(font, text, size, 0, baseline)
+    return f'<path d="{d}" fill="{fill}" transform="translate({cx - width / 2:.2f} 0)"/>'
+
+
+def card_blank(kind):
+    c = APPS[CARD_BLANK[kind]]
+    cx, cy = CARD_W / 2, CARD_H / 2 - 4
+    extra = ""
+    if kind == "sheet":
+        extra = "".join(_line(14, CARD_W - 14, y, "#E6E8EC", 1.2) for y in range(30, 160, 14))
+        extra += "".join(f'<rect x="{x - 0.6}" y="24" width="1.2" height="136" fill="#E6E8EC"/>' for x in (44, 76, 108))
+    elif kind == "slide":
+        extra = (f'<rect x="12" y="{cy - 34}" width="{CARD_W - 24}" height="{(CARD_W - 24) * 9 / 16:.1f}" rx="4" '
+                 f'fill="#FFF6EF" stroke="#F3C6A4"/>')
+    plus = (f'<rect x="{cx - 26}" y="{cy - 5}" width="52" height="10" rx="5" fill="{c}"/>'
+            f'<rect x="{cx - 5}" y="{cy - 26}" width="10" height="52" rx="5" fill="{c}"/>')
+    return svg(CARD_W, CARD_H, PAGE + extra + plus, CARD_W, CARD_H)
+
+
+def card_nd30(bold, title):
+    ink, grey = "#3C4048", "#9AA0A6"
+    body = [
+        _line(16, 52, 14, grey), _line(20, 48, 19.5, ink), _line(28, 40, 23.5, ink, 1),        # cơ quan
+        _line(70, 126, 14, ink), _line(76, 120, 19.5, ink), _line(88, 108, 23.5, ink, 1),      # quốc hiệu, tiêu ngữ
+        _line(80, 124, 31, grey, 1.6),                                                         # địa danh, ngày
+        _centered(bold, title, 9.5, CARD_W / 2, 48, "#1D1D1F"),
+        _line(46, 90, 54, grey, 1.6),                                                          # trích yếu
+    ]
+    body += [_line(16 if i else 22, 120 if i % 4 != 3 else 92, 64 + i * 7) for i in range(9)]
+    body += [_line(84, 116, 134, ink), _line(88, 112, 140, grey, 1.6), _line(86, 114, 160, ink)]   # khối ký
+    body += [_line(12, 46, 134, grey, 1.4), _line(12, 40, 139, grey, 1.4), _line(12, 44, 144, grey, 1.4)]
+    return svg(CARD_W, CARD_H, PAGE + "".join(body), CARD_W, CARD_H)
+
+
+def card_gallery(bold, regular):
+    pages = "".join(f'<rect x="{10 + i * 8}" y="{6 + i * 6}" width="{CARD_W - 44}" height="{CARD_H - 38}" rx="6" '
+                    f'fill="#FFFFFF" stroke="#D7DAE0"/>' for i in range(3))
+    tag = APPS["pdf"]
+    return svg(CARD_W, CARD_H, pages
+               + _centered(bold, "NĐ30", 22, CARD_W / 2 + 8, 92, tag)
+               + _centered(regular, "28 loại văn bản", 9, CARD_W / 2 + 8, 112, "#5F6368"),
+               CARD_W, CARD_H)
+
+
+def start_cards(bold, regular):
+    """{đường dẫn trong icon theme: svg} cho mọi thẻ Start Center."""
+    out = {f"res/1x_card_{k}.svg": card_blank(k) for k in CARD_BLANK}
+    out.update({f"res/1x_card_{k}.svg": card_nd30(bold, t) for k, t in CARD_ND30.items()})
+    out["res/1x_card_nd30.svg"] = card_gallery(bold, regular)
+    return out
+
+
+def icon_theme_zip(path, fluent_dir=None, files=None):
     """Icon theme "1x": chỉ chứa icon được thay; mọi icon khác upstream tự lấy từ colibre/colibre_dark."""
     import zipfile
     extra, missing = fluent_icons(fluent_dir) if fluent_dir else ({}, [])
+    extra.update(files or {})
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for name, (kind, key) in sorted(ICON_FILES.items()):
             z.writestr(name, icon_file(kind, key))
@@ -375,7 +444,7 @@ def main():
     (OUT / "vietqr.svg").write_text(vietqr_svg(), encoding="utf-8")
     (OUT / "mark.svg").write_text(svg(256, 256, mark_group(0, 0, 256, "m")), encoding="utf-8")
     (REPO / "config" / "1x-theme.xcd").write_text(theme_xcd(), encoding="utf-8")
-    icon_theme_zip(OUT / "images_1x.zip", a.fluent)
+    icon_theme_zip(OUT / "images_1x.zip", a.fluent, start_cards(bold, regular))
     if a.fluent:
         addon_icons(a.fluent, REPO / "extensions" / "1xai-tools" / "icons")
     if a.no_png:

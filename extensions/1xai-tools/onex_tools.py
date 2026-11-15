@@ -97,6 +97,8 @@ TEXTS = {
         "acct_open_key_page": "{label} needs an API key.\n\nOpen the page where you create one ({url}) in your browser now? Sign in there, create a key, copy it, then come back here to paste it.",
         "acct_open_failed": "Could not open the browser. Open this address yourself: {url}",
         "cancel": "Cancel",
+        "panel_no_ai": "No AI account yet. Open AI Accounts below; free providers come first.",
+        "panel_ai": "AI in use: {name}",
         "acct_title": "AI accounts",
         "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
         "acct_pick": "Type the number or the name of the provider to add (empty to close):",
@@ -179,6 +181,8 @@ TEXTS = {
         "acct_open_key_page": "{label} cần một khoá API.\n\nMở trang tạo khoá ({url}) trong trình duyệt ngay bây giờ? Bạn đăng nhập ở đó, tạo khoá, chép lại, rồi quay về đây dán vào.",
         "acct_open_failed": "Không mở được trình duyệt. Bạn tự mở địa chỉ này: {url}",
         "cancel": "Huỷ",
+        "panel_no_ai": "Chưa gắn tài khoản AI. Bấm Tài khoản AI bên dưới; hãng miễn phí nằm đầu.",
+        "panel_ai": "Đang dùng: {name}",
         "acct_title": "Tài khoản AI",
         "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
         "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
@@ -254,9 +258,16 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             self.t = TEXTS[_ui_lang(self.ctx)]
             self.cmd_Nd30Check()
             return
-        if url.Path == "Nd30Document":  # works from any module: creates a new Writer document
+        if url.Path in ("Nd30Document", "Nd30Gallery"):  # works from any module: creates a new Writer document
             self.t = TEXTS[_ui_lang(self.ctx)]
             self.cmd_Nd30Document()
+            return
+        if url.Path in START_CARD_TYPES:   # thẻ mẫu trên Start Center: mở hộp soạn NĐ30 đã chọn sẵn loại
+            self.t = TEXTS[_ui_lang(self.ctx)]
+            self.cmd_Nd30Document(START_CARD_TYPES[url.Path])
+            return
+        if url.Path in START_CARD_BLANK:   # thẻ trống: mở ứng dụng ngay trong cửa sổ Start Center
+            self._open_blank(START_CARD_BLANK[url.Path])
             return
         if url.Path == "AiAccounts":    # cần chạy được ở Start Center, nơi chưa có tài liệu nào
             self.t = TEXTS[_ui_lang(self.ctx)]
@@ -884,6 +895,15 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             return False
         return True
 
+    def _open_blank(self, factory):
+        """Tài liệu trống: ngay trong cửa sổ hiện tại nếu đó là Start Center, không thì một cửa sổ mới."""
+        current = self.frame.getController().getModel() if self.frame else None
+        if current is None and self.frame is not None:
+            self.frame.loadComponentFromURL(factory, "_self", 0, ())
+        else:
+            desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
+            desktop.loadComponentFromURL(factory, "_blank", 0, ())
+
     def _open_url(self, url):
         """Mở trang trong trình duyệt mặc định của máy (thường là Chrome), ở một thẻ mới."""
         try:
@@ -1160,7 +1180,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             nd30_check_writer.apply_page_fix(doc, fix)
             self.message(self.t["check_fixed"].format(font=fix["font"]))
 
-    def cmd_Nd30Document(self):
+    def cmd_Nd30Document(self, doc_type=None):
         # ONEX_TOOLS_ND30_FIELDS (JSON) bypasses the dialog for automated tests.
         raw = os.environ.get("ONEX_TOOLS_ND30_FIELDS")
         if raw:
@@ -1170,7 +1190,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         else:
             from vn1x import nd30_dialog
             parent = self.frame.getContainerWindow() if self.frame else None
-            fields = nd30_dialog.run(self.ctx, parent, "vi" if self.t is TEXTS["vi"] else "en")
+            fields = nd30_dialog.run(self.ctx, parent, "vi" if self.t is TEXTS["vi"] else "en", doc_type)
             if fields is None:
                 return
         try:
@@ -1227,6 +1247,12 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
         box = toolkit.createMessageBox(self.frame.getContainerWindow(), INFOBOX, 1, self.t["title"], text)
         box.execute()
 
+
+# Thẻ trên dải "Bắt đầu tài liệu mới" của Start Center (bản vá 0004). Nhãn nằm ở GenericCommands.xcu.
+START_CARD_TYPES = {"NewCongVan": "cong_van", "NewToTrinh": "to_trinh", "NewQuyetDinh": "quyet_dinh",
+                    "NewBienBan": "bien_ban"}
+START_CARD_BLANK = {"NewTextDocument": "private:factory/swriter", "NewSpreadsheet": "private:factory/scalc",
+                    "NewPresentation": "private:factory/simpress"}
 
 MCP_EXAMPLE = json.dumps({
     "mcpServers": {
@@ -1534,6 +1560,143 @@ def _message_box(ctx, doc, title, text):
     box.dispose()
 
 
+# ---------------------------------------------------------------- thanh bên AI
+# Một mục "AI" trên dải thẻ thanh bên phải (Sidebar.xcu, Factories.xcu). AI chỉ hiện ở đây khi người dùng mở nó,
+# không chen vào Start Center. Panel dựng từ dialogs/AiPanel.xdl; mỗi nút gọi đúng lệnh vnd.1x.tools như ribbon.
+PANEL_FACTORY_IMPL = "org.1xaioffice.tools.PanelFactory"
+PANEL_ROWS = [("status", "text"), ("AiAsk", "btn"), ("AiRewrite", "btn"), ("AiSkill", "btn"), ("sep1", "line"),
+              ("Nd30Document", "btn"), ("Nd30Check", "btn"), ("sep2", "line"), ("McpTools", "btn"),
+              ("AiAccounts", "btn")]
+PANEL_WRITER_ONLY = {"AiRewrite", "Nd30Document", "Nd30Check", "sep1"}
+
+try:
+    from com.sun.star.ui import XUIElementFactory, XUIElement, XToolPanel, XSidebarPanel
+    from com.sun.star.awt import XContainerWindowEventHandler
+except ImportError:  # chạy ngoài office (kiểm logic): không có thanh bên
+    XUIElementFactory = None
+
+
+def _command_label(ctx, module, command):
+    """Nhãn ngắn (Label, như trên ribbon) của một lệnh trong bảng mô tả lệnh, theo ngôn ngữ giao diện. Thanh bên hẹp,
+    nhãn dài kiểu menu bị cắt mất đầu chữ."""
+    try:
+        desc = ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.UICommandDescription", ctx)
+        props = {p.Name: p.Value for p in desc.getByName(module).getByName(command)}
+        return (props.get("Label") or props.get("PopupLabel") or "").replace("~", "")
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+if XUIElementFactory is not None:
+    class AiPanel(unohelper.Base, XToolPanel, XSidebarPanel, XContainerWindowEventHandler):
+        def __init__(self, ctx, frame, parent):
+            self.ctx, self.frame = ctx, frame
+            self.t = TEXTS[_ui_lang(ctx)]
+            info = ctx.getValueByName("/singletons/com.sun.star.deployment.PackageInformationProvider")
+            url = info.getPackageLocation("org.1xaioffice.tools") + "/dialogs/AiPanel.xdl"
+            provider = ctx.ServiceManager.createInstanceWithContext("com.sun.star.awt.ContainerWindowProvider", ctx)
+            self.window = provider.createContainerWindow(url, "", parent, self)
+            manager = ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.ModuleManager", ctx)
+            try:
+                self.module = manager.identify(frame)
+            except Exception:  # noqa: BLE001
+                self.module = "com.sun.star.text.TextDocument"
+            self.writer = self.module == "com.sun.star.text.TextDocument"
+            for name, kind in PANEL_ROWS:
+                control = self.window.getControl(name)
+                if control is None:
+                    continue
+                if not self.writer and name in PANEL_WRITER_ONLY:
+                    control.setVisible(False)
+                elif kind == "btn":
+                    control.getModel().Label = _command_label(ctx, self.module, "vnd.1x.tools:" + name) or name
+            self.refresh()
+            self.window.setVisible(True)
+            self.height = 0
+
+        def refresh(self):
+            from vn1x import aiconfig, aipanel
+            try:
+                subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+                profile = uno.fileUrlToSystemPath(subst.substituteVariables("$(userurl)", True))
+                config = aiconfig.load(os.environ.get("ONEX_AI_CONFIG_PATH") or str(Path(profile) / aiconfig.FILENAME))
+            except Exception:  # noqa: BLE001 - tệp hỏng thì coi như chưa gắn
+                config = {}
+            status = self.window.getControl("status")
+            if status is not None:
+                status.getModel().Label = aipanel.status(config, self.t)
+
+        def layout(self, width):
+            """Xếp các dòng theo bề rộng thanh bên (pixel); trả về chiều cao cần."""
+            pad, y = 8, 8
+            for name, kind in PANEL_ROWS:
+                control = self.window.getControl(name)
+                if control is None or (not self.writer and name in PANEL_WRITER_ONLY):
+                    continue
+                h = {"text": 64, "line": 10, "btn": 30}[kind]
+                control.setPosSize(pad, y, max(width - 2 * pad, 120), h, 15)
+                y += h + (4 if kind == "btn" else 2)
+            return y + pad
+
+        # XContainerWindowEventHandler
+        def callHandlerMethod(self, window, event, method):
+            if method != "onClick":
+                return False
+            name = event.Source.getModel().Name
+            helper = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.DispatchHelper", self.ctx)
+            helper.executeDispatch(self.frame, "vnd.1x.tools:" + name, "", 0, ())
+            self.refresh()                      # vừa gắn tài khoản thì dòng trạng thái đổi ngay
+            return True
+
+        def getSupportedMethodNames(self):
+            return ("onClick",)
+
+        # XToolPanel
+        def getWindow(self):
+            return self.window
+
+        def createAccessible(self, parent):
+            return self.window.getAccessibleContext()
+
+        # XSidebarPanel
+        def getHeightForWidth(self, width):
+            h = self.layout(width)
+            size = uno.createUnoStruct("com.sun.star.ui.LayoutSize")
+            size.Minimum = size.Maximum = size.Preferred = h
+            return size
+
+        def getMinimalWidth(self):
+            return 180
+
+    class AiPanelElement(unohelper.Base, XUIElement):
+        def __init__(self, url, frame, panel):
+            self.ResourceURL, self.Frame, self.panel = url, frame, panel
+            self.Type = 7                       # com.sun.star.ui.UIElementType.TOOLPANEL
+
+        def getRealInterface(self):
+            return self.panel
+
+    class PanelFactory(unohelper.Base, XUIElementFactory, XServiceInfo):
+        def __init__(self, ctx, *args):
+            self.ctx = ctx
+
+        def createUIElement(self, url, args):
+            values = {a.Name: a.Value for a in args}
+            frame, parent = values.get("Frame"), values.get("ParentWindow")
+            if not url.endswith("/AiPanel") or frame is None or parent is None:
+                return None
+            return AiPanelElement(url, frame, AiPanel(self.ctx, frame, parent))
+
+        def getImplementationName(self):
+            return PANEL_FACTORY_IMPL
+
+        def supportsService(self, name):
+            return name == "com.sun.star.ui.UIElementFactory"
+
+        def getSupportedServiceNames(self):
+            return ("com.sun.star.ui.UIElementFactory",)
+
+
 g_ImplementationHelper = unohelper.ImplementationHelper()
 g_ImplementationHelper.addImplementation(Handler, IMPL, ("com.sun.star.frame.ProtocolHandler",))
 g_ImplementationHelper.addImplementation(GuideSeeder, GUIDES_IMPL, ("com.sun.star.task.Job",))
@@ -1541,3 +1704,5 @@ g_ImplementationHelper.addImplementation(XlsxWarner, WARNER_IMPL, ("com.sun.star
 g_ImplementationHelper.addImplementation(McpAcceptor, MCP_ACCEPTOR_IMPL, ("com.sun.star.task.Job",))
 if XVnSheetFunctions is not None:
     g_ImplementationHelper.addImplementation(SheetFunctions, SHEET_IMPL, ("com.sun.star.sheet.AddIn",))
+if XUIElementFactory is not None:
+    g_ImplementationHelper.addImplementation(PanelFactory, PANEL_FACTORY_IMPL, ("com.sun.star.ui.UIElementFactory",))

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="AiPanel" dlg:left="0" dlg:top="0" dlg:width="140" dlg:height="178" dlg:closeable="false" dlg:moveable="false" dlg:withtitlebar="false">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="status" dlg:left="4" dlg:top="4" dlg:width="132" dlg:height="24" dlg:value="" dlg:multiline="true"/>
+  <dlg:button dlg:id="AiAsk" dlg:left="4" dlg:top="32" dlg:width="132" dlg:height="15" dlg:value="AiAsk">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+  <dlg:button dlg:id="AiRewrite" dlg:left="4" dlg:top="50" dlg:width="132" dlg:height="15" dlg:value="AiRewrite">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+  <dlg:button dlg:id="AiSkill" dlg:left="4" dlg:top="68" dlg:width="132" dlg:height="15" dlg:value="AiSkill">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+  <dlg:fixedline dlg:id="sep1" dlg:left="4" dlg:top="86" dlg:width="132" dlg:height="6"/>
+  <dlg:button dlg:id="Nd30Document" dlg:left="4" dlg:top="94" dlg:width="132" dlg:height="15" dlg:value="Nd30Document">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+  <dlg:button dlg:id="Nd30Check" dlg:left="4" dlg:top="112" dlg:width="132" dlg:height="15" dlg:value="Nd30Check">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+  <dlg:fixedline dlg:id="sep2" dlg:left="4" dlg:top="130" dlg:width="132" dlg:height="6"/>
+  <dlg:button dlg:id="McpTools" dlg:left="4" dlg:top="138" dlg:width="132" dlg:height="15" dlg:value="McpTools">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+  <dlg:button dlg:id="AiAccounts" dlg:left="4" dlg:top="156" dlg:width="132" dlg:height="15" dlg:value="AiAccounts">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.UNO:onClick" script:language="UNO"/>
+  </dlg:button>
+ </dlg:bulletinboard>
+</dlg:window>

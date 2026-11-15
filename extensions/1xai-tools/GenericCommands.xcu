@@ -96,6 +96,36 @@
           <prop oor:name="PopupLabel" oor:type="xs:string"><value xml:lang="en-US">Remove Vietnamese Diacritics</value><value xml:lang="vi">Bỏ dấu tiếng Việt</value></prop>
           <prop oor:name="TooltipLabel" oor:type="xs:string"><value xml:lang="en-US">Remove Vietnamese Diacritics</value><value xml:lang="vi">Bỏ dấu tiếng Việt</value></prop>
       </node>
+      <node oor:name="vnd.1x.tools:StartNew" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Start a new document</value><value xml:lang="vi">Bắt đầu tài liệu mới</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartRecent" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Recent documents</value><value xml:lang="vi">Tài liệu gần đây</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewTextDocument" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Blank document</value><value xml:lang="vi">Văn bản trống</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewSpreadsheet" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Blank spreadsheet</value><value xml:lang="vi">Bảng tính trống</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewPresentation" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Blank presentation</value><value xml:lang="vi">Trình chiếu trống</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:Nd30Gallery" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">All Decree 30 templates</value><value xml:lang="vi">Tất cả mẫu NĐ30</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewCongVan" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Official letter (Decree 30)</value><value xml:lang="vi">Công văn</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewToTrinh" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Proposal (Decree 30)</value><value xml:lang="vi">Tờ trình</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewQuyetDinh" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Decision (Decree 30)</value><value xml:lang="vi">Quyết định</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:NewBienBan" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Minutes (Decree 30)</value><value xml:lang="vi">Biên bản</value></prop>
+      </node>
     </node>
   </node>
 </oor:component-data>

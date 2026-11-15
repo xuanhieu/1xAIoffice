@@ -290,8 +290,10 @@ def add_ai_tab(root, app):
     text = _el("object", tab, **{"class": "GtkLabel", "id": "1xAILabel"})
     _props(text, visible="True", can_focus="False", label="AI", use_underline="False")
     style = _el("style", text)
-    for ctx in ("context-default", "context-any"):
-        _el("class", style, name=ctx)
+    # Chỉ "context-any" (luôn hiện), KHÔNG "context-default": khi ngữ cảnh mở đầu không khớp thẻ nào (ô của Calc),
+    # vcl (NotebookbarTabControlBase::SetContext) chọn thẻ default CUỐI CÙNG, và thẻ AI đứng sau Home sẽ giành mất,
+    # tức là ép người dùng vào AI ngay khi mở bảng tính.
+    _el("class", style, name="context-any")
     _props(_el("packing", tab), tab_fill="False")
     kids = list(notebook)
     at = kids.index(tab_child) + 1

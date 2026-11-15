@@ -157,9 +157,12 @@ class Server:
         uri = params.get("uri", "")
         return {"contents": mcpresources.contents(uri, self.backend.read_resource(uri))}
 
-    # --- prompt: mỗi skill đã cài là một prompt ---
+    # --- prompt: mỗi skill NGƯỜI DÙNG tự cài là một prompt ---
     def installed_skills(self):
-        found, _ = skills.discover(BUNDLED_SKILLS, user_skills_path())
+        """Chỉ skill người dùng tự cài. Skill đi kèm app là giá trị của sản phẩm (gói trả phí qua 1xPass): trợ lý bên
+        ngoài không được liệt kê hay lấy nguyên văn chúng qua MCP, để không AI nào gom hết về mà dựng lại được.
+        Trong app, skill đi kèm vẫn chạy bình thường qua lệnh Chạy skill."""
+        found, _ = skills.discover(user_skills_path())
         return found
 
     def list_prompts(self):

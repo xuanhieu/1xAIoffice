@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Nhà máy dựng panel cho thanh bên AI (Sidebar.xcu trỏ tới private:resource/toolpanel/OnexPanelFactory/...). -->
+<oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    oor:name="Factories" oor:package="org.openoffice.Office.UI">
+  <node oor:name="Registered">
+    <node oor:name="UIElementFactories">
+      <node oor:name="OnexPanelFactory" oor:op="replace">
+        <prop oor:name="Type"><value>toolpanel</value></prop>
+        <prop oor:name="Name"><value>OnexPanelFactory</value></prop>
+        <prop oor:name="Module"><value></value></prop>
+        <prop oor:name="FactoryImplementation"><value>org.1xaioffice.tools.PanelFactory</value></prop>
+      </node>
+    </node>
+  </node>
+</oor:component-data>

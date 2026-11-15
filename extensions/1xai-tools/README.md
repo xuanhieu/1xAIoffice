@@ -161,7 +161,7 @@ Ngoài công cụ, máy chủ còn mở ra **resource** và **prompt**:
 |---|---|---|
 | Tài liệu văn bản đang mở | `1x://doc/<mã>` | Markdown (tiêu đề thành `#`) |
 | Trang tính đang mở | `1x://sheet/<mã>/<tên trang>` | CSV đúng RFC 4180 |
-| Mỗi skill đã cài | prompt cùng tên skill | Thân `SKILL.md` kèm việc bạn giao |
+| Mỗi skill **bạn tự cài** (thư mục skill của người dùng) | prompt cùng tên skill | Thân `SKILL.md` kèm việc bạn giao. Skill đi kèm app không bao giờ đưa ra qua MCP: chúng chỉ chạy trong app |
 
 Mỗi **trang tính** là một resource riêng, không gộp cả sổ vào một tệp CSV: gộp thì mất ranh giới giữa các trang và trợ lý dễ đọc nhầm số của trang khác. Markdown chỉ đổi tiêu đề thành `#`, cố ý không đoán in đậm, danh sách hay bảng — đoán sai thì trợ lý đọc ra một tài liệu không giống bản bạn đang nhìn.
 
