@@ -4,8 +4,10 @@
 # 1xAIoffice/4/user/providers.json và khoá nằm trong Keychain.
 # Script này KHÔNG đọc và KHÔNG in khoá; app tự lấy từ kho bí mật.
 set -euo pipefail
+# shellcheck source=scripts/env.sh
 source "$(dirname "$0")/env.sh"
 
+# shellcheck disable=SC2012 # bundle names are fixed product names without spaces
 APP="$(ls -dt "$ONEX_WORK"/src/libreoffice-*/instdir/*.app 2>/dev/null | head -1)"
 [ -n "$APP" ] || { echo "Chưa có bản dựng nào trong instdir."; exit 1; }
 CONFIG="${ONEX_AI_CONFIG_PATH:-$HOME/Library/Application Support/1xAIoffice/4/user/providers.json}"

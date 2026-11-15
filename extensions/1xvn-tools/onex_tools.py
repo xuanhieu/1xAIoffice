@@ -92,6 +92,8 @@ TEXTS = {
         "ai_answer": "{text}\n\n— {provider}/{model}, sent {note}, {tokens} tokens.",
         "ai_no_config": ("No AI provider is set up yet.\n\nWrite your own providers.json at:\n{path}\n\n"
                          "Example (the key itself stays in the system keychain, never in this file):\n{example}"),
+        "ai_no_account": ("No AI account is connected yet.\n\nConnect one now? You can use the ChatGPT plan you already "
+                          "pay for, an API key, or an AI server on this computer."),
         "acct_title": "AI accounts",
         "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
         "acct_pick": "Type the number or the name of the provider to add (empty to close):",
@@ -169,6 +171,8 @@ TEXTS = {
         "ai_answer": "{text}\n\n— {provider}/{model}, đã gửi {note}, {tokens} token.",
         "ai_no_config": ("Chưa khai báo nhà cung cấp AI nào.\n\nTạo tệp providers.json của bạn tại:\n{path}\n\n"
                          "Ví dụ (khoá API nằm trong kho bí mật của hệ điều hành, không bao giờ ghi vào tệp này):\n{example}"),
+        "ai_no_account": ("Chưa gắn tài khoản AI nào.\n\nGắn ngay bây giờ? Bạn có thể dùng gói ChatGPT đang trả, "
+                          "một khoá API, hoặc máy chủ AI chạy trong máy."),
         "acct_title": "Tài khoản AI",
         "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
         "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
@@ -708,8 +712,17 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             self.message(self.t["ai_bad_config"].format(list=str(exc), path=path))
             return None
         if not config.get("providers"):
-            self.message(self.t["ai_no_config"].format(path=path, example=AI_EXAMPLE))
-            return None
+            # Người dùng văn phòng không đi viết providers.json: mời mở thẳng màn hình Tài khoản AI, gắn xong
+            # thì làm tiếp đúng việc họ vừa bấm.
+            if not self.ask(self.t["ai_no_account"]):
+                return None
+            self.cmd_AiAccounts(None, False)
+            try:
+                config = aiconfig.load(path)
+            except aiconfig.ConfigError:
+                return None
+            if not config.get("providers"):
+                return None
         found = aiconfig.problems(config)
         if found:
             self.message(self.t["ai_bad_config"].format(list="\n".join(f"- {p}" for p in found), path=path))

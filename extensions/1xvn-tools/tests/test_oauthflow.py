@@ -5,6 +5,7 @@ Không ra Internet, không chạm Keychain thật (ONEX_OAUTH_STORE_FOR_TEST tr�
 """
 import json
 import os
+import shutil
 import sys
 import tempfile
 import threading
@@ -274,6 +275,12 @@ class DynamicRegistrationTests(unittest.TestCase):
         self.assertEqual(self.server.exchanges[0]["resource"], ["https://api.openai.com/v1"])
 
 
+# Các kiểm dưới đây ghi vào Keychain THẬT của macOS (mục tên riêng cho kiểm, dọn sau mỗi lần). Máy chạy CI là
+# Linux, không có lệnh `security`, nên tự bỏ qua ở đó thay vì báo lỗi giả.
+NEEDS_KEYCHAIN = unittest.skipUnless(shutil.which("security"), "cần Keychain của macOS (lệnh security)")
+
+
+@NEEDS_KEYCHAIN
 class LongSecretTests(unittest.TestCase):
     """Khoá và thẻ dài hơn 128 ký tự phải lưu được nguyên vẹn.
 
@@ -314,6 +321,7 @@ class LongSecretTests(unittest.TestCase):
         self.assertEqual(oauthflow.read_bundle(self.REF)["access_token"], "cu")
 
 
+@NEEDS_KEYCHAIN
 class RenameMigrationTests(unittest.TestCase):
     """Đổi tên sản phẩm thì tiền tố mục trong Keychain đổi theo, nhưng không ai phải đăng nhập lại.
 
@@ -348,6 +356,10 @@ class RenameMigrationTests(unittest.TestCase):
     def test_an_unrelated_name_does_not_fall_back(self):
         """Chỉ mục mang đúng tiền tố mới mới được dò sang tên cũ."""
         self.assertEqual(oauthflow._keychain_read("khong-co-tien-to-nay"), "")
+
+
+class HostIdMigrationTests(unittest.TestCase):
+    """Mã máy không nằm trong Keychain nên kiểm được ở mọi máy, kể cả CI."""
 
     def test_a_host_id_made_under_the_old_name_is_kept(self):
         """Đổi mã máy là nhà cung cấp coi đây là máy lạ, phải đăng nhập lại — nên giữ nguyên mã cũ."""
