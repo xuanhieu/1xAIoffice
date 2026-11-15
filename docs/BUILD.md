@@ -46,3 +46,11 @@ Log nằm ở `$ONEX_WORK/logs/`.
 1. Lấy tên tarball, SHA-256 (trang `.mirrorlist` trên download.documentfoundation.org) và commit (`git ls-remote --tags https://git.libreoffice.org/core 'refs/tags/libreoffice-<phiên bản>*'`).
 2. Sửa `upstream/source-lock.json`.
 3. Chạy `python3 scripts/check-repo.py`, rồi build lại.
+
+## Trước khi push: chạy đúng các bước của CI tại máy
+
+`scripts/ci-local.sh` đọc các bước `run:` trong `.github/workflows/quality.yml` và chạy y nguyên (khoảng 40 giây), nên
+máy và CI không thể lệch nhau. Hook `.githooks/pre-push` gọi nó trước mỗi lần push và chặn push nếu có bước hỏng.
+Một lần cho mỗi bản clone: `git config core.hooksPath .githooks` và `brew install shellcheck`.
+
+Lý do (15/11/2026): CI hỏng năm lần push liền vì shellcheck báo SC2043 mà máy làm việc không có shellcheck.

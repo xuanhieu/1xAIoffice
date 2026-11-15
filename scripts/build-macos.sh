@@ -216,7 +216,8 @@ step_extensions() {
   python3 "$REPO_ROOT/scripts/build-extensions.py" --out "$ONEX_WORK/dist"
   local oxt name dest old
   # Folder names an extension used before it was renamed; two copies with one identifier must never load together.
-  for old in 1xvn-tools; do
+  local retired=(1xvn-tools)
+  for old in "${retired[@]}"; do
     if [ -d "$app/Contents/Resources/extensions/$old" ]; then
       rm -rf "$app/Contents/Resources/extensions/$old"
       info "Gỡ extension tên cũ: $old"

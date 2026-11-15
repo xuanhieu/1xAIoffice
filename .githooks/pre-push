@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Chặn push khi workflow quality sẽ hỏng: chạy y nguyên các bước của CI tại máy (scripts/ci-local.sh).
+# Bỏ qua một lần (không khuyến khích): git push --no-verify
+exec "$(git rev-parse --show-toplevel)/scripts/ci-local.sh"
