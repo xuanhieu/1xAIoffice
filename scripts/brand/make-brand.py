@@ -173,20 +173,23 @@ ICON_FILES = {  # đường dẫn trong icon theme -> (kiểu, khoá)
     "framework/res/folder_32.svg": ("nav", "folder"), "framework/res/recent-documents.svg": ("nav", "recent"),
     "framework/res/remote-documents.svg": ("nav", "remote"), "framework/res/templates_32.svg": ("nav", "templates"),
 }
+# Icon loại tệp 16px cho danh sách tài liệu gần đây dạng cột của Start Center (bản vá 0004).
+ICON_FILES_16 = {f"res/{ext}_16_8.svg": key for ext, key in
+                 {"odt": "doc", "ods": "sheet", "odp": "slide", "odg": "draw", "odf": "formula", "odb": "base"}.items()}
 APP_COLOR = {"doc": "doc", "sheet": "sheet", "slide": "slide", "draw": "ai", "formula": "pdf", "base": "ai"}
 
 
-def icon_file(kind, key):
+def icon_file(kind, key, px=32):
     if kind == "nav":
         return svg(32, 32, f'<g fill="none" stroke="#C9CCD6" stroke-width="1.8" stroke-linecap="round" '
-                           f'stroke-linejoin="round">{NAV[key]}</g>', 32, 32)
+                           f'stroke-linejoin="round">{NAV[key]}</g>', px, px)
     c = APPS[APP_COLOR[key]]
     return svg(32, 32, f"""<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
   <stop offset="0" stop-color="{c}"/><stop offset="1" stop-color="{c}" stop-opacity="0.82"/></linearGradient></defs>
 <rect x="2" y="2" width="28" height="28" rx="7.5" fill="url(#g)"/>
 <rect x="2.5" y="2.5" width="27" height="27" rx="7" fill="none" stroke="#FFFFFF" stroke-opacity="0.18"/>
 <g fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{GLYPHS[key]}</g>""",
-               32, 32)
+               px, px)
 
 
 ICON_FG = "#E3E5EB"  # màu nét icon lệnh trên nền than chì
@@ -353,6 +356,8 @@ def icon_theme_zip(path, fluent_dir=None, files=None):
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for name, (kind, key) in sorted(ICON_FILES.items()):
             z.writestr(name, icon_file(kind, key))
+        for name, key in sorted(ICON_FILES_16.items()):
+            z.writestr(name, icon_file("app", key, 16))
         for name, text in sorted(extra.items()):
             z.writestr(name, text)
     if fluent_dir:

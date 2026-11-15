@@ -1,4 +1,4 @@
-Subject: Start Center: dải "Bắt đầu tài liệu mới" kiểu trang chủ Google Docs
+Subject: Start Center kiểu WPS/Google Docs: thẻ tạo mới, VI/EN, trang theo ứng dụng, danh sách cột
 Why: Start Center cũ chỉ có danh sách nút bên trái và vùng tài liệu gần đây; người dùng không thấy ngay mẫu văn
  bản hành chính. Thêm, phía trên vùng gần đây, một dải thẻ lớn như trang chủ Google Docs: Văn bản trống, Bảng
  tính trống, Trình chiếu trống, Công văn, Tờ trình, Quyết định, Biên bản và "Tất cả mẫu NĐ30", rồi tiêu đề "Tài
@@ -6,16 +6,39 @@ Why: Start Center cũ chỉ có danh sách nút bên trái và vùng tài liệu
  thẻ NĐ30 mở hộp soạn đã chọn sẵn loại. Nhãn lấy từ bảng mô tả lệnh (GenericCommands.xcu của extension) nên theo
  ngôn ngữ giao diện; extension vắng mặt thì cả dải ẩn đi. Hình thẻ nằm trong icon theme "1x" (res/1x_card_*).
  Không có lối vào AI ở Start Center: AI chỉ nằm ở thanh bên và thẻ AI trong trình soạn, khi người dùng cần.
- Hai nhãn tiêu đề được miễn kiểm orphan-label trong sfx.suppr, như nhãn "New" của bản gốc.
+ Nút VI/EN đổi ngôn ngữ giao diện (gọi lệnh extension, ghi cài đặt và khởi động lại). Bấm Văn bản/Bảng tính/
+ Trình chiếu ở cột trái mở trang của ứng dụng đó (thẻ của nó + tài liệu gần đây cùng loại) như WPS; "Gần đây" là
+ trang chủ. Tài liệu gần đây hiện dạng cột (Tên tệp, Vị trí, Sửa lần cuối, Dung lượng) nhóm Hôm nay / Hôm qua /
+ Trong 7 ngày / Cũ hơn, nhấn đúp để mở, thay cho lưới hình thu nhỏ. Nhãn tiêu đề dải được miễn kiểm orphan-label
+ trong sfx.suppr như nhãn "New" của bản gốc.
 Upstream: not suitable: lối vào riêng cho extension đi kèm của 1xAIoffice
 Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở app); bấm thẻ trống và thẻ NĐ30.
 
 --- a/sfx2/uiconfig/ui/startcenter.ui
 +++ b/sfx2/uiconfig/ui/startcenter.ui
-@@ -25,6 +25,46 @@
+@@ -24,7 +24,65 @@
+         <property name="label" translatable="yes" context="startcenter|clear_unavailable">Clear Unavailable Files</property>
        </object>
      </child>
-   </object>
++  </object>
++  <object class="GtkListStore" id="onex_recent_store">
++    <columns>
++      <!-- column-name icon -->
++      <column type="GdkPixbuf"/>
++      <!-- column-name name -->
++      <column type="gchararray"/>
++      <!-- column-name where -->
++      <column type="gchararray"/>
++      <!-- column-name modified -->
++      <column type="gchararray"/>
++      <!-- column-name size -->
++      <column type="gchararray"/>
++      <!-- column-name weight -->
++      <column type="gint"/>
++      <!-- column-name id -->
++      <column type="gchararray"/>
++    </columns>
++  </object>
 +  <object class="GtkImage" id="onex_card_doc_image">
 +    <property name="visible">True</property>
 +    <property name="can-focus">False</property>
@@ -50,7 +73,7 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
 +    <property name="visible">True</property>
 +    <property name="can-focus">False</property>
 +    <property name="icon-name">res/1x_card_bienban.png</property>
-+  </object>
+   </object>
 +  <object class="GtkImage" id="onex_card_nd30_image">
 +    <property name="visible">True</property>
 +    <property name="can-focus">False</property>
@@ -59,13 +82,10 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
    <object class="GtkImage" id="database_all_image">
      <property name="visible">True</property>
      <property name="can-focus">False</property>
-@@ -540,6 +580,446 @@
-                 <property name="expand">False</property>
-                 <property name="fill">True</property>
-                 <property name="position">1</property>
-+              </packing>
-+            </child>
-+            <child>
+@@ -543,6 +601,490 @@
+               </packing>
+             </child>
+             <child>
 +              <object class="GtkBox" id="onex_home">
 +                <property name="visible">True</property>
 +                <property name="can-focus">False</property>
@@ -73,13 +93,54 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
 +                <property name="margin-end">24</property>
 +                <property name="orientation">vertical</property>
 +                <child>
-+                  <object class="GtkLabel" id="onex_new_title">
++                  <object class="GtkBox" id="onex_header">
 +                    <property name="visible">True</property>
 +                    <property name="can-focus">False</property>
-+                    <property name="xalign">0</property>
-+                    <property name="margin-top">16</property>
-+                    <property name="margin-bottom">8</property>
-+                    <property name="label">onex_new_title</property>
++                    <property name="spacing">4</property>
++                    <child>
++                      <object class="GtkLabel" id="onex_new_title">
++                        <property name="visible">True</property>
++                        <property name="can-focus">False</property>
++                        <property name="hexpand">True</property>
++                        <property name="xalign">0</property>
++                        <property name="margin-top">16</property>
++                        <property name="margin-bottom">8</property>
++                        <property name="label">onex_new_title</property>
++                      </object>
++                      <packing>
++                        <property name="expand">True</property>
++                        <property name="fill">True</property>
++                        <property name="position">0</property>
++                      </packing>
++                    </child>
++                    <child>
++                      <object class="GtkToggleButton" id="onex_lang_vi">
++                        <property name="label">VI</property>
++                        <property name="visible">True</property>
++                        <property name="can-focus">True</property>
++                        <property name="receives-default">False</property>
++                        <property name="valign">center</property>
++                      </object>
++                      <packing>
++                        <property name="expand">False</property>
++                        <property name="fill">True</property>
++                        <property name="position">1</property>
++                      </packing>
++                    </child>
++                    <child>
++                      <object class="GtkToggleButton" id="onex_lang_en">
++                        <property name="label">EN</property>
++                        <property name="visible">True</property>
++                        <property name="can-focus">True</property>
++                        <property name="receives-default">False</property>
++                        <property name="valign">center</property>
++                      </object>
++                      <packing>
++                        <property name="expand">False</property>
++                        <property name="fill">True</property>
++                        <property name="position">2</property>
++                      </packing>
++                    </child>
 +                  </object>
 +                  <packing>
 +                    <property name="expand">False</property>
@@ -491,6 +552,9 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
 +                    <property name="margin-top">20</property>
 +                    <property name="margin-bottom">8</property>
 +                    <property name="label">onex_recent_title</property>
++                    <accessibility>
++                      <relation type="label-for" target="onex_recent_list"/>
++                    </accessibility>
 +                  </object>
 +                  <packing>
 +                    <property name="expand">False</property>
@@ -503,10 +567,13 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
 +                <property name="expand">False</property>
 +                <property name="fill">True</property>
 +                <property name="position">2</property>
-               </packing>
-             </child>
-             <child>
-@@ -611,7 +1091,7 @@
++              </packing>
++            </child>
++            <child>
+               <!-- n-columns=3 n-rows=1 -->
+               <object class="GtkGrid" id="actions">
+                 <property name="visible">True</property>
+@@ -611,7 +1153,7 @@
                <packing>
                  <property name="expand">False</property>
                  <property name="fill">True</property>
@@ -515,36 +582,153 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
                </packing>
              </child>
              <child>
-@@ -642,7 +1122,7 @@
+@@ -642,7 +1184,116 @@
                <packing>
                  <property name="expand">False</property>
                  <property name="fill">True</property>
 -                <property name="position">3</property>
 +                <property name="position">4</property>
-               </packing>
-             </child>
-             <child>
-@@ -673,7 +1153,7 @@
-               <packing>
-                 <property name="expand">False</property>
-                 <property name="fill">True</property>
--                <property name="position">4</property>
++              </packing>
++            </child>
++            <child>
++              <!-- Bộ dựng giao diện bỏ GtkScrolledWindow khi nó chỉ bọc một bảng; hộp này là chỗ ẩn/hiện danh sách. -->
++              <object class="GtkBox" id="onex_list_box">
++                <property name="visible">True</property>
++                <property name="can-focus">False</property>
++                <property name="hexpand">True</property>
++                <property name="vexpand">True</property>
++                <property name="margin-start">24</property>
++                <property name="margin-end">24</property>
++                <child>
++                  <object class="GtkScrolledWindow" id="onex_list_sw">
++                    <property name="visible">True</property>
++                    <property name="can-focus">True</property>
++                    <property name="hexpand">True</property>
++                    <property name="vexpand">True</property>
++                    <property name="hscrollbar-policy">never</property>
++                    <child>
++                      <object class="GtkTreeView" id="onex_recent_list">
++                        <property name="visible">True</property>
++                        <property name="can-focus">True</property>
++                        <property name="model">onex_recent_store</property>
++                        <property name="headers-visible">True</property>
++                        <property name="enable-search">False</property>
++                        <property name="search-column">1</property>
++                        <property name="show-expanders">False</property>
++                        <accessibility>
++                          <relation type="labelled-by" target="onex_recent_title"/>
++                        </accessibility>
++                        <child internal-child="selection">
++                          <object class="GtkTreeSelection"/>
++                        </child>
++                        <child>
++                          <object class="GtkTreeViewColumn" id="onex_col_name">
++                            <property name="resizable">True</property>
++                            <property name="expand">True</property>
++                            <property name="title">name</property>
++                            <child>
++                              <object class="GtkCellRendererPixbuf" id="onex_cell_icon"/>
++                              <attributes>
++                                <attribute name="pixbuf">0</attribute>
++                              </attributes>
++                            </child>
++                            <child>
++                              <object class="GtkCellRendererText" id="onex_cell_name"/>
++                              <attributes>
++                                <attribute name="text">1</attribute>
++                                <attribute name="weight">5</attribute>
++                              </attributes>
++                            </child>
++                          </object>
++                        </child>
++                        <child>
++                          <object class="GtkTreeViewColumn" id="onex_col_where">
++                            <property name="resizable">True</property>
++                            <property name="expand">False</property>
++                            <property name="title">where</property>
++                            <child>
++                              <object class="GtkCellRendererText" id="onex_cell_where"/>
++                              <attributes>
++                                <attribute name="text">2</attribute>
++                                <attribute name="weight">5</attribute>
++                              </attributes>
++                            </child>
++                          </object>
++                        </child>
++                        <child>
++                          <object class="GtkTreeViewColumn" id="onex_col_date">
++                            <property name="resizable">True</property>
++                            <property name="expand">False</property>
++                            <property name="title">modified</property>
++                            <child>
++                              <object class="GtkCellRendererText" id="onex_cell_date"/>
++                              <attributes>
++                                <attribute name="text">3</attribute>
++                                <attribute name="weight">5</attribute>
++                              </attributes>
++                            </child>
++                          </object>
++                        </child>
++                        <child>
++                          <object class="GtkTreeViewColumn" id="onex_col_size">
++                            <property name="resizable">True</property>
++                            <property name="expand">False</property>
++                            <property name="title">size</property>
++                            <child>
++                              <object class="GtkCellRendererText" id="onex_cell_size"/>
++                              <attributes>
++                                <attribute name="text">4</attribute>
++                                <attribute name="weight">5</attribute>
++                              </attributes>
++                            </child>
++                          </object>
++                        </child>
++                      </object>
++                    </child>
++                  </object>
++                  <packing>
++                    <property name="expand">True</property>
++                    <property name="fill">True</property>
++                    <property name="position">0</property>
++                  </packing>
++                </child>
++              </object>
++              <packing>
++                <property name="expand">True</property>
++                <property name="fill">True</property>
 +                <property name="position">5</property>
                </packing>
              </child>
              <child>
-@@ -766,7 +1246,7 @@
+@@ -673,7 +1324,7 @@
+               <packing>
+                 <property name="expand">False</property>
+                 <property name="fill">True</property>
+-                <property name="position">4</property>
++                <property name="position">6</property>
+               </packing>
+             </child>
+             <child>
+@@ -766,7 +1417,7 @@
                <packing>
                  <property name="expand">False</property>
                  <property name="fill">True</property>
 -                <property name="position">5</property>
-+                <property name="position">6</property>
++                <property name="position">7</property>
                </packing>
              </child>
            </object>
 --- a/sfx2/source/dialog/backingwindow.hxx
 +++ b/sfx2/source/dialog/backingwindow.hxx
-@@ -43,6 +43,7 @@
+@@ -31,6 +31,7 @@
+ #include <vcl/weld/LinkButton.hxx>
+ #include <vcl/weld/MenuButton.hxx>
+ #include <vcl/weld/ToggleButton.hxx>
++#include <vcl/weld/TreeView.hxx>
+ 
+ #include <recentdocsview.hxx>
+ #include <templatedefaultview.hxx>
+@@ -43,6 +44,7 @@
  #include <com/sun/star/frame/XFrame.hpp>
  
  #include <memory>
@@ -552,7 +736,7 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
  
  class BrandImage;
  
-@@ -70,6 +71,11 @@
+@@ -70,6 +72,27 @@
      std::unique_ptr<weld::Button> mxImpressAllButton;
      std::unique_ptr<weld::Button> mxDrawAllButton;
      std::unique_ptr<weld::Button> mxDBAllButton;
@@ -560,110 +744,406 @@ Test: chụp Start Center trên app thật (scripts/build-macos.sh rồi mở ap
 +    std::unique_ptr<weld::Container> mxOnexHome;
 +    std::unique_ptr<weld::Label> mxOnexNewTitle;
 +    std::unique_ptr<weld::Label> mxOnexRecentTitle;
-+    std::vector<std::pair<std::unique_ptr<weld::Button>, OUString>> maOnexCards;
++    std::unique_ptr<weld::ToggleButton> mxOnexLangVi;
++    std::unique_ptr<weld::ToggleButton> mxOnexLangEn;
++    std::unique_ptr<weld::TreeView> mxOnexList;
++    std::unique_ptr<weld::Widget> mxOnexListBox;
++    struct OnexCard
++    {
++        std::unique_ptr<weld::Button> xButton;
++        std::unique_ptr<weld::Widget> xBox;
++        OUString aCommand;
++        int nApp; // 1 văn bản, 2 bảng tính, 3 trình chiếu
++    };
++    std::vector<OnexCard> maOnexCards;
++    int mnOnexApp = 0; // 0 = trang chủ (mọi ứng dụng)
++    void onexShowApp(int nApp);
++    void onexFillList();
++    DECL_LINK(OnexListActivatedHdl, const weld::TreeIter&, bool);
++    DECL_LINK(OnexLangHdl, weld::Toggleable&, void);
      std::unique_ptr<weld::Button> mxMathAllButton;
      std::unique_ptr<BrandImage> mxBrandImage;
      std::unique_ptr<weld::CustomWeld> mxBrandImageWeld;
 --- a/sfx2/source/dialog/backingwindow.cxx
 +++ b/sfx2/source/dialog/backingwindow.cxx
-@@ -61,6 +61,7 @@
+@@ -61,6 +61,14 @@
  
  #include <sfx2/viewfrm.hxx>
  #include <vcl/commandinfoprovider.hxx>
 +#include <algorithm>
++#include <tuple>
++#include <tools/time.hxx>
++#include <tools/date.hxx>
++#include <unotools/localedatawrapper.hxx>
++#include <tools/urlobj.hxx>
++#include <osl/security.hxx>
++#include <osl/file.hxx>
  #include <sfx2/styfitem.hxx>
  #include <sfx2/objsh.hxx>
  #include <sfx2/tplpitem.hxx>
-@@ -181,6 +182,9 @@
+@@ -165,7 +173,50 @@
+ 
+ // increase size of the text in the buttons on the left fMultiplier-times
+ float const g_fMultiplier = 1.2f;
++
++namespace
++{
++/// Nhãn của một lệnh trong bảng mô tả lệnh của Start Center (rỗng khi extension 1xai-tools vắng mặt).
++OUString lcl_OnexLabel(const OUString& rCommand)
++{
++    return vcl::CommandInfoProvider::GetLabelForCommand(
++        vcl::CommandInfoProvider::GetCommandProperties(rCommand, u"com.sun.star.frame.StartModule"_ustr));
++}
++
++/// "/Users/ten/Documents" -> "~/Documents", cho cột Vị trí gọn như WPS.
++OUString lcl_OnexShortPath(const OUString& rDirPath)
++{
++    // Đường thư mục có thể kết thúc bằng "/": bỏ đi để lấy đúng tên thư mục cuối.
++    const OUString rPath = rDirPath.endsWith("/") && rDirPath.getLength() > 1
++                               ? rDirPath.copy(0, rDirPath.getLength() - 1) : rDirPath;
++    OUString aHome;
++    if (osl::Security().getHomeDir(aHome))
++    {
++        OUString aHomePath;
++        if (osl::FileBase::getSystemPathFromFileURL(aHome, aHomePath) == osl::FileBase::E_None
++            && rPath.startsWith(aHomePath))
++        {
++            const OUString aShort = "~" + rPath.copy(aHomePath.getLength());
++            if (aShort.getLength() <= 32)
++                return aShort;
++        }
++    }
++    // Đường dài thì chỉ giữ thư mục cuối, như WPS hiện "Downloads": không để chữ bị cắt giữa chừng.
++    if (rPath.getLength() > 32)
++        return u"\u2026/"_ustr + rPath.copy(rPath.lastIndexOf('/') + 1);
++    return rPath;
++}
+ 
++OUString lcl_OnexSize(sal_uInt64 nBytes)
++{
++    if (nBytes < 1024)
++        return OUString::number(nBytes) + " B";
++    if (nBytes < 1024 * 1024)
++        return OUString::number((nBytes + 512) / 1024) + " KB";
++    return OUString::number(static_cast<double>(nBytes / 1024 / 102) / 10.0) + " MB";
++}
++}
++
+ BackingWindow::BackingWindow(vcl::Window* i_pParent)
+     : InterimItemWindow(i_pParent, u"sfx/ui/startcenter.ui"_ustr, u"StartCenter"_ustr, false)
+     , mxOpenButton(m_xBuilder->weld_button(u"open_all"_ustr))
+@@ -181,6 +232,13 @@
      , mxImpressAllButton(m_xBuilder->weld_button(u"impress_all"_ustr))
      , mxDrawAllButton(m_xBuilder->weld_button(u"draw_all"_ustr))
      , mxDBAllButton(m_xBuilder->weld_button(u"database_all"_ustr))
 +    , mxOnexHome(m_xBuilder->weld_container(u"onex_home"_ustr))
 +    , mxOnexNewTitle(m_xBuilder->weld_label(u"onex_new_title"_ustr))
 +    , mxOnexRecentTitle(m_xBuilder->weld_label(u"onex_recent_title"_ustr))
++    , mxOnexLangVi(m_xBuilder->weld_toggle_button(u"onex_lang_vi"_ustr))
++    , mxOnexLangEn(m_xBuilder->weld_toggle_button(u"onex_lang_en"_ustr))
++    , mxOnexList(m_xBuilder->weld_tree_view(u"onex_recent_list"_ustr))
++    , mxOnexListBox(m_xBuilder->weld_widget(u"onex_list_box"_ustr))
      , mxMathAllButton(m_xBuilder->weld_button(u"math_all"_ustr))
      , mxBrandImage(new BrandImage)
      , mxBrandImageWeld(new weld::CustomWeld(*m_xBuilder, u"daBrand"_ustr, *mxBrandImage))
-@@ -342,6 +346,10 @@
+@@ -342,6 +400,14 @@
      mxImpressAllButton.reset();
      mxDrawAllButton.reset();
      mxDBAllButton.reset();
 +    maOnexCards.clear();
++    mxOnexListBox.reset();
++    mxOnexList.reset();
++    mxOnexLangEn.reset();
++    mxOnexLangVi.reset();
 +    mxOnexRecentTitle.reset();
 +    mxOnexNewTitle.reset();
 +    mxOnexHome.reset();
      mxMathAllButton.reset();
      mxBrandImageWeld.reset();
      mxBrandImage.reset();
-@@ -417,6 +425,45 @@
+@@ -388,6 +454,7 @@
+ 
+     mxAllRecentThumbnails->mnFileTypes |= sfx2::ApplicationType::TYPE_OTHER;
+     mxAllRecentThumbnails->Reload();
++    onexFillList(); // 1xAIoffice: danh sách cột đi theo lưới
+     mxAllRecentThumbnails->ShowTooltips( true );
+ 
+     mxRecentButton->set_active(true);
+@@ -417,6 +484,61 @@
      mxDrawAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
      mxCalcAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
      mxDBAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
 +
-+    // 1xAIoffice: dải "Bắt đầu tài liệu mới". Nhãn lấy từ bảng mô tả lệnh (GenericCommands.xcu của extension 1xai-tools)
-+    // nên theo ngôn ngữ giao diện; bấm thẻ là gọi lệnh của extension qua chính khung Start Center. Không có extension
-+    // thì cả dải ẩn đi, Start Center trở lại như bản gốc.
++    // 1xAIoffice: trang chủ kiểu Google Docs / WPS. Dải "Bắt đầu tài liệu mới", nút VI/EN đổi ngôn ngữ giao diện,
++    // danh sách tài liệu gần đây dạng cột nhóm theo ngày. Nhãn lấy từ bảng mô tả lệnh (GenericCommands.xcu của
++    // extension 1xai-tools) nên theo ngôn ngữ giao diện; không có extension thì mọi phần này ẩn, Start Center như gốc.
++    if (lcl_OnexLabel(u"vnd.1x.tools:StartNew"_ustr).isEmpty())
 +    {
-+        const OUString aModule(u"com.sun.star.frame.StartModule"_ustr);
-+        auto lcl_Label = [&aModule](const OUString& rCommand) {
-+            return vcl::CommandInfoProvider::GetLabelForCommand(
-+                vcl::CommandInfoProvider::GetCommandProperties(rCommand, aModule));
-+        };
-+        const OUString aNewTitle = lcl_Label(u"vnd.1x.tools:StartNew"_ustr);
-+        if (aNewTitle.isEmpty())
-+            mxOnexHome->hide();
-+        else
-+        {
-+            mxOnexNewTitle->set_label(aNewTitle);
-+            mxOnexRecentTitle->set_label(lcl_Label(u"vnd.1x.tools:StartRecent"_ustr));
-+            static const std::pair<OUString, OUString> aCards[] = {
-+          { u"doc"_ustr, u"vnd.1x.tools:NewTextDocument"_ustr },
-+          { u"sheet"_ustr, u"vnd.1x.tools:NewSpreadsheet"_ustr },
-+          { u"slide"_ustr, u"vnd.1x.tools:NewPresentation"_ustr },
-+          { u"congvan"_ustr, u"vnd.1x.tools:NewCongVan"_ustr },
-+          { u"totrinh"_ustr, u"vnd.1x.tools:NewToTrinh"_ustr },
-+          { u"quyetdinh"_ustr, u"vnd.1x.tools:NewQuyetDinh"_ustr },
-+          { u"bienban"_ustr, u"vnd.1x.tools:NewBienBan"_ustr },
-+          { u"nd30"_ustr, u"vnd.1x.tools:Nd30Gallery"_ustr }
-+            };
-+            for (const auto& [rId, rCommand] : aCards)
-+            {
-+                std::unique_ptr<weld::Button> xCard = m_xBuilder->weld_button("onex_card_" + rId);
-+                std::unique_ptr<weld::Label> xLabel = m_xBuilder->weld_label("onex_card_" + rId + "_label");
-+                const OUString aLabel = lcl_Label(rCommand);
-+                xLabel->set_label(aLabel);
-+                xCard->set_tooltip_text(aLabel);
-+                xCard->connect_clicked(LINK(this, BackingWindow, ClickHdl));
-+                maOnexCards.emplace_back(std::move(xCard), rCommand);
-+            }
-+        }
++        mxOnexHome->hide();
++        mxOnexListBox->hide();
++        mxAllRecentThumbnails->Show(); // không có extension: lưới hình thu nhỏ như bản gốc
 +    }
++    else
++    {
++        mxOnexNewTitle->set_label(lcl_OnexLabel(u"vnd.1x.tools:StartNew"_ustr));
++        mxOnexRecentTitle->set_label(lcl_OnexLabel(u"vnd.1x.tools:StartRecent"_ustr));
++        static const std::tuple<OUString, OUString, int> aCards[] = {
++                { u"doc"_ustr, u"vnd.1x.tools:NewTextDocument"_ustr, 1 },
++                { u"sheet"_ustr, u"vnd.1x.tools:NewSpreadsheet"_ustr, 2 },
++                { u"slide"_ustr, u"vnd.1x.tools:NewPresentation"_ustr, 3 },
++                { u"congvan"_ustr, u"vnd.1x.tools:NewCongVan"_ustr, 1 },
++                { u"totrinh"_ustr, u"vnd.1x.tools:NewToTrinh"_ustr, 1 },
++                { u"quyetdinh"_ustr, u"vnd.1x.tools:NewQuyetDinh"_ustr, 1 },
++                { u"bienban"_ustr, u"vnd.1x.tools:NewBienBan"_ustr, 1 },
++                { u"nd30"_ustr, u"vnd.1x.tools:Nd30Gallery"_ustr, 1 }
++        };
++        for (const auto& [rId, rCommand, nApp] : aCards)
++        {
++            OnexCard aCard{ m_xBuilder->weld_button("onex_card_" + rId),
++                            m_xBuilder->weld_widget("onex_card_" + rId + "_box"), rCommand, nApp };
++            const OUString aLabel = lcl_OnexLabel(rCommand);
++            m_xBuilder->weld_label("onex_card_" + rId + "_label")->set_label(aLabel);
++            aCard.xButton->set_tooltip_text(aLabel);
++            aCard.xButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
++            maOnexCards.push_back(std::move(aCard));
++        }
++        const bool bVi = Application::GetSettings().GetUILanguageTag().getLanguage() == "vi";
++        mxOnexLangVi->set_active(bVi);
++        mxOnexLangEn->set_active(!bVi);
++        mxOnexLangVi->connect_toggled(LINK(this, BackingWindow, OnexLangHdl));
++        mxOnexLangEn->connect_toggled(LINK(this, BackingWindow, OnexLangHdl));
++        static const std::pair<int, OUString> aColumns[] = {
++            { 0, u"vnd.1x.tools:StartColName"_ustr }, { 1, u"vnd.1x.tools:StartColWhere"_ustr },
++            { 2, u"vnd.1x.tools:StartColDate"_ustr }, { 3, u"vnd.1x.tools:StartColSize"_ustr } };
++        for (const auto& [nCol, rCommand] : aColumns)
++            mxOnexList->set_column_title(nCol, lcl_OnexLabel(rCommand));
++        mxOnexList->set_size_request(-1, mxOnexList->get_height_rows(8));
++        {
++            // Lõi chỉ vẽ chữ của các cột sau khi đã biết vị trí cột (như linkdlg, acccfg): Tên rộng, Vị trí, Ngày.
++            const int nDigit = mxOnexList->get_approximate_digit_width();
++            mxOnexList->set_column_fixed_widths({ nDigit * 48, nDigit * 34, nDigit * 20 });
++        }
++        mxOnexList->connect_item_activated(LINK(this, BackingWindow, OnexListActivatedHdl));
++        mxAllRecentThumbnails->Hide();
++        onexFillList();
++    }
++
      mxImpressAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
      mxMathAllButton->connect_clicked(LINK(this, BackingWindow, ClickHdl));
  
-@@ -726,6 +773,14 @@
+@@ -680,6 +802,7 @@
+         else
+             aFilter = static_cast<sfx2::ApplicationType>(1 << (nFilter - 1));
+         mxAllRecentThumbnails->setFilter(aFilter);
++        onexFillList();
+     }
+ }
+ 
+@@ -693,14 +816,25 @@
+     if (&rButton == mxRecentButton.get())
+     {
+         mxLocalView->Hide();
+-        mxAllRecentThumbnails->Show();
+-        mxAllRecentThumbnails->GrabFocus();
++        if (mxOnexHome && mxOnexHome->get_visible())
++        {
++            // 1xAIoffice: "Gần đây" là trang chủ: mọi thẻ tạo mới, danh sách cột thay cho lưới hình thu nhỏ
++            mxOnexListBox->show();
++            onexShowApp(0);
++        }
++        else
++        {
++            mxAllRecentThumbnails->Show();
++            mxAllRecentThumbnails->GrabFocus();
++        }
+         mxTemplateButton->set_active(false);
+         mxActions->show();
+     }
+     else
+     {
+         mxAllRecentThumbnails->Hide();
++        if (mxOnexListBox)
++            mxOnexListBox->hide();
+         initializeLocalView();
+         mxLocalView->Show();
+         mxLocalView->reload();
+@@ -714,18 +848,28 @@
+ IMPL_LINK( BackingWindow, ClickHdl, weld::Button&, rButton, void )
+ {
+     // dispatch the appropriate URL and end the dialog
++    // 1xAIoffice: có trang chủ mới thì bấm ứng dụng mở trang của ứng dụng đó (thẻ tạo mới + tài liệu gần đây cùng
++    // loại), như WPS; tạo văn bản trống bằng thẻ "Văn bản trống". Không có extension thì giữ hành vi gốc.
+     if( &rButton == mxWriterAllButton.get() )
+-        dispatchURL( u"private:factory/swriter"_ustr );
++        mxOnexHome->get_visible() ? onexShowApp(1) : dispatchURL( u"private:factory/swriter"_ustr );
+     else if( &rButton == mxCalcAllButton.get() )
+-        dispatchURL( u"private:factory/scalc"_ustr );
++        mxOnexHome->get_visible() ? onexShowApp(2) : dispatchURL( u"private:factory/scalc"_ustr );
+     else if( &rButton == mxImpressAllButton.get() )
+-        dispatchURL( u"private:factory/simpress?slot=6686"_ustr );
++        mxOnexHome->get_visible() ? onexShowApp(3) : dispatchURL( u"private:factory/simpress?slot=6686"_ustr );
+     else if( &rButton == mxDrawAllButton.get() )
+         dispatchURL( u"private:factory/sdraw"_ustr );
+     else if( &rButton == mxDBAllButton.get() )
          dispatchURL( u"private:factory/sdatabase?Interactive"_ustr );
      else if( &rButton == mxMathAllButton.get() )
          dispatchURL( u"private:factory/smath"_ustr );
 +    else if (auto it = std::find_if(maOnexCards.begin(), maOnexCards.end(),
-+                                   [&rButton](const auto& rCard) { return rCard.first.get() == &rButton; });
++                                   [&rButton](const auto& rCard) { return rCard.xButton.get() == &rButton; });
 +             it != maOnexCards.end())
 +    {
 +        // Gửi qua chính khung Start Center, để lệnh của extension biết là chưa có tài liệu và mở ngay tại đây
 +        Reference< XDispatchProvider > xFrame( mxFrame, UNO_QUERY );
-+        dispatchURL( it->second, OUString(), xFrame, {} );
++        dispatchURL( it->aCommand, OUString(), xFrame, {} );
 +    }
      else if( &rButton == mxOpenButton.get() )
      {
          Reference< XDispatchProvider > xFrame( mxFrame, UNO_QUERY );
+@@ -746,11 +890,13 @@
+     {
+         SvtHistoryOptions::Clear(EHistoryType::PickList, false);
+         mxAllRecentThumbnails->Reload();
++        onexFillList(); // 1xAIoffice: danh sách cột đi theo lưới
+         return;
+     }
+     else if(rId == "clear_unavailable")
+     {
+         mxAllRecentThumbnails->clearUnavailableFiles();
++        onexFillList(); // 1xAIoffice: danh sách cột đi theo lưới
+     }
+ }
+ 
+@@ -839,6 +985,116 @@
+     delete pDispatch;
+ }
+ 
++void BackingWindow::onexShowApp(int nApp)
++{
++    mnOnexApp = nApp;
++    for (const auto& rCard : maOnexCards)
++        rCard.xBox->set_visible(nApp == 0 || rCard.nApp == nApp);
++    // Bộ lọc gốc: 0 mọi loại, 1 văn bản, 2 bảng tính, 3 trình chiếu
++    mxFilter->set_active(nApp);
++    applyFilter();
++}
++
++void BackingWindow::onexFillList()
++{
++    if (!mxOnexList || !mxOnexHome || !mxOnexHome->get_visible())
++        return;
++    static const sfx2::ApplicationType aTypes[] = {
++        sfx2::ApplicationType::TYPE_WRITER, sfx2::ApplicationType::TYPE_CALC, sfx2::ApplicationType::TYPE_IMPRESS,
++        sfx2::ApplicationType::TYPE_DRAW, sfx2::ApplicationType::TYPE_DATABASE, sfx2::ApplicationType::TYPE_MATH };
++    static const char* aIcons[] = { "res/odt_16_8.png", "res/ods_16_8.png", "res/odp_16_8.png",
++                                    "res/odg_16_8.png", "res/odb_16_8.png", "res/odf_16_8.png" };
++    const int nFilter = mxFilter->get_active();
++    const LocaleDataWrapper& rLocale = Application::GetSettings().GetLocaleDataWrapper();
++    const Date aToday(Date::SYSTEM);
++    static const OUString aGroups[] = { u"vnd.1x.tools:StartToday"_ustr, u"vnd.1x.tools:StartYesterday"_ustr,
++                                        u"vnd.1x.tools:StartWeek"_ustr, u"vnd.1x.tools:StartOlder"_ustr };
++    mxOnexList->freeze();
++    mxOnexList->clear();
++    int nLastGroup = -1;
++    for (const SvtHistoryOptions::HistoryItem& rItem : SvtHistoryOptions::GetList(EHistoryType::PickList))
++    {
++        INetURLObject aURL(rItem.sURL);
++        const OUString aExt = aURL.getExtension();
++        if (nFilter > 0 && nFilter <= 6
++            && !sfx2::RecentDocsView::typeMatchesExtension(aTypes[nFilter - 1], aExt))
++            continue;
++        OUString aIcon(u"res/odt_16_8.png"_ustr);
++        for (size_t n = 0; n < std::size(aTypes); ++n)
++            if (sfx2::RecentDocsView::typeMatchesExtension(aTypes[n], aExt))
++            {
++                aIcon = OUString::createFromAscii(aIcons[n]);
++                break;
++            }
++        OUString aWhere, aWhen, aSize;
++        int nGroup = 3;
++        if (aURL.GetProtocol() == INetProtocol::File)
++        {
++            INetURLObject aDir(aURL);
++            aDir.removeSegment();
++            aWhere = lcl_OnexShortPath(aDir.getFSysPath(FSysStyle::Detect));
++            osl::DirectoryItem aItem;
++            osl::FileStatus aStatus(osl_FileStatus_Mask_ModifyTime | osl_FileStatus_Mask_FileSize);
++            if (osl::DirectoryItem::get(rItem.sURL, aItem) == osl::FileBase::E_None
++                && aItem.getFileStatus(aStatus) == osl::FileBase::E_None)
++            {
++                TimeValue aUtc = aStatus.getModifyTime(), aLocal;
++                oslDateTime aDT;
++                if (osl_getLocalTimeFromSystemTime(&aUtc, &aLocal) && osl_getDateTimeFromTimeValue(&aLocal, &aDT))
++                {
++                    const Date aDate(aDT.Day, aDT.Month, aDT.Year);
++                    const tools::Time aTime(aDT.Hours, aDT.Minutes);
++                    const sal_Int32 nDays = aToday - aDate;
++                    nGroup = nDays <= 0 ? 0 : nDays == 1 ? 1 : nDays < 7 ? 2 : 3;
++                    aWhen = nGroup <= 1 ? rLocale.getTime(aTime, false) : rLocale.getDate(aDate);
++                }
++                aSize = lcl_OnexSize(aStatus.getFileSize());
++            }
++        }
++        else
++            aWhere = aURL.GetHost();
++        if (nGroup != nLastGroup)
++        {
++            // Dòng nhóm như WPS: Hôm nay / Hôm qua / Trong 7 ngày / Cũ hơn (không mở được, chữ đậm)
++            mxOnexList->append(OUString(), lcl_OnexLabel(aGroups[nGroup]));
++            mxOnexList->set_text_emphasis(mxOnexList->n_children() - 1, true, 0);
++            nLastGroup = nGroup;
++        }
++        const OUString aTitle = rItem.sTitle.isEmpty() ? aURL.getName(INetURLObject::LAST_SEGMENT, true,
++                                                                       INetURLObject::DecodeMechanism::WithCharset)
++                                                       : rItem.sTitle;
++        mxOnexList->append(rItem.sURL, aTitle, aIcon);
++        const int nRow = mxOnexList->n_children() - 1;
++        mxOnexList->set_text(nRow, aWhere, 1);
++        mxOnexList->set_text(nRow, aWhen, 2);
++        mxOnexList->set_text(nRow, aSize, 3);
++    }
++    mxOnexList->thaw();
++}
++
++IMPL_LINK(BackingWindow, OnexListActivatedHdl, const weld::TreeIter&, rIter, bool)
++{
++    const OUString aURL = mxOnexList->get_id(rIter);
++    if (!aURL.isEmpty()) // dòng nhóm không có địa chỉ
++        dispatchURL(aURL, u"_default"_ustr, Reference<XDispatchProvider>(),
++                    { comphelper::makePropertyValue(u"Referer"_ustr, u"private:user"_ustr),
++                      comphelper::makePropertyValue(u"AsTemplate"_ustr, false) });
++    return true;
++}
++
++IMPL_LINK(BackingWindow, OnexLangHdl, weld::Toggleable&, rButton, void)
++{
++    // Giữ hai nút như một công tắc: nút vừa bấm luôn sáng, nút kia tắt; chỉ đổi khi chọn ngôn ngữ khác hiện tại.
++    const bool bWantVi = &rButton == mxOnexLangVi.get();
++    mxOnexLangVi->set_active(bWantVi);
++    mxOnexLangEn->set_active(!bWantVi);
++    const bool bIsVi = Application::GetSettings().GetUILanguageTag().getLanguage() == "vi";
++    if (bWantVi == bIsVi)
++        return;
++    Reference< XDispatchProvider > xFrame( mxFrame, UNO_QUERY );
++    dispatchURL(bWantVi ? u"vnd.1x.tools:UiVietnamese"_ustr : u"vnd.1x.tools:UiEnglish"_ustr, OUString(), xFrame, {});
++}
++
+ void BackingWindow::dispatchURL( const OUString& i_rURL,
+                                  const OUString& rTarget,
+                                  const Reference< XDispatchProvider >& i_xProv,
+@@ -887,5 +1143,6 @@
+     mxAllRecentThumbnails->Clear();
+     // tdf#166349 - reload recent documents to show pinned items
+     mxAllRecentThumbnails->Reload();
++    onexFillList(); // 1xAIoffice: danh sách cột đi theo lưới
+ }
+ /* vim:set shiftwidth=4 softtabstop=4 expandtab:*/
 --- a/solenv/sanitizers/ui/sfx.suppr
 +++ b/solenv/sanitizers/ui/sfx.suppr
-@@ -35,6 +35,8 @@
+@@ -35,6 +35,7 @@
  sfx2/uiconfig/ui/managestylepage.ui://GtkLabel[@id='desc'] orphan-label
  sfx2/uiconfig/ui/startcenter.ui://GtkLabel[@id='create_label'] orphan-label
  sfx2/uiconfig/ui/startcenter.ui://GtkLabel[@id='althelplabel'] orphan-label
 +sfx2/uiconfig/ui/startcenter.ui://GtkLabel[@id='onex_new_title'] orphan-label
-+sfx2/uiconfig/ui/startcenter.ui://GtkLabel[@id='onex_recent_title'] orphan-label
  sfx2/uiconfig/ui/startcenter.ui://GtkImage[@id='imgDonationLeft'] no-labelled-by
  sfx2/uiconfig/ui/startcenter.ui://GtkImage[@id='imgDonationRight'] no-labelled-by
  sfx2/uiconfig/ui/tabbarcontents.ui://GtkToggleToolButton[@id='toggle'] button-no-label

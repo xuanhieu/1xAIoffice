@@ -103,6 +103,7 @@ TEXTS = {
         "yes": "Yes",
         "no": "No",
         "guide": "Guide \u2197",
+        "lang_unsaved": "Switching the language restarts 1xAIoffice. Some documents have unsaved changes; they will be offered for recovery when the app reopens. Switch now?",
         "acct_title": "AI accounts",
         "acct_overview": "AI accounts\n\nSet up now:\n{current}\n\nYou can add:\n{catalogue}",
         "acct_pick": "Type the number or the name of the provider to add (empty to close):",
@@ -190,6 +191,7 @@ TEXTS = {
         "yes": "Có",
         "no": "Không",
         "guide": "Hướng dẫn \u2197",
+        "lang_unsaved": "Đổi ngôn ngữ sẽ khởi động lại 1xAIoffice. Có tài liệu chưa lưu; khi app mở lại sẽ có bước phục hồi. Đổi ngay?",
         "acct_title": "Tài khoản AI",
         "acct_overview": "Tài khoản AI\n\nĐang có:\n{current}\n\nThêm được:\n{catalogue}",
         "acct_pick": "Gõ số hoặc tên nhà cung cấp muốn thêm (bỏ trống để đóng):",
@@ -276,6 +278,10 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             return
         if url.Path in START_CARD_BLANK:   # thẻ trống: mở ứng dụng ngay trong cửa sổ Start Center
             self._open_blank(START_CARD_BLANK[url.Path])
+            return
+        if url.Path in ("UiVietnamese", "UiEnglish"):   # nút VI/EN trên Start Center
+            self.t = TEXTS[_ui_lang(self.ctx)]
+            self._switch_language("vi" if url.Path == "UiVietnamese" else "en-US")
             return
         if url.Path == "AiAccounts":    # cần chạy được ở Start Center, nơi chưa có tài liệu nào
             self.t = TEXTS[_ui_lang(self.ctx)]
@@ -912,6 +918,33 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
             desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
             desktop.loadComponentFromURL(factory, "_blank", 0, ())
 
+    def _switch_language(self, locale):
+        """Đổi ngôn ngữ giao diện rồi khởi động lại app ngay (LibreOffice chỉ nạp ngôn ngữ lúc mở). Còn tài liệu chưa
+        lưu thì hỏi trước; tự lưu và phục hồi vẫn giữ việc đang làm."""
+        provider = self.ctx.ServiceManager.createInstanceWithContext(
+            "com.sun.star.configuration.ConfigurationProvider", self.ctx)
+        arg = uno.createUnoStruct("com.sun.star.beans.PropertyValue")
+        arg.Name, arg.Value = "nodepath", "/org.openoffice.Office.Linguistic/General"
+        node = provider.createInstanceWithArguments("com.sun.star.configuration.ConfigurationUpdateAccess", (arg,))
+        if node.getPropertyValue("UILocale") == locale:
+            return
+        desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)
+        components = desktop.getComponents().createEnumeration()
+        while components.hasMoreElements():
+            doc = components.nextElement()
+            if hasattr(doc, "isModified") and doc.isModified():
+                if not self.ask(self.t["lang_unsaved"]):
+                    return
+                break
+        node.setPropertyValue("UILocale", locale)
+        node.commitChanges()
+        try:
+            GuideSeeder(self.ctx).swap_language(locale)   # hướng dẫn nhanh theo ngôn ngữ mới
+        except Exception:  # noqa: BLE001 - không đổi được thì vẫn đổi ngôn ngữ như thường
+            pass
+        restart = self.ctx.getValueByName("/singletons/com.sun.star.task.OfficeRestartManager")
+        restart.requestRestart(None)
+
     def _open_url(self, url):
         """Mở trang trong trình duyệt mặc định của máy (thường là Chrome), ở một thẻ mới."""
         try:
@@ -1308,7 +1341,7 @@ class Handler(unohelper.Base, XDispatchProvider, XDispatch, XInitialization, XSe
 # Bài hướng dẫn chi tiết của từng lệnh trên 1xag.com/office/<chủ đề> (chủ dự án chốt 15/11/2026). Mọi hộp thoại có
 # nút "Hướng dẫn" mở đúng bài của lệnh đang chạy; lệnh không có bài riêng mở trang chung.
 GUIDE_BASE = "https://1xag.com/office/"
-GUIDE_TOPICS = {"AiAsk": "ai", "AiRewrite": "ai", "AiSkill": "skill", "AiAccounts": "tai-khoan-ai",
+GUIDE_TOPICS = {"UiVietnamese": "ngon-ngu", "UiEnglish": "ngon-ngu", "AiAsk": "ai", "AiRewrite": "ai", "AiSkill": "skill", "AiAccounts": "tai-khoan-ai",
                 "McpTools": "mcp", "McpServer": "mcp", "Nd30Document": "nd30", "Nd30Gallery": "nd30",
                 "Nd30Check": "kiem-the-thuc", "NewCongVan": "nd30", "NewToTrinh": "nd30", "NewQuyetDinh": "nd30",
                 "NewBienBan": "nd30", "OpenCsvSafely": "csv", "ConvertTCVN3": "tieng-viet", "ConvertVNI": "tieng-viet",
@@ -1535,6 +1568,40 @@ class GuideSeeder(unohelper.Base, XJob):
             order.insertByName(str(i), ref)
         histories.commitChanges()
         self.reload_start_center()
+
+    def swap_language(self, locale):
+        """Thay các tệp hướng dẫn nhanh trong mục Gần đây bằng bản đúng ngôn ngữ mới (chủ dự án: hướng dẫn phải có
+        cả tiếng Việt lẫn tiếng Anh). Chỉ đụng tới tệp hướng dẫn đi kèm app; tài liệu của người dùng giữ nguyên chỗ."""
+        import base64
+        from vn1x.guides import guide_files, thumbnail_png
+        subst = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.util.PathSubstitution", self.ctx)
+        root = uno.fileUrlToSystemPath(subst.substituteVariables("$(inst)", True)) + "/Resources/guides"
+        root_url = uno.systemPathToFileUrl(root)
+        histories = self._config("/org.openoffice.Office.Histories/Histories", update=True)
+        pick = histories.getByName("PickList")
+        items, order = pick.getByName("ItemList"), pick.getByName("OrderList")
+        names = sorted(order.ElementNames, key=lambda n: int(n) if n.isdigit() else 0)
+        refs = [order.getByName(n).HistoryItemRef for n in names]
+        kept = [r for r in refs if not r.startswith(root_url)]
+        for url in list(items.ElementNames):
+            if url.startswith(root_url):
+                items.removeByName(url)
+        for n in names:
+            order.removeByName(n)
+        fresh = []
+        for path, filt in guide_files(root, locale):
+            url = uno.systemPathToFileUrl(str(path))
+            item = items.createInstance()
+            png = thumbnail_png(path)
+            thumb = base64.b64encode(png).decode("ascii") if png else ""
+            item.Filter, item.Title, item.Thumbnail, item.ReadOnly, item.Pinned = filt, path.name, thumb, False, False
+            items.insertByName(url, item)
+            fresh.append(url)
+        for i, url in enumerate(kept + fresh):
+            ref = order.createInstance()
+            ref.HistoryItemRef = url
+            order.insertByName(str(i), ref)
+        histories.commitChanges()
 
     def reload_start_center(self):
         desktop = self.ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", self.ctx)

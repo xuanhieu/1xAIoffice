@@ -126,6 +126,36 @@
       <node oor:name="vnd.1x.tools:NewBienBan" oor:op="replace">
           <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Minutes (Decree 30)</value><value xml:lang="vi">Biên bản</value></prop>
       </node>
+      <node oor:name="vnd.1x.tools:StartColName" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">File name</value><value xml:lang="vi">Tên tệp</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartColWhere" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Location</value><value xml:lang="vi">Vị trí</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartColDate" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Last modified</value><value xml:lang="vi">Sửa lần cuối</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartColSize" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Size</value><value xml:lang="vi">Dung lượng</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartToday" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Today</value><value xml:lang="vi">Hôm nay</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartYesterday" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Yesterday</value><value xml:lang="vi">Hôm qua</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartWeek" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Within 7 days</value><value xml:lang="vi">Trong 7 ngày</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:StartOlder" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Older</value><value xml:lang="vi">Cũ hơn</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:UiVietnamese" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">Tiếng Việt</value><value xml:lang="vi">Tiếng Việt</value></prop>
+      </node>
+      <node oor:name="vnd.1x.tools:UiEnglish" oor:op="replace">
+          <prop oor:name="Label" oor:type="xs:string"><value xml:lang="en-US">English</value><value xml:lang="vi">English</value></prop>
+      </node>
     </node>
   </node>
 </oor:component-data>
